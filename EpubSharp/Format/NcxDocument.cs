@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using EpubSharp.Schema.Navigation;
 
 namespace EpubSharp.Format
 {
@@ -11,9 +10,9 @@ namespace EpubSharp.Format
         public IReadOnlyCollection<EpubNcxMetadata> Metadata { get; internal set; }
         public IReadOnlyCollection<string> DocTitle { get; internal set; }
         public IReadOnlyCollection<string> DocAuthors { get; internal set; }
-        public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationPoints { get; internal set; }
-        public IReadOnlyCollection<EpubNavigationPageTarget> PageList { get; internal set; }
-        public IReadOnlyCollection<EpubNavigationList> NavLists { get; internal set; }
+        public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationMap { get; internal set; }
+        public IReadOnlyCollection<EpubNcxPageTarget> PageList { get; internal set; }
+        public IReadOnlyCollection<EpubNcxNavigationList> NavigationList { get; internal set; }
     }
 
     public class EpubNcxMetadata
@@ -36,5 +35,41 @@ namespace EpubSharp.Format
         {
             return $"Id: {Id}, ContentSource: {ContentSource}";
         }
+    }
+
+    public enum EpubNcxPageTargetType
+    {
+        Front = 1,
+        Normal,
+        Special
+    }
+
+    public class EpubNcxPageTarget
+    {
+        public string Id { get; internal set; }
+        public string Value { get; internal set; }
+        public string Class { get; internal set; }
+        public string PlayOrder { get; internal set; }
+        public EpubNcxPageTargetType Type { get; internal set; }
+        public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
+        public string ContentSource { get; internal set; }
+    }
+
+    public class EpubNcxNavigationList
+    {
+        public string Id { get; internal set; }
+        public string Class { get; internal set; }
+        public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
+        public List<EpubNcxNavigationTarget> NavigationTargets { get; internal set; }
+    }
+
+    public class EpubNcxNavigationTarget
+    {
+        public string Id { get; internal set; }
+        public string Class { get; internal set; }
+        public string Value { get; internal set; }
+        public string PlayOrder { get; internal set; }
+        public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
+        public string ContentSource { get; internal set; }
     }
 }

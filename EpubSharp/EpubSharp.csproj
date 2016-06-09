@@ -55,10 +55,6 @@
     <Compile Include="Readers\PackageReader.cs" />
     <Compile Include="Readers\OcfReader.cs" />
     <Compile Include="Readers\PackageDocumentReader.cs" />
-    <Compile Include="Format\Navigation\EpubNavigationList.cs" />
-    <Compile Include="Format\Navigation\EpubNavigationPageTarget.cs" />
-    <Compile Include="Format\Navigation\EpubNavigationPageTargetType.cs" />
-    <Compile Include="Format\Navigation\EpubNavigationTarget.cs" />
     <Compile Include="Utils\XmlUtils.cs" />
     <Compile Include="Utils\ZipPathUtils.cs" />
   </ItemGroup>

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Xml;
 using EpubSharp.Format;
 using EpubSharp.Readers;
-using EpubSharp.Schema.Navigation;
 using EpubSharp.Utils;
 
 namespace EpubSharp
@@ -84,7 +83,7 @@ namespace EpubSharp
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
         {
-            return LoadChapters(book, book.Format.Ncx.NavigationPoints, epubArchive);
+            return LoadChapters(book, book.Format.Ncx.NavigationMap, epubArchive);
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
