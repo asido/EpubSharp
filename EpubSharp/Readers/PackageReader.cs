@@ -30,8 +30,7 @@ namespace EpubSharp.Readers
             XmlNode manifestNode = packageNode.SelectSingleNode("opf:manifest", xmlNamespaceManager);
             if (manifestNode == null)
                 throw new Exception("EPUB parsing error: manifest not found in the package.");
-            EpubManifest manifest = ReadManifest(manifestNode);
-            result.Manifest = manifest;
+            result.Manifest = ReadManifest(manifestNode);
             XmlNode spineNode = packageNode.SelectSingleNode("opf:spine", xmlNamespaceManager);
             if (spineNode == null)
                 throw new Exception("EPUB parsing error: spine not found in the package.");
@@ -265,9 +264,9 @@ namespace EpubSharp.Readers
             return result;
         }
 
-        private static EpubManifest ReadManifest(XmlNode manifestNode)
+        private static IReadOnlyCollection<EpubManifestItem> ReadManifest(XmlNode manifestNode)
         {
-            EpubManifest result = new EpubManifest();
+            var result = new List<EpubManifestItem>();
             foreach (XmlNode manifestItemNode in manifestNode.ChildNodes)
                 if (String.Compare(manifestItemNode.LocalName, "item", StringComparison.OrdinalIgnoreCase) == 0)
                 {
