@@ -62,4 +62,20 @@ namespace EpubSharp.Format
         public string Property { get; internal set; }
         public string Scheme { get; internal set; }
     }
+
+    public class EpubManifestItem
+    {
+        public string Id { get; internal set; }
+        public string Href { get; internal set; }
+        public string MediaType { get; internal set; }
+        public string RequiredNamespace { get; internal set; }
+        public string RequiredModules { get; internal set; }
+        public string Fallback { get; internal set; }
+        public string FallbackStyle { get; internal set; }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Href = {Href}, MediaType = {MediaType}";
+        }
+    }
 }
