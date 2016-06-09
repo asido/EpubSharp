@@ -20,22 +20,22 @@ namespace EpubSharp.Format
 
     public class EpubMetadata
     {
-        public IReadOnlyCollection<string> Titles { get; set; }
-        public IReadOnlyCollection<EpubMetadataCreator> Creators { get; set; }
-        public IReadOnlyCollection<string> Subjects { get; set; }
-        public string Description { get; set; }
-        public IReadOnlyCollection<string> Publishers { get; set; }
-        public IReadOnlyCollection<EpubMetadataCreator> Contributors { get; set; }
-        public string Date { get; set; }
-        public IReadOnlyCollection<string> Types { get; set; }
-        public IReadOnlyCollection<string> Formats { get; set; }
-        public IReadOnlyCollection<EpubMetadataIdentifier> Identifiers { get; set; }
-        public IReadOnlyCollection<string> Sources { get; set; }
-        public IReadOnlyCollection<string> Languages { get; set; }
-        public IReadOnlyCollection<string> Relations { get; set; }
-        public IReadOnlyCollection<string> Coverages { get; set; }
-        public IReadOnlyCollection<string> Rights { get; set; }
-        public IReadOnlyCollection<EpubMetadataMeta> MetaItems { get; set; }
+        public IReadOnlyCollection<string> Titles { get; internal set; }
+        public IReadOnlyCollection<EpubMetadataCreator> Creators { get; internal set; }
+        public IReadOnlyCollection<string> Subjects { get; internal set; }
+        public string Description { get; internal set; }
+        public IReadOnlyCollection<string> Publishers { get; internal set; }
+        public IReadOnlyCollection<EpubMetadataCreator> Contributors { get; internal set; }
+        public string Date { get; internal set; }
+        public IReadOnlyCollection<string> Types { get; internal set; }
+        public IReadOnlyCollection<string> Formats { get; internal set; }
+        public IReadOnlyCollection<EpubMetadataIdentifier> Identifiers { get; internal set; }
+        public IReadOnlyCollection<string> Sources { get; internal set; }
+        public IReadOnlyCollection<string> Languages { get; internal set; }
+        public IReadOnlyCollection<string> Relations { get; internal set; }
+        public IReadOnlyCollection<string> Coverages { get; internal set; }
+        public IReadOnlyCollection<string> Rights { get; internal set; }
+        public IReadOnlyCollection<EpubMetadataMeta> MetaItems { get; internal set; }
     }
 
     public class EpubMetadataCreator
@@ -48,18 +48,18 @@ namespace EpubSharp.Format
 
     public class EpubMetadataIdentifier
     {
-        public string Id { get; set; }
-        public string Scheme { get; set; }
-        public string Text { get; set; }
+        public string Id { get; internal set; }
+        public string Scheme { get; internal set; }
+        public string Text { get; internal set; }
     }
 
     public class EpubMetadataMeta
     {
-        public string Name { get; set; }
-        public string Content { get; set; }
-        public string Id { get; set; }
-        public string Refines { get; set; }
-        public string Property { get; set; }
-        public string Scheme { get; set; }
+        public string Name { get; internal set; }
+        public string Content { get; internal set; }
+        public string Id { get; internal set; }
+        public string Refines { get; internal set; }
+        public string Property { get; internal set; }
+        public string Scheme { get; internal set; }
     }
 }
