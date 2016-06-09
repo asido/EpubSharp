@@ -22,7 +22,7 @@ namespace EpubSharp.Readers
             if (tocManifestItem == null)
                 throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
             string tocFileEntryPath = ZipPathUtils.Combine(contentDirectoryPath, tocManifestItem.Href);
-            ZipArchiveEntry tocFileEntry = epubArchive.GetEntry(tocFileEntryPath);
+            ZipArchiveEntry tocFileEntry = epubArchive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
             if (tocFileEntry == null)
                 throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} not found in archive.");
             if (tocFileEntry.Length > Int32.MaxValue)

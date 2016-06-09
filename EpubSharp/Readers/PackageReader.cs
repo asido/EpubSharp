@@ -12,7 +12,7 @@ namespace EpubSharp.Readers
     {
         public static EpubPackage ReadPackage(ZipArchive epubArchive, string rootFilePath)
         {
-            ZipArchiveEntry rootFileEntry = epubArchive.GetEntry(rootFilePath);
+            ZipArchiveEntry rootFileEntry = epubArchive.GetEntryIgnoringSlashDirection(rootFilePath);
             if (rootFileEntry == null)
                 throw new Exception("EPUB parsing error: root file not found in archive.");
             XmlDocument containerDocument;
@@ -309,7 +309,7 @@ namespace EpubSharp.Readers
         {
             EpubSpine result = new EpubSpine();
             XmlAttribute tocAttribute = spineNode.Attributes["toc"];
-            if (tocAttribute == null || String.IsNullOrWhiteSpace(tocAttribute.Value))
+            if (tocAttribute == null || string.IsNullOrWhiteSpace(tocAttribute.Value))
                 throw new Exception("Incorrect EPUB spine: TOC is missing");
             result.Toc = tocAttribute.Value;
             foreach (XmlNode spineItemNode in spineNode.ChildNodes)

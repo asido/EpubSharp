@@ -11,7 +11,7 @@ namespace EpubSharp.Readers
         public static string GetRootFilePath(ZipArchive epubArchive)
         {
             const string epubContainerFilePath = "META-INF/container.xml";
-            ZipArchiveEntry containerFileEntry = epubArchive.GetEntry(epubContainerFilePath);
+            ZipArchiveEntry containerFileEntry = epubArchive.GetEntryIgnoringSlashDirection(epubContainerFilePath);
             if (containerFileEntry == null)
                 throw new Exception(string.Format("EPUB parsing error: {0} file not found in archive.", epubContainerFilePath));
             XmlDocument containerDocument;
