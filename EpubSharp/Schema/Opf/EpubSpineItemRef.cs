@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EpubSharp.Schema.Opf
 {
@@ -13,7 +9,7 @@ namespace EpubSharp.Schema.Opf
 
         public override string ToString()
         {
-            return String.Concat("IdRef: ", IdRef);
+            return "IdRef: " + IdRef;
         }
     }
 }

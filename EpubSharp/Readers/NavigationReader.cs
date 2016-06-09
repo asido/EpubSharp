@@ -8,7 +8,7 @@ using EpubSharp.Schema.Navigation;
 using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;
 
-namespace EpubSharp.Schema.Readers
+namespace EpubSharp.Readers
 {
     internal static class NavigationReader
     {
@@ -18,15 +18,15 @@ namespace EpubSharp.Schema.Readers
             string tocId = package.Spine.Toc;
             if (String.IsNullOrEmpty(tocId))
                 throw new Exception("EPUB parsing error: TOC ID is empty.");
-            EpubManifestItem tocManifestItem = package.Manifest.FirstOrDefault(item => String.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
+            EpubManifestItem tocManifestItem = package.Manifest.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
             if (tocManifestItem == null)
-                throw new Exception(String.Format("EPUB parsing error: TOC item {0} not found in EPUB manifest.", tocId));
+                throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
             string tocFileEntryPath = ZipPathUtils.Combine(contentDirectoryPath, tocManifestItem.Href);
             ZipArchiveEntry tocFileEntry = epubArchive.GetEntry(tocFileEntryPath);
             if (tocFileEntry == null)
-                throw new Exception(String.Format("EPUB parsing error: TOC file {0} not found in archive.", tocFileEntryPath));
+                throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} not found in archive.");
             if (tocFileEntry.Length > Int32.MaxValue)
-                throw new Exception(String.Format("EPUB parsing error: TOC file {0} is bigger than 2 Gb.", tocFileEntryPath));
+                throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} is bigger than 2 Gb.");
             XmlDocument containerDocument;
             using (Stream containerStream = tocFileEntry.Open())
                 containerDocument = XmlUtils.LoadDocument(containerStream);
@@ -91,7 +91,7 @@ namespace EpubSharp.Schema.Readers
                                 break;
                         }
                     }
-                    if (String.IsNullOrWhiteSpace(meta.Name))
+                    if (string.IsNullOrWhiteSpace(meta.Name))
                         throw new Exception("Incorrect EPUB navigation meta: meta name is missing");
                     if (meta.Content == null)
                         throw new Exception("Incorrect EPUB navigation meta: meta content is missing");
@@ -102,18 +102,18 @@ namespace EpubSharp.Schema.Readers
 
         private static EpubNavigationDocTitle ReadNavigationDocTitle(XmlNode docTitleNode)
         {
-            EpubNavigationDocTitle result = new EpubNavigationDocTitle();
+            var result = new EpubNavigationDocTitle();
             foreach (XmlNode textNode in docTitleNode.ChildNodes)
-                if (String.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0)
                     result.Add(textNode.InnerText);
             return result;
         }
 
         private static EpubNavigationDocAuthor ReadNavigationDocAuthor(XmlNode docAuthorNode)
         {
-            EpubNavigationDocAuthor result = new EpubNavigationDocAuthor();
+            var result = new EpubNavigationDocAuthor();
             foreach (XmlNode textNode in docAuthorNode.ChildNodes)
-                if (String.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0)
                     result.Add(textNode.InnerText);
             return result;
         }
@@ -122,11 +122,13 @@ namespace EpubSharp.Schema.Readers
         {
             EpubNavigationMap result = new EpubNavigationMap();
             foreach (XmlNode navigationPointNode in navigationMapNode.ChildNodes)
-                if (String.Compare(navigationPointNode.LocalName, "navPoint", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                if (string.Compare(navigationPointNode.LocalName, "navPoint", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    EpubNavigationPoint navigationPoint = ReadNavigationPoint(navigationPointNode);
+                    var navigationPoint = ReadNavigationPoint(navigationPointNode);
                     result.Add(navigationPoint);
                 }
+            }
             return result;
         }
 
@@ -135,7 +137,7 @@ namespace EpubSharp.Schema.Readers
             EpubNavigationPoint result = new EpubNavigationPoint();
             foreach (XmlAttribute navigationPointNodeAttribute in navigationPointNode.Attributes)
             {
-                string attributeValue = navigationPointNodeAttribute.Value;
+                var attributeValue = navigationPointNodeAttribute.Value;
                 switch (navigationPointNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "id":
@@ -149,7 +151,7 @@ namespace EpubSharp.Schema.Readers
                         break;
                 }
             }
-            if (String.IsNullOrWhiteSpace(result.Id))
+            if (string.IsNullOrWhiteSpace(result.Id))
                 throw new Exception("Incorrect EPUB navigation point: point ID is missing");
             result.NavigationLabels = new List<EpubNavigationLabel>();
             result.ChildNavigationPoints = new List<EpubNavigationPoint>();
@@ -170,17 +172,17 @@ namespace EpubSharp.Schema.Readers
                         break;
                 }
             if (!result.NavigationLabels.Any())
-                throw new Exception(String.Format("EPUB parsing error: navigation point {0} should contain at least one navigation label", result.Id));
+                throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain at least one navigation label");
             if (result.Content == null)
-                throw new Exception(String.Format("EPUB parsing error: navigation point {0} should contain content", result.Id));
+                throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain content");
             return result;
         }
 
         private static EpubNavigationLabel ReadNavigationLabel(XmlNode navigationLabelNode)
         {
-            EpubNavigationLabel result = new EpubNavigationLabel();
-            XmlNode navigationLabelTextNode = navigationLabelNode.ChildNodes.OfType<XmlNode>().
-                Where(node => String.Compare(node.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
+            var result = new EpubNavigationLabel();
+            var navigationLabelTextNode = navigationLabelNode.ChildNodes.OfType<XmlNode>().
+                Where(node => string.Compare(node.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0).FirstOrDefault();
             if (navigationLabelTextNode == null)
                 throw new Exception("Incorrect EPUB navigation label: label text element is missing");
             result.Text = navigationLabelTextNode.InnerText;
@@ -189,10 +191,10 @@ namespace EpubSharp.Schema.Readers
 
         private static EpubNavigationContent ReadNavigationContent(XmlNode navigationContentNode)
         {
-            EpubNavigationContent result = new EpubNavigationContent();
+            var result = new EpubNavigationContent();
             foreach (XmlAttribute navigationContentNodeAttribute in navigationContentNode.Attributes)
             {
-                string attributeValue = navigationContentNodeAttribute.Value;
+                var attributeValue = navigationContentNodeAttribute.Value;
                 switch (navigationContentNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "id":
@@ -203,16 +205,16 @@ namespace EpubSharp.Schema.Readers
                         break;
                 }
             }
-            if (String.IsNullOrWhiteSpace(result.Source))
+            if (string.IsNullOrWhiteSpace(result.Source))
                 throw new Exception("Incorrect EPUB navigation content: content source is missing");
             return result;
         }
 
         private static EpubNavigationPageList ReadNavigationPageList(XmlNode navigationPageListNode)
         {
-            EpubNavigationPageList result = new EpubNavigationPageList();
+            var result = new EpubNavigationPageList();
             foreach (XmlNode pageTargetNode in navigationPageListNode.ChildNodes)
-                if (String.Compare(pageTargetNode.LocalName, "pageTarget", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(pageTargetNode.LocalName, "pageTarget", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     EpubNavigationPageTarget pageTarget = ReadNavigationPageTarget(pageTargetNode);
                     result.Add(pageTarget);
@@ -222,10 +224,10 @@ namespace EpubSharp.Schema.Readers
 
         private static EpubNavigationPageTarget ReadNavigationPageTarget(XmlNode navigationPageTargetNode)
         {
-            EpubNavigationPageTarget result = new EpubNavigationPageTarget();
+            var result = new EpubNavigationPageTarget();
             foreach (XmlAttribute navigationPageTargetNodeAttribute in navigationPageTargetNode.Attributes)
             {
-                string attributeValue = navigationPageTargetNodeAttribute.Value;
+                var attributeValue = navigationPageTargetNodeAttribute.Value;
                 switch (navigationPageTargetNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "id":
@@ -236,8 +238,8 @@ namespace EpubSharp.Schema.Readers
                         break;
                     case "type":
                         EpubNavigationPageTargetType type;
-                        if (!Enum.TryParse<EpubNavigationPageTargetType>(attributeValue, out type))
-                            throw new Exception(String.Format("Incorrect EPUB navigation page target: {0} is incorrect value for page target type", attributeValue));
+                        if (!Enum.TryParse(attributeValue, out type))
+                            throw new Exception($"Incorrect EPUB navigation page target: {attributeValue} is incorrect value for page target type");
                         result.Type = type;
                         break;
                     case "class":
@@ -269,10 +271,10 @@ namespace EpubSharp.Schema.Readers
 
         private static EpubNavigationList ReadNavigationList(XmlNode navigationListNode)
         {
-            EpubNavigationList result = new EpubNavigationList();
+            var result = new EpubNavigationList();
             foreach (XmlAttribute navigationListNodeAttribute in navigationListNode.Attributes)
             {
-                string attributeValue = navigationListNodeAttribute.Value;
+                var attributeValue = navigationListNodeAttribute.Value;
                 switch (navigationListNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "id":
@@ -287,11 +289,11 @@ namespace EpubSharp.Schema.Readers
                 switch (navigationListChildNode.LocalName.ToLowerInvariant())
                 {
                     case "navlabel":
-                        EpubNavigationLabel navigationLabel = ReadNavigationLabel(navigationListChildNode);
+                        var navigationLabel = ReadNavigationLabel(navigationListChildNode);
                         result.NavigationLabels.Add(navigationLabel);
                         break;
                     case "navTarget":
-                        EpubNavigationTarget navigationTarget = ReadNavigationTarget(navigationListChildNode);
+                        var navigationTarget = ReadNavigationTarget(navigationListChildNode);
                         result.NavigationTargets.Add(navigationTarget);
                         break;
                 }
@@ -302,10 +304,10 @@ namespace EpubSharp.Schema.Readers
 
         private static EpubNavigationTarget ReadNavigationTarget(XmlNode navigationTargetNode)
         {
-            EpubNavigationTarget result = new EpubNavigationTarget();
+            var result = new EpubNavigationTarget();
             foreach (XmlAttribute navigationPageTargetNodeAttribute in navigationTargetNode.Attributes)
             {
-                string attributeValue = navigationPageTargetNodeAttribute.Value;
+                var attributeValue = navigationPageTargetNodeAttribute.Value;
                 switch (navigationPageTargetNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "id":
@@ -322,17 +324,17 @@ namespace EpubSharp.Schema.Readers
                         break;
                 }
             }
-            if (String.IsNullOrWhiteSpace(result.Id))
+            if (string.IsNullOrWhiteSpace(result.Id))
                 throw new Exception("Incorrect EPUB navigation target: navigation target ID is missing");
             foreach (XmlNode navigationTargetChildNode in navigationTargetNode.ChildNodes)
                 switch (navigationTargetChildNode.LocalName.ToLowerInvariant())
                 {
                     case "navlabel":
-                        EpubNavigationLabel navigationLabel = ReadNavigationLabel(navigationTargetChildNode);
+                        var navigationLabel = ReadNavigationLabel(navigationTargetChildNode);
                         result.NavigationLabels.Add(navigationLabel);
                         break;
                     case "content":
-                        EpubNavigationContent content = ReadNavigationContent(navigationTargetChildNode);
+                        var content = ReadNavigationContent(navigationTargetChildNode);
                         result.Content = content;
                         break;
                 }

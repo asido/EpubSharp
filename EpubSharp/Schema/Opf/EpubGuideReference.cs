@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EpubSharp.Schema.Opf
 {
@@ -14,7 +10,7 @@ namespace EpubSharp.Schema.Opf
 
         public override string ToString()
         {
-            return String.Format("Type: {0}, Href: {1}", Type, Href);
+            return $"Type: {Type}, Href: {Href}";
         }
     }
 }

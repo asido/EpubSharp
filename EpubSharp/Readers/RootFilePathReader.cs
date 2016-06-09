@@ -4,7 +4,7 @@ using System.IO.Compression;
 using System.Xml;
 using EpubSharp.Utils;
 
-namespace EpubSharp.Schema.Readers
+namespace EpubSharp.Readers
 {
     internal static class RootFilePathReader
     {

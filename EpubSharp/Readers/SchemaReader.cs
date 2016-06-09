@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 using EpubSharp.Entities;
 using EpubSharp.Schema.Navigation;
 using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;
 
-namespace EpubSharp.Schema.Readers
+namespace EpubSharp.Readers
 {
     internal static class SchemaReader
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EpubSharp.Schema.Navigation
+﻿namespace EpubSharp.Schema.Navigation
 {
     public class EpubNavigationContent
     {
@@ -13,7 +7,7 @@ namespace EpubSharp.Schema.Navigation
 
         public override string ToString()
         {
-            return String.Concat("Source: " + Source);
+            return "Source: " + Source;
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Xml;
 using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;
 
-namespace EpubSharp.Schema.Readers
+namespace EpubSharp.Readers
 {
     internal static class PackageReader
     {
@@ -24,10 +24,10 @@ namespace EpubSharp.Schema.Readers
             EpubPackage result = new EpubPackage();
             string epubVersionValue = packageNode.Attributes["version"].Value;
             if (epubVersionValue == "2.0")
-                result.EpubVersion = EpubVersion.EPUB_2;
+                result.EpubVersion = EpubVersion.Epub2;
             else
                 if (epubVersionValue == "3.0")
-                    result.EpubVersion = EpubVersion.EPUB_3;
+                    result.EpubVersion = EpubVersion.Epub3;
                 else
                     throw new Exception(String.Format("Unsupported EPUB version: {0}.", epubVersionValue));
             XmlNode metadataNode = packageNode.SelectSingleNode("opf:metadata", xmlNamespaceManager);
@@ -127,13 +127,13 @@ namespace EpubSharp.Schema.Readers
                         result.Rights.Add(innerText);
                         break;
                     case "meta":
-                        if (epubVersion == EpubVersion.EPUB_2)
+                        if (epubVersion == EpubVersion.Epub2)
                         {
                             EpubMetadataMeta meta = ReadMetadataMetaVersion2(metadataItemNode);
                             result.MetaItems.Add(meta);
                         }
                         else
-                            if (epubVersion == EpubVersion.EPUB_3)
+                            if (epubVersion == EpubVersion.Epub3)
                             {
                                 EpubMetadataMeta meta = ReadMetadataMetaVersion3(metadataItemNode);
                                 result.MetaItems.Add(meta);

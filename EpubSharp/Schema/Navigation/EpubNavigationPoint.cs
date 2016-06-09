@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EpubSharp.Schema.Navigation
 {
@@ -17,7 +14,7 @@ namespace EpubSharp.Schema.Navigation
 
         public override string ToString()
         {
-            return String.Format("Id: {0}, Content.Source: {1}", Id, Content.Source);
+            return $"Id: {Id}, Content.Source: {Content.Source}";
         }
     }
 }

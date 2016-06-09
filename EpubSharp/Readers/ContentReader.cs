@@ -6,7 +6,7 @@ using EpubSharp.Entities;
 using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;
 
-namespace EpubSharp.Schema.Readers
+namespace EpubSharp.Readers
 {
     internal static class ContentReader
     {
@@ -25,21 +25,21 @@ namespace EpubSharp.Schema.Readers
                 string contentFilePath = ZipPathUtils.Combine(book.Schema.ContentDirectoryPath, manifestItem.Href);
                 ZipArchiveEntry contentFileEntry = epubArchive.GetEntry(contentFilePath);
                 if (contentFileEntry == null)
-                    throw new Exception(String.Format("EPUB parsing error: file {0} not found in archive.", contentFilePath));
+                    throw new Exception($"EPUB parsing error: file {contentFilePath} not found in archive.");
                 if (contentFileEntry.Length > Int32.MaxValue)
-                    throw new Exception(String.Format("EPUB parsing error: file {0} is bigger than 2 Gb.", contentFilePath));
+                    throw new Exception($"EPUB parsing error: file {contentFilePath} is bigger than 2 Gb.");
                 string fileName = manifestItem.Href;
                 string contentMimeType = manifestItem.MediaType;
                 EpubContentType contentType = GetContentTypeByContentMimeType(contentMimeType);
                 switch (contentType)
                 {
-                    case EpubContentType.XHTML_1_1:
-                    case EpubContentType.CSS:
-                    case EpubContentType.OEB1_DOCUMENT:
-                    case EpubContentType.OEB1_CSS:
-                    case EpubContentType.XML:
-                    case EpubContentType.DTBOOK:
-                    case EpubContentType.DTBOOK_NCX:
+                    case EpubContentType.Xhtml11:
+                    case EpubContentType.Css:
+                    case EpubContentType.Oeb1Document:
+                    case EpubContentType.Oeb1Css:
+                    case EpubContentType.Xml:
+                    case EpubContentType.Dtbook:
+                    case EpubContentType.DtbookNcx:
                         EpubTextContentFile epubTextContentFile = new EpubTextContentFile
                         {
                             FileName = fileName,
@@ -49,16 +49,16 @@ namespace EpubSharp.Schema.Readers
                         using (Stream contentStream = contentFileEntry.Open())
                         {
                             if (contentStream == null)
-                                throw new Exception(String.Format("Incorrect EPUB file: content file \"{0}\" specified in manifest is not found", fileName));
+                                throw new Exception($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
                             using (StreamReader streamReader = new StreamReader(contentStream))
                                 epubTextContentFile.Content = streamReader.ReadToEnd();
                         }
                         switch (contentType)
                         {
-                            case EpubContentType.XHTML_1_1:
+                            case EpubContentType.Xhtml11:
                                 result.Html.Add(fileName, epubTextContentFile);
                                 break;
-                            case EpubContentType.CSS:
+                            case EpubContentType.Css:
                                 result.Css.Add(fileName, epubTextContentFile);
                                 break;
                         }
@@ -74,8 +74,8 @@ namespace EpubSharp.Schema.Readers
                         using (Stream contentStream = contentFileEntry.Open())
                         {
                             if (contentStream == null)
-                                throw new Exception(String.Format("Incorrect EPUB file: content file \"{0}\" specified in manifest is not found", fileName));
-                            using (MemoryStream memoryStream = new MemoryStream((int)contentFileEntry.Length))
+                                throw new Exception($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
+                            using (var memoryStream = new MemoryStream((int)contentFileEntry.Length))
                             {
                                 contentStream.CopyTo(memoryStream);
                                 epubByteContentFile.Content = memoryStream.ToArray();
@@ -83,14 +83,14 @@ namespace EpubSharp.Schema.Readers
                         }
                         switch (contentType)
                         {
-                            case EpubContentType.IMAGE_GIF:
-                            case EpubContentType.IMAGE_JPEG:
-                            case EpubContentType.IMAGE_PNG:
-                            case EpubContentType.IMAGE_SVG:
+                            case EpubContentType.ImageGif:
+                            case EpubContentType.ImageJpeg:
+                            case EpubContentType.ImagePng:
+                            case EpubContentType.ImageSvg:
                                 result.Images.Add(fileName, epubByteContentFile);
                                 break;
-                            case EpubContentType.FONT_TRUETYPE:
-                            case EpubContentType.FONT_OPENTYPE:
+                            case EpubContentType.FontTruetype:
+                            case EpubContentType.FontOpentype:
                                 result.Fonts.Add(fileName, epubByteContentFile);
                                 break;
                         }
@@ -106,35 +106,35 @@ namespace EpubSharp.Schema.Readers
             switch (contentMimeType.ToLowerInvariant())
             {
                 case "application/xhtml+xml":
-                    return EpubContentType.XHTML_1_1;
+                    return EpubContentType.Xhtml11;
                 case "application/x-dtbook+xml":
-                    return EpubContentType.DTBOOK;
+                    return EpubContentType.Dtbook;
                 case "application/x-dtbncx+xml":
-                    return EpubContentType.DTBOOK_NCX;
+                    return EpubContentType.DtbookNcx;
                 case "text/x-oeb1-document":
-                    return EpubContentType.OEB1_DOCUMENT;
+                    return EpubContentType.Oeb1Document;
                 case "application/xml":
-                    return EpubContentType.XML;
+                    return EpubContentType.Xml;
                 case "text/css":
-                    return EpubContentType.CSS;
+                    return EpubContentType.Css;
                 case "text/x-oeb1-css":
-                    return EpubContentType.OEB1_CSS;
+                    return EpubContentType.Oeb1Css;
                 case "image/gif":
-                    return EpubContentType.IMAGE_GIF;
+                    return EpubContentType.ImageGif;
                 case "image/jpeg":
-                    return EpubContentType.IMAGE_JPEG;
+                    return EpubContentType.ImageJpeg;
                 case "image/png":
-                    return EpubContentType.IMAGE_PNG;
+                    return EpubContentType.ImagePng;
                 case "image/svg+xml":
-                    return EpubContentType.IMAGE_SVG;
+                    return EpubContentType.ImageSvg;
                 case "font/truetype":
-                    return EpubContentType.FONT_TRUETYPE;
+                    return EpubContentType.FontTruetype;
                 case "font/opentype":
-                    return EpubContentType.FONT_OPENTYPE;
+                    return EpubContentType.FontOpentype;
                 case "application/vnd.ms-opentype":
-                    return EpubContentType.FONT_OPENTYPE;
+                    return EpubContentType.FontOpentype;
                 default:
-                    return EpubContentType.OTHER;
+                    return EpubContentType.Other;
             }
         }
     }
