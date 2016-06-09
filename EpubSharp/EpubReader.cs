@@ -20,10 +20,10 @@ namespace EpubSharp
             using (var archive = ZipFile.OpenRead(filePath))
             {
                 book.Format = new EpubFormat();
-                book.Format.PackageDocument = SchemaReader.ReadSchema(archive);
-                book.Format.Ncx = NcxReader.ReadNavigation(archive, book.Format.PackageDocument.ContentDirectoryPath, book.Format.PackageDocument);
-                book.Title = book.Format.PackageDocument.Metadata.Titles.FirstOrDefault() ?? string.Empty;
-                book.AuthorList = book.Format.PackageDocument.Metadata.Creators.Select(creator => creator.Creator).ToList();
+                book.Format.Package = SchemaReader.ReadSchema(archive);
+                book.Format.Ncx = NcxReader.ReadNavigation(archive, book.Format.Package.ContentDirectoryPath, book.Format.Package);
+                book.Title = book.Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
+                book.AuthorList = book.Format.Package.Metadata.Creators.Select(creator => creator.Creator).ToList();
                 book.Author = string.Join(", ", book.AuthorList);
                 book.Content = ContentReader.ReadContentFiles(archive, book);
                 book.CoverImage = LoadCoverImage(book);
@@ -34,7 +34,7 @@ namespace EpubSharp
 
         private static Image LoadCoverImage(EpubBook book)
         {
-            var metaItems = book.Format.PackageDocument.Metadata.MetaItems;
+            var metaItems = book.Format.Package.Metadata.MetaItems;
             if (metaItems == null || !metaItems.Any())
                 return null;
             var coverMetaItem = metaItems.FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
@@ -42,7 +42,7 @@ namespace EpubSharp
                 return null;
             if (string.IsNullOrEmpty(coverMetaItem.Content))
                 throw new Exception("Incorrect EPUB metadata: cover item content is missing");
-            var coverManifestItem = book.Format.PackageDocument.Manifest.FirstOrDefault(manifestItem => string.Compare(manifestItem.Id, coverMetaItem.Content, StringComparison.OrdinalIgnoreCase) == 0);
+            var coverManifestItem = book.Format.Package.Manifest.FirstOrDefault(manifestItem => string.Compare(manifestItem.Id, coverMetaItem.Content, StringComparison.OrdinalIgnoreCase) == 0);
             if (coverManifestItem == null)
                 throw new Exception($"Incorrect EPUB manifest: item with ID = \"{coverMetaItem.Content}\" is missing");
             EpubByteContentFile coverImageContentFile;
