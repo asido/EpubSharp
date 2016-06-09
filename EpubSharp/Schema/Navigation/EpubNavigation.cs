@@ -9,6 +9,6 @@ namespace EpubSharp.Schema.Navigation
         public IReadOnlyCollection<string> DocAuthors { get; set; }
         public IReadOnlyCollection<EpubNavigationPoint> NavMap { get; set; }
         public IReadOnlyCollection<EpubNavigationPageTarget> PageList { get; set; }
-        public List<EpubNavigationList> NavLists { get; set; }
+        public IReadOnlyCollection<EpubNavigationList> NavLists { get; set; }
     }
 }

@@ -57,12 +57,8 @@ namespace EpubSharp.Readers
             {
                 result.PageList = ReadNavigationPageList(pageListNode);
             }
-            result.NavLists = new List<EpubNavigationList>();
-            foreach (XmlNode navigationListNode in containerDocument.DocumentElement.SelectNodes("ncx:navList", xmlNamespaceManager))
-            {
-                EpubNavigationList navigationList = ReadNavigationList(navigationListNode);
-                result.NavLists.Add(navigationList);
-            }
+            result.NavLists = (from XmlNode navigationListNode in containerDocument.DocumentElement.SelectNodes("ncx:navList", xmlNamespaceManager)
+                               select ReadNavigationList(navigationListNode)).ToList().AsReadOnly();
             return result;
         }
 
