@@ -53,7 +53,7 @@ namespace EpubSharp.Readers
             var subjects = new List<string>();
             var publishers = new List<string>();
             var contributors = new List<EpubCreator>();
-            var dates = new List<EpubMetadataDate>();
+            var date = "";
             var types = new List<string>();
             var formats = new List<string>();
             var identifiers = new List<EpubMetadataIdentifier>();
@@ -91,8 +91,7 @@ namespace EpubSharp.Readers
                         contributors.Add(contributor);
                         break;
                     case "date":
-                        var date = ReadMetadataDate(metadataItemNode);
-                        dates.Add(date);
+                        date = metadataItemNode.InnerText;
                         break;
                     case "type":
                         types.Add(innerText);
@@ -141,7 +140,7 @@ namespace EpubSharp.Readers
                 Subjects = subjects,
                 Publishers = publishers,
                 Contributors = contributors,
-                Dates = dates,
+                Date = date,
                 Types = types,
                 Formats = formats,
                 Identifiers = identifiers,
@@ -198,16 +197,6 @@ namespace EpubSharp.Readers
                 }
             }
             result.Text = metadataContributorNode.InnerText;
-            return result;
-        }
-
-        private static EpubMetadataDate ReadMetadataDate(XmlNode metadataDateNode)
-        {
-            EpubMetadataDate result = new EpubMetadataDate();
-            XmlAttribute eventAttribute = metadataDateNode.Attributes["opf:event"];
-            if (eventAttribute != null)
-                result.Event = eventAttribute.Value;
-            result.Date = metadataDateNode.InnerText;
             return result;
         }
 

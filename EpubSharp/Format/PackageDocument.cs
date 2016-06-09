@@ -26,7 +26,7 @@ namespace EpubSharp.Format
         public string Description { get; set; }
         public IReadOnlyCollection<string> Publishers { get; set; }
         public IReadOnlyCollection<EpubCreator> Contributors { get; set; }
-        public IReadOnlyCollection<EpubMetadataDate> Dates { get; set; }
+        public string Date { get; set; }
         public IReadOnlyCollection<string> Types { get; set; }
         public IReadOnlyCollection<string> Formats { get; set; }
         public IReadOnlyCollection<EpubMetadataIdentifier> Identifiers { get; set; }
