@@ -11,11 +11,11 @@ using EpubSharp.Utils;
 
 namespace EpubSharp.Readers
 {
-    internal static class NavigationReader
+    internal static class NcxReader
     {
-        public static EpubNavigation ReadNavigation(ZipArchive epubArchive, string contentDirectoryPath, PackageDocument package)
+        public static NcxDocument ReadNavigation(ZipArchive epubArchive, string contentDirectoryPath, PackageDocument package)
         {
-            EpubNavigation result = new EpubNavigation();
+            NcxDocument result = new NcxDocument();
             string tocId = package.Spine.Toc;
             if (String.IsNullOrEmpty(tocId))
                 throw new Exception("EPUB parsing error: TOC ID is empty.");

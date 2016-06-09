@@ -53,7 +53,7 @@ namespace EpubSharp
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
         {
-            return LoadChapters(book, book.Format.PackageDocument.Navigation.NavMap, epubArchive);
+            return LoadChapters(book, book.Format.PackageDocument.Ncx.NavMap, epubArchive);
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNavigationPoint> navigationPoints, ZipArchive epubArchive)
