@@ -18,7 +18,7 @@ namespace EpubSharp.Readers
                 Fonts = new Dictionary<string, EpubByteContentFile>(),
                 AllFiles = new Dictionary<string, EpubContentFile>()
             };
-            foreach (var manifestItem in book.Format.PackageDocument.Package.Manifest)
+            foreach (var manifestItem in book.Format.PackageDocument.Manifest)
             {
                 var contentFilePath = ZipPathUtils.Combine(book.Format.PackageDocument.ContentDirectoryPath, manifestItem.Href);
                 var contentFileEntry = epubArchive.GetEntryIgnoringSlashDirection(contentFilePath);

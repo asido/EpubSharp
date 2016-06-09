@@ -72,7 +72,6 @@
     <Compile Include="Format\Opf\EpubMetadataDate.cs" />
     <Compile Include="Format\Opf\EpubMetadataIdentifier.cs" />
     <Compile Include="Format\Opf\EpubMetadataMeta.cs" />
-    <Compile Include="Format\Opf\EpubPackage.cs" />
     <Compile Include="Format\Opf\EpubSpine.cs" />
     <Compile Include="Format\Opf\EpubSpineItemRef.cs" />
     <Compile Include="Format\Opf\EpubVersion.cs" />

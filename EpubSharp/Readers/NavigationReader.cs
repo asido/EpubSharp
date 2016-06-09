@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml;
+using EpubSharp.Format;
 using EpubSharp.Schema.Navigation;
 using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;
@@ -12,7 +13,7 @@ namespace EpubSharp.Readers
 {
     internal static class NavigationReader
     {
-        public static EpubNavigation ReadNavigation(ZipArchive epubArchive, string contentDirectoryPath, EpubPackage package)
+        public static EpubNavigation ReadNavigation(ZipArchive epubArchive, string contentDirectoryPath, PackageDocument package)
         {
             EpubNavigation result = new EpubNavigation();
             string tocId = package.Spine.Toc;

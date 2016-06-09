@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
+using EpubSharp.Format;
 using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;
 
@@ -10,7 +11,7 @@ namespace EpubSharp.Readers
 {
     internal static class PackageReader
     {
-        public static EpubPackage ReadPackage(ZipArchive epubArchive, string rootFilePath)
+        public static PackageDocument ReadPackage(ZipArchive epubArchive, string rootFilePath)
         {
             ZipArchiveEntry rootFileEntry = epubArchive.GetEntryIgnoringSlashDirection(rootFilePath);
             if (rootFileEntry == null)
@@ -21,7 +22,7 @@ namespace EpubSharp.Readers
             XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(containerDocument.NameTable);
             xmlNamespaceManager.AddNamespace("opf", "http://www.idpf.org/2007/opf");
             XmlNode packageNode = containerDocument.DocumentElement.SelectSingleNode("/opf:package", xmlNamespaceManager);
-            EpubPackage result = new EpubPackage();
+            var result = new PackageDocument();
             string epubVersionValue = packageNode.Attributes["version"].Value;
             if (epubVersionValue == "2.0")
                 result.EpubVersion = EpubVersion.Epub2;
