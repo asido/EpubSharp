@@ -12,7 +12,7 @@ namespace EpubSharp.Readers
     {
         public static EpubContent ReadContentFiles(ZipArchive epubArchive, EpubBook book)
         {
-            EpubContent result = new EpubContent
+            var result = new EpubContent
             {
                 Html = new Dictionary<string, EpubTextContentFile>(),
                 Css = new Dictionary<string, EpubTextContentFile>(),
@@ -20,17 +20,17 @@ namespace EpubSharp.Readers
                 Fonts = new Dictionary<string, EpubByteContentFile>(),
                 AllFiles = new Dictionary<string, EpubContentFile>()
             };
-            foreach (EpubManifestItem manifestItem in book.Schema.Package.Manifest)
+            foreach (var manifestItem in book.Schema.Package.Manifest)
             {
-                string contentFilePath = ZipPathUtils.Combine(book.Schema.ContentDirectoryPath, manifestItem.Href);
-                ZipArchiveEntry contentFileEntry = epubArchive.GetEntry(contentFilePath);
+                var contentFilePath = ZipPathUtils.Combine(book.Schema.ContentDirectoryPath, manifestItem.Href);
+                var contentFileEntry = epubArchive.GetEntry(contentFilePath);
                 if (contentFileEntry == null)
                     throw new Exception($"EPUB parsing error: file {contentFilePath} not found in archive.");
                 if (contentFileEntry.Length > Int32.MaxValue)
                     throw new Exception($"EPUB parsing error: file {contentFilePath} is bigger than 2 Gb.");
-                string fileName = manifestItem.Href;
-                string contentMimeType = manifestItem.MediaType;
-                EpubContentType contentType = GetContentTypeByContentMimeType(contentMimeType);
+                var fileName = manifestItem.Href;
+                var contentMimeType = manifestItem.MediaType;
+                var contentType = GetContentTypeByContentMimeType(contentMimeType);
                 switch (contentType)
                 {
                     case EpubContentType.Xhtml11:
@@ -46,12 +46,12 @@ namespace EpubSharp.Readers
                             ContentMimeType = contentMimeType,
                             ContentType = contentType
                         };
-                        using (Stream contentStream = contentFileEntry.Open())
+                        using (var contentStream = contentFileEntry.Open())
                         {
                             if (contentStream == null)
                                 throw new Exception($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
-                            using (StreamReader streamReader = new StreamReader(contentStream))
-                                epubTextContentFile.Content = streamReader.ReadToEnd();
+                            using (var reader = new StreamReader(contentStream))
+                                epubTextContentFile.Content = reader.ReadToEnd();
                         }
                         switch (contentType)
                         {
@@ -65,19 +65,19 @@ namespace EpubSharp.Readers
                         result.AllFiles.Add(fileName, epubTextContentFile);
                         break;
                     default:
-                        EpubByteContentFile epubByteContentFile = new EpubByteContentFile
+                        var epubByteContentFile = new EpubByteContentFile
                         {
                             FileName = fileName,
                             ContentMimeType = contentMimeType,
                             ContentType = contentType
                         };
-                        using (Stream contentStream = contentFileEntry.Open())
+                        using (var stream = contentFileEntry.Open())
                         {
-                            if (contentStream == null)
+                            if (stream == null)
                                 throw new Exception($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
                             using (var memoryStream = new MemoryStream((int)contentFileEntry.Length))
                             {
-                                contentStream.CopyTo(memoryStream);
+                                stream.CopyTo(memoryStream);
                                 epubByteContentFile.Content = memoryStream.ToArray();
                             }
                         }
