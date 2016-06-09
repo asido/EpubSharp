@@ -75,11 +75,11 @@ namespace EpubSharp
 
     public class EpubByteContentFile : EpubContentFile
     {
-        public byte[] Content { get; set; }
+        public new byte[] Content { get; set; }
     }
     
     public class EpubTextContentFile : EpubContentFile
     {
-        public string Content { get; set; }
+        public new string Content { get; set; }
     }
 }
