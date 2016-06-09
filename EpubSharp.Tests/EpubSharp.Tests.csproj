@@ -55,10 +55,7 @@
     <Compile Include="EpubReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Samples\epub30\" />
-    <Folder Include="Samples\epub31\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\EpubSharp\EpubSharp.csproj">
       <Project>{0276336f-b58f-4a05-bc71-65e7406502da}</Project>
