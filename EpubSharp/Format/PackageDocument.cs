@@ -11,13 +11,13 @@ namespace EpubSharp.Format
     public class PackageDocument
     {
         public EpubVersion EpubVersion { get; internal set; }
-        public EpubMetadata Metadata { get; internal set; }
+        public EpubPackageMetadata Metadata { get; internal set; }
         public EpubManifest Manifest { get; internal set; }
         public EpubSpine Spine { get; internal set; }
         public EpubGuide Guide { get; internal set; }
     }
 
-    public class EpubMetadata
+    public class EpubPackageMetadata
     {
         public IReadOnlyCollection<string> Titles { get; internal set; }
         public IReadOnlyCollection<string> Subjects { get; internal set; }

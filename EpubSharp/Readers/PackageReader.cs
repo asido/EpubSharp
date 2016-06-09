@@ -24,7 +24,7 @@ namespace EpubSharp.Readers
             XmlNode metadataNode = packageNode.SelectSingleNode("opf:metadata", xmlNamespaceManager);
             if (metadataNode == null)
                 throw new Exception("EPUB parsing error: metadata not found in the package.");
-            EpubMetadata metadata = ReadMetadata(metadataNode, result.EpubVersion);
+            var metadata = ReadMetadata(metadataNode, result.EpubVersion);
             result.Metadata = metadata;
             XmlNode manifestNode = packageNode.SelectSingleNode("opf:manifest", xmlNamespaceManager);
             if (manifestNode == null)
@@ -45,7 +45,7 @@ namespace EpubSharp.Readers
             return result;
         }
 
-        private static EpubMetadata ReadMetadata(XmlNode metadataNode, EpubVersion epubVersion)
+        private static EpubPackageMetadata ReadMetadata(XmlNode metadataNode, EpubVersion epubVersion)
         {
             var titles = new List<string>();
             var creators = new List<EpubMetadataCreator>();
@@ -132,7 +132,7 @@ namespace EpubSharp.Readers
                 }
             }
             
-            return new EpubMetadata
+            return new EpubPackageMetadata
             {
                 Titles = titles,
                 Creators = creators,
