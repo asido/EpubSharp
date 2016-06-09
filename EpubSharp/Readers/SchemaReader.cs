@@ -13,7 +13,6 @@ namespace EpubSharp.Readers
 
             var package = PackageReader.ReadPackage(epubArchive, rootFilePath);
             package.ContentDirectoryPath = contentDirectoryPath;
-            package.Ncx = NcxReader.ReadNavigation(epubArchive, contentDirectoryPath, package);
             return package;
         }
     }

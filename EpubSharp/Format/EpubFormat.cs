@@ -7,6 +7,7 @@ namespace EpubSharp.Format
     public class EpubFormat
     {
         public PackageDocument PackageDocument { get; internal set; }
+        public NcxDocument Ncx { get; set; }
     }
 
     public class PackageDocument
@@ -17,7 +18,6 @@ namespace EpubSharp.Format
         public EpubSpine Spine { get; set; }
         public EpubGuide Guide { get; set; }
 
-        public NcxDocument Ncx { get; set; }
         public string ContentDirectoryPath { get; set; }
     }
 

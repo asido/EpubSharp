@@ -21,6 +21,7 @@ namespace EpubSharp
             {
                 book.Format = new EpubFormat();
                 book.Format.PackageDocument = SchemaReader.ReadSchema(archive);
+                book.Format.Ncx = NcxReader.ReadNavigation(archive, book.Format.PackageDocument.ContentDirectoryPath, book.Format.PackageDocument);
                 book.Title = book.Format.PackageDocument.Metadata.Titles.FirstOrDefault() ?? string.Empty;
                 book.AuthorList = book.Format.PackageDocument.Metadata.Creators.Select(creator => creator.Creator).ToList();
                 book.Author = string.Join(", ", book.AuthorList);
@@ -53,7 +54,7 @@ namespace EpubSharp
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
         {
-            return LoadChapters(book, book.Format.PackageDocument.Ncx.NavMap, epubArchive);
+            return LoadChapters(book, book.Format.Ncx.NavMap, epubArchive);
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNavigationPoint> navigationPoints, ZipArchive epubArchive)
