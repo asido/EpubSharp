@@ -4,9 +4,11 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml;
 using EpubSharp.Format;
 using EpubSharp.Readers;
 using EpubSharp.Schema.Navigation;
+using EpubSharp.Utils;
 
 namespace EpubSharp
 {
@@ -20,8 +22,36 @@ namespace EpubSharp
             using (var archive = ZipFile.OpenRead(filePath))
             {
                 book.Format = new EpubFormat();
-                book.Format.Package = SchemaReader.ReadSchema(archive);
-                book.Format.Ncx = NcxReader.ReadNavigation(archive, book.Format.Package.ContentDirectoryPath, book.Format.Package);
+                book.Format.Ocf = OcfReader.Read(archive);
+
+                var rootFileEntry = archive.GetEntryIgnoringSlashDirection(book.Format.Ocf.RootFile);
+                if (rootFileEntry == null)
+                    throw new Exception("EPUB parsing error: root file not found in archive.");
+                XmlDocument containerDocument;
+                using (var containerStream = rootFileEntry.Open())
+                {
+                    containerDocument = XmlUtils.LoadDocument(containerStream);
+                }
+
+                book.Format.Package = PackageDocumentReader.Read(containerDocument);
+
+                string tocId = book.Format.Package.Spine.Toc;
+                if (String.IsNullOrEmpty(tocId))
+                    throw new Exception("EPUB parsing error: TOC ID is empty.");
+                var tocManifestItem = book.Format.Package.Manifest.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
+                if (tocManifestItem == null)
+                    throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
+
+                var tocFileEntryPath = ZipPathUtils.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), tocManifestItem.Href);
+                var tocFileEntry = archive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
+                if (tocFileEntry == null)
+                    throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} not found in archive.");
+                if (tocFileEntry.Length > int.MaxValue)
+                    throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} is bigger than 2 Gb.");
+                using (var containerStream = tocFileEntry.Open())
+                    containerDocument = XmlUtils.LoadDocument(containerStream);
+
+                book.Format.Ncx = NcxReader.Read(containerDocument);
                 book.Title = book.Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
                 book.AuthorList = book.Format.Package.Metadata.Creators.Select(creator => creator.Creator).ToList();
                 book.Author = string.Join(", ", book.AuthorList);

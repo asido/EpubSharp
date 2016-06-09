@@ -13,52 +13,37 @@ namespace EpubSharp.Readers
 {
     internal static class NcxReader
     {
-        public static NcxDocument ReadNavigation(ZipArchive epubArchive, string contentDirectoryPath, PackageDocument package)
+        public static NcxDocument Read(XmlDocument xml)
         {
             NcxDocument result = new NcxDocument();
-            string tocId = package.Spine.Toc;
-            if (String.IsNullOrEmpty(tocId))
-                throw new Exception("EPUB parsing error: TOC ID is empty.");
-            EpubManifestItem tocManifestItem = package.Manifest.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
-            if (tocManifestItem == null)
-                throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
-            string tocFileEntryPath = ZipPathUtils.Combine(contentDirectoryPath, tocManifestItem.Href);
-            ZipArchiveEntry tocFileEntry = epubArchive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
-            if (tocFileEntry == null)
-                throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} not found in archive.");
-            if (tocFileEntry.Length > Int32.MaxValue)
-                throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} is bigger than 2 Gb.");
-            XmlDocument containerDocument;
-            using (Stream containerStream = tocFileEntry.Open())
-                containerDocument = XmlUtils.LoadDocument(containerStream);
-            XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(containerDocument.NameTable);
+            XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
             xmlNamespaceManager.AddNamespace("ncx", "http://www.daisy.org/z3986/2005/ncx/");
-            XmlNode headNode = containerDocument.DocumentElement.SelectSingleNode("ncx:head", xmlNamespaceManager);
+            XmlNode headNode = xml.DocumentElement.SelectSingleNode("ncx:head", xmlNamespaceManager);
             if (headNode == null)
                 throw new Exception("EPUB parsing error: TOC file does not contain head element");
             result.Head = ReadNavigationHead(headNode);
-            XmlNode docTitleNode = containerDocument.DocumentElement.SelectSingleNode("ncx:docTitle", xmlNamespaceManager);
+            XmlNode docTitleNode = xml.DocumentElement.SelectSingleNode("ncx:docTitle", xmlNamespaceManager);
             if (docTitleNode == null)
                 throw new Exception("EPUB parsing error: TOC file does not contain docTitle element");
             result.DocTitle = ReadNavigationDocTitle(docTitleNode);
 
             var authors = new List<string>();
-            foreach (XmlNode docAuthorNode in containerDocument.DocumentElement.SelectNodes("ncx:docAuthor", xmlNamespaceManager))
+            foreach (XmlNode docAuthorNode in xml.DocumentElement.SelectNodes("ncx:docAuthor", xmlNamespaceManager))
             {
                 authors.AddRange(ReadNavigationDocAuthor(docAuthorNode));
             }
             result.DocAuthors = authors.AsReadOnly();
 
-            XmlNode navMapNode = containerDocument.DocumentElement.SelectSingleNode("ncx:navMap", xmlNamespaceManager);
+            XmlNode navMapNode = xml.DocumentElement.SelectSingleNode("ncx:navMap", xmlNamespaceManager);
             if (navMapNode == null)
                 throw new Exception("EPUB parsing error: TOC file does not contain navMap element");
             result.NavMap = ReadNavigationMap(navMapNode);
-            XmlNode pageListNode = containerDocument.DocumentElement.SelectSingleNode("ncx:pageList", xmlNamespaceManager);
+            XmlNode pageListNode = xml.DocumentElement.SelectSingleNode("ncx:pageList", xmlNamespaceManager);
             if (pageListNode != null)
             {
                 result.PageList = ReadNavigationPageList(pageListNode);
             }
-            result.NavLists = (from XmlNode navigationListNode in containerDocument.DocumentElement.SelectNodes("ncx:navList", xmlNamespaceManager)
+            result.NavLists = (from XmlNode navigationListNode in xml.DocumentElement.SelectNodes("ncx:navList", xmlNamespaceManager)
                                select ReadNavigationList(navigationListNode)).ToList().AsReadOnly();
             return result;
         }

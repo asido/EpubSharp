@@ -51,8 +51,8 @@
     <Compile Include="Readers\ContentReader.cs" />
     <Compile Include="Readers\NcxReader.cs" />
     <Compile Include="Readers\PackageReader.cs" />
-    <Compile Include="Readers\RootFilePathReader.cs" />
-    <Compile Include="Readers\SchemaReader.cs" />
+    <Compile Include="Readers\OcfReader.cs" />
+    <Compile Include="Readers\PackageDocumentReader.cs" />
     <Compile Include="Format\Navigation\EpubNavigationContent.cs" />
     <Compile Include="Format\Navigation\EpubNavigationHeadMeta.cs" />
     <Compile Include="Format\Navigation\EpubNavigationLabel.cs" />

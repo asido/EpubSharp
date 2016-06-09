@@ -1,27 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Xml;
 using EpubSharp.Format;
 using EpubSharp.Schema.Opf;
-using EpubSharp.Utils;
 
 namespace EpubSharp.Readers
 {
     internal static class PackageReader
     {
-        public static PackageDocument ReadPackage(ZipArchive epubArchive, string rootFilePath)
+        public static PackageDocument ReadPackage(XmlDocument xml)
         {
-            ZipArchiveEntry rootFileEntry = epubArchive.GetEntryIgnoringSlashDirection(rootFilePath);
-            if (rootFileEntry == null)
-                throw new Exception("EPUB parsing error: root file not found in archive.");
-            XmlDocument containerDocument;
-            using (Stream containerStream = rootFileEntry.Open())
-                containerDocument = XmlUtils.LoadDocument(containerStream);
-            XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(containerDocument.NameTable);
+            XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
             xmlNamespaceManager.AddNamespace("opf", "http://www.idpf.org/2007/opf");
-            XmlNode packageNode = containerDocument.DocumentElement.SelectSingleNode("/opf:package", xmlNamespaceManager);
+            XmlNode packageNode = xml.DocumentElement.SelectSingleNode("/opf:package", xmlNamespaceManager);
             var result = new PackageDocument();
             string epubVersionValue = packageNode.Attributes["version"].Value;
             if (epubVersionValue == "2.0")
