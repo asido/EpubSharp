@@ -57,7 +57,6 @@
     <Compile Include="Schema\Navigation\EpubNavigationHeadMeta.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationLabel.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationList.cs" />
-    <Compile Include="Schema\Navigation\EpubNavigationPageList.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationPageTarget.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationPageTargetType.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationPoint.cs" />

@@ -55,8 +55,7 @@ namespace EpubSharp.Readers
             XmlNode pageListNode = containerDocument.DocumentElement.SelectSingleNode("ncx:pageList", xmlNamespaceManager);
             if (pageListNode != null)
             {
-                EpubNavigationPageList pageList = ReadNavigationPageList(pageListNode);
-                result.PageList = pageList;
+                result.PageList = ReadNavigationPageList(pageListNode);
             }
             result.NavLists = new List<EpubNavigationList>();
             foreach (XmlNode navigationListNode in containerDocument.DocumentElement.SelectNodes("ncx:navList", xmlNamespaceManager))
@@ -198,16 +197,11 @@ namespace EpubSharp.Readers
             return result;
         }
 
-        private static EpubNavigationPageList ReadNavigationPageList(XmlNode navigationPageListNode)
+        private static IReadOnlyCollection<EpubNavigationPageTarget> ReadNavigationPageList(XmlNode navigationPageListNode)
         {
-            var result = new EpubNavigationPageList();
-            foreach (XmlNode pageTargetNode in navigationPageListNode.ChildNodes)
-                if (string.Compare(pageTargetNode.LocalName, "pageTarget", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    EpubNavigationPageTarget pageTarget = ReadNavigationPageTarget(pageTargetNode);
-                    result.Add(pageTarget);
-                }
-            return result;
+            return (from XmlNode pageTargetNode in navigationPageListNode.ChildNodes
+                    where string.Compare(pageTargetNode.LocalName, "pageTarget", StringComparison.OrdinalIgnoreCase) == 0
+                    select ReadNavigationPageTarget(pageTargetNode)).ToList().AsReadOnly();
         }
 
         private static EpubNavigationPageTarget ReadNavigationPageTarget(XmlNode navigationPageTargetNode)
