@@ -21,11 +21,11 @@ namespace EpubSharp.Format
     public class EpubMetadata
     {
         public IReadOnlyCollection<string> Titles { get; set; }
-        public IReadOnlyCollection<EpubCreator> Creators { get; set; }
+        public IReadOnlyCollection<EpubMetadataCreator> Creators { get; set; }
         public IReadOnlyCollection<string> Subjects { get; set; }
         public string Description { get; set; }
         public IReadOnlyCollection<string> Publishers { get; set; }
-        public IReadOnlyCollection<EpubCreator> Contributors { get; set; }
+        public IReadOnlyCollection<EpubMetadataCreator> Contributors { get; set; }
         public string Date { get; set; }
         public IReadOnlyCollection<string> Types { get; set; }
         public IReadOnlyCollection<string> Formats { get; set; }
@@ -38,11 +38,28 @@ namespace EpubSharp.Format
         public IReadOnlyCollection<EpubMetadataMeta> MetaItems { get; set; }
     }
 
-    public class EpubCreator
+    public class EpubMetadataCreator
     {
         public string Text { get; internal set; }
         public string Role { get; internal set; }
         public string FileAs { get; internal set; }
         public string AlternateScript { get; internal set; }
+    }
+
+    public class EpubMetadataIdentifier
+    {
+        public string Id { get; set; }
+        public string Scheme { get; set; }
+        public string Text { get; set; }
+    }
+
+    public class EpubMetadataMeta
+    {
+        public string Name { get; set; }
+        public string Content { get; set; }
+        public string Id { get; set; }
+        public string Refines { get; set; }
+        public string Property { get; set; }
+        public string Scheme { get; set; }
     }
 }

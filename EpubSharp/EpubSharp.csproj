@@ -66,8 +66,6 @@
     <Compile Include="Format\Opf\EpubGuideReference.cs" />
     <Compile Include="Format\Opf\EpubManifest.cs" />
     <Compile Include="Format\Opf\EpubManifestItem.cs" />
-    <Compile Include="Format\Opf\EpubMetadataIdentifier.cs" />
-    <Compile Include="Format\Opf\EpubMetadataMeta.cs" />
     <Compile Include="Format\Opf\EpubSpine.cs" />
     <Compile Include="Format\Opf\EpubSpineItemRef.cs" />
     <Compile Include="Utils\XmlUtils.cs" />

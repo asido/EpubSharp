@@ -49,10 +49,10 @@ namespace EpubSharp.Readers
         private static EpubMetadata ReadMetadata(XmlNode metadataNode, EpubVersion epubVersion)
         {
             var titles = new List<string>();
-            var creators = new List<EpubCreator>();
+            var creators = new List<EpubMetadataCreator>();
             var subjects = new List<string>();
             var publishers = new List<string>();
-            var contributors = new List<EpubCreator>();
+            var contributors = new List<EpubMetadataCreator>();
             var date = "";
             var types = new List<string>();
             var formats = new List<string>();
@@ -154,9 +154,9 @@ namespace EpubSharp.Readers
             };
         }
 
-        private static EpubCreator ReadMetadataCreator(XmlNode metadataCreatorNode)
+        private static EpubMetadataCreator ReadMetadataCreator(XmlNode metadataCreatorNode)
         {
-            EpubCreator result = new EpubCreator();
+            EpubMetadataCreator result = new EpubMetadataCreator();
             foreach (XmlAttribute metadataCreatorNodeAttribute in metadataCreatorNode.Attributes)
             {
                 string attributeValue = metadataCreatorNodeAttribute.Value;
@@ -177,9 +177,9 @@ namespace EpubSharp.Readers
             return result;
         }
 
-        private static EpubCreator ReadMetadataContributor(XmlNode metadataContributorNode)
+        private static EpubMetadataCreator ReadMetadataContributor(XmlNode metadataContributorNode)
         {
-            var result = new EpubCreator();
+            var result = new EpubMetadataCreator();
             foreach (XmlAttribute metadataContributorNodeAttribute in metadataContributorNode.Attributes)
             {
                 string attributeValue = metadataContributorNodeAttribute.Value;
@@ -216,7 +216,7 @@ namespace EpubSharp.Readers
                         break;
                 }
             }
-            result.Identifier = metadataIdentifierNode.InnerText;
+            result.Text = metadataIdentifierNode.InnerText;
             return result;
         }
 
