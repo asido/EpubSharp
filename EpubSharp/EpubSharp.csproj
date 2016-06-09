@@ -54,13 +54,9 @@
     <Compile Include="Readers\SchemaReader.cs" />
     <Compile Include="Schema\Navigation\EpubNavigation.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationContent.cs" />
-    <Compile Include="Schema\Navigation\EpubNavigationDocAuthor.cs" />
-    <Compile Include="Schema\Navigation\EpubNavigationDocTitle.cs" />
-    <Compile Include="Schema\Navigation\EpubNavigationHead.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationHeadMeta.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationLabel.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationList.cs" />
-    <Compile Include="Schema\Navigation\EpubNavigationMap.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationPageList.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationPageTarget.cs" />
     <Compile Include="Schema\Navigation\EpubNavigationPageTargetType.cs" />

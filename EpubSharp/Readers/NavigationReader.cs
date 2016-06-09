@@ -35,24 +35,23 @@ namespace EpubSharp.Readers
             XmlNode headNode = containerDocument.DocumentElement.SelectSingleNode("ncx:head", xmlNamespaceManager);
             if (headNode == null)
                 throw new Exception("EPUB parsing error: TOC file does not contain head element");
-            EpubNavigationHead navigationHead = ReadNavigationHead(headNode);
-            result.Head = navigationHead;
+            result.Head = ReadNavigationHead(headNode);
             XmlNode docTitleNode = containerDocument.DocumentElement.SelectSingleNode("ncx:docTitle", xmlNamespaceManager);
             if (docTitleNode == null)
                 throw new Exception("EPUB parsing error: TOC file does not contain docTitle element");
-            EpubNavigationDocTitle navigationDocTitle = ReadNavigationDocTitle(docTitleNode);
-            result.DocTitle = navigationDocTitle;
-            result.DocAuthors = new List<EpubNavigationDocAuthor>();
+            result.DocTitle = ReadNavigationDocTitle(docTitleNode);
+
+            var authors = new List<string>();
             foreach (XmlNode docAuthorNode in containerDocument.DocumentElement.SelectNodes("ncx:docAuthor", xmlNamespaceManager))
             {
-                EpubNavigationDocAuthor navigationDocAuthor = ReadNavigationDocAuthor(docAuthorNode);
-                result.DocAuthors.Add(navigationDocAuthor);
+                authors.AddRange(ReadNavigationDocAuthor(docAuthorNode));
             }
+            result.DocAuthors = authors.AsReadOnly();
+
             XmlNode navMapNode = containerDocument.DocumentElement.SelectSingleNode("ncx:navMap", xmlNamespaceManager);
             if (navMapNode == null)
                 throw new Exception("EPUB parsing error: TOC file does not contain navMap element");
-            EpubNavigationMap navMap = ReadNavigationMap(navMapNode);
-            result.NavMap = navMap;
+            result.NavMap = ReadNavigationMap(navMapNode);
             XmlNode pageListNode = containerDocument.DocumentElement.SelectSingleNode("ncx:pageList", xmlNamespaceManager);
             if (pageListNode != null)
             {
@@ -68,11 +67,11 @@ namespace EpubSharp.Readers
             return result;
         }
 
-        private static EpubNavigationHead ReadNavigationHead(XmlNode headNode)
+        private static IReadOnlyCollection<EpubNavigationHeadMeta> ReadNavigationHead(XmlNode headNode)
         {
-            EpubNavigationHead result = new EpubNavigationHead();
+            var result = new List<EpubNavigationHeadMeta>();
             foreach (XmlNode metaNode in headNode.ChildNodes)
-                if (String.Compare(metaNode.LocalName, "meta", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(metaNode.LocalName, "meta", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     EpubNavigationHeadMeta meta = new EpubNavigationHeadMeta();
                     foreach (XmlAttribute metaNodeAttribute in metaNode.Attributes)
@@ -100,36 +99,25 @@ namespace EpubSharp.Readers
             return result;
         }
 
-        private static EpubNavigationDocTitle ReadNavigationDocTitle(XmlNode docTitleNode)
+        private static IReadOnlyCollection<string> ReadNavigationDocTitle(XmlNode docTitleNode)
         {
-            var result = new EpubNavigationDocTitle();
-            foreach (XmlNode textNode in docTitleNode.ChildNodes)
-                if (string.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0)
-                    result.Add(textNode.InnerText);
-            return result;
+            return (from XmlNode textNode in docTitleNode.ChildNodes
+                    where string.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0
+                    select textNode.InnerText).ToList().AsReadOnly();
         }
 
-        private static EpubNavigationDocAuthor ReadNavigationDocAuthor(XmlNode docAuthorNode)
+        private static IReadOnlyCollection<string> ReadNavigationDocAuthor(XmlNode docAuthorNode)
         {
-            var result = new EpubNavigationDocAuthor();
-            foreach (XmlNode textNode in docAuthorNode.ChildNodes)
-                if (string.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0)
-                    result.Add(textNode.InnerText);
-            return result;
+            return (from XmlNode textNode in docAuthorNode.ChildNodes
+                    where string.Compare(textNode.LocalName, "text", StringComparison.OrdinalIgnoreCase) == 0
+                    select textNode.InnerText).ToList().AsReadOnly();
         }
 
-        private static EpubNavigationMap ReadNavigationMap(XmlNode navigationMapNode)
+        private static IReadOnlyCollection<EpubNavigationPoint> ReadNavigationMap(XmlNode navigationMapNode)
         {
-            EpubNavigationMap result = new EpubNavigationMap();
-            foreach (XmlNode navigationPointNode in navigationMapNode.ChildNodes)
-            {
-                if (string.Compare(navigationPointNode.LocalName, "navPoint", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    var navigationPoint = ReadNavigationPoint(navigationPointNode);
-                    result.Add(navigationPoint);
-                }
-            }
-            return result;
+            return (from XmlNode navigationPointNode in navigationMapNode.ChildNodes
+                    where string.Compare(navigationPointNode.LocalName, "navPoint", StringComparison.OrdinalIgnoreCase) == 0
+                    select ReadNavigationPoint(navigationPointNode)).ToList().AsReadOnly();
         }
 
         private static EpubNavigationPoint ReadNavigationPoint(XmlNode navigationPointNode)

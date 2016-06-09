@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace EpubSharp.Schema.Navigation
 {
     public class EpubNavigation
     {
-        public EpubNavigationHead Head { get; set; }
-        public EpubNavigationDocTitle DocTitle { get; set; }
-        public List<EpubNavigationDocAuthor> DocAuthors { get; set; }
-        public EpubNavigationMap NavMap { get; set; }
+        public IReadOnlyCollection<EpubNavigationHeadMeta> Head { get; set; }
+        public IReadOnlyCollection<string> DocTitle { get; set; }
+        public IReadOnlyCollection<string> DocAuthors { get; set; }
+        public IReadOnlyCollection<EpubNavigationPoint> NavMap { get; set; }
         public EpubNavigationPageList PageList { get; set; }
         public List<EpubNavigationList> NavLists { get; set; }
     }
