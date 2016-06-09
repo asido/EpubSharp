@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using EpubSharp.Entities;
 using EpubSharp.Schema.Navigation;
 using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;

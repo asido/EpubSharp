@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using EpubSharp.Entities;
-using EpubSharp.Schema.Opf;
 using EpubSharp.Utils;
 
 namespace EpubSharp.Readers

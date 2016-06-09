@@ -43,13 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\EpubByteContentFile.cs" />
-    <Compile Include="Entities\EpubChapter.cs" />
-    <Compile Include="Entities\EpubContent.cs" />
-    <Compile Include="Entities\EpubContentFile.cs" />
-    <Compile Include="Entities\EpubContentType.cs" />
-    <Compile Include="Entities\EpubSchema.cs" />
-    <Compile Include="Entities\EpubTextContentFile.cs" />
     <Compile Include="EpubBook.cs" />
     <Compile Include="EpubReader.cs" />
     <Compile Include="Extensions\ZipArchive.cs" />
