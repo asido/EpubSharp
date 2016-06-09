@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using EpubSharp.Schema.Navigation;
-using EpubSharp.Schema.Opf;
 
 namespace EpubSharp.Format
 {

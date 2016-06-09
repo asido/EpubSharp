@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using EpubSharp.Schema.Opf;
 
 namespace EpubSharp.Format
 {
@@ -88,5 +87,33 @@ namespace EpubSharp.Format
     {
         public string Toc { get; internal set; }
         public IReadOnlyCollection<EpubSpineItemRef> ItemRefs { get; internal set; }
+    }
+
+    public class EpubSpineItemRef
+    {
+        public string IdRef { get; internal set; }
+        public bool IsLinear { get; internal set; }
+
+        public override string ToString()
+        {
+            return "IdRef: " + IdRef;
+        }
+    }
+
+    public class EpubGuide
+    {
+        public IReadOnlyCollection<EpubGuideReference> References { get; internal set; }
+    }
+
+    public class EpubGuideReference
+    {
+        public string Type { get; internal set; }
+        public string Title { get; internal set; }
+        public string Href { get; internal set; }
+
+        public override string ToString()
+        {
+            return $"Type: {Type}, Href: {Href}";
+        }
     }
 }

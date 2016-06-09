@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Xml;
 using EpubSharp.Format;
 using EpubSharp.Schema.Navigation;
-using EpubSharp.Schema.Opf;
-using EpubSharp.Utils;
 
 namespace EpubSharp.Readers
 {

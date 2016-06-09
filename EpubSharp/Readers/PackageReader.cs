@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Xml;
 using EpubSharp.Format;
-using EpubSharp.Schema.Opf;
 
 namespace EpubSharp.Readers
 {
@@ -342,9 +341,11 @@ namespace EpubSharp.Readers
 
         private static EpubGuide ReadGuide(XmlNode guideNode)
         {
-            EpubGuide result = new EpubGuide();
+            var references = new List<EpubGuideReference>();
+
             foreach (XmlNode guideReferenceNode in guideNode.ChildNodes)
-                if (String.Compare(guideReferenceNode.LocalName, "reference", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                if (string.Compare(guideReferenceNode.LocalName, "reference", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     EpubGuideReference guideReference = new EpubGuideReference();
                     foreach (XmlAttribute guideReferenceNodeAttribute in guideReferenceNode.Attributes)
@@ -363,13 +364,15 @@ namespace EpubSharp.Readers
                                 break;
                         }
                     }
-                    if (String.IsNullOrWhiteSpace(guideReference.Type))
+                    if (string.IsNullOrWhiteSpace(guideReference.Type))
                         throw new Exception("Incorrect EPUB guide: item type is missing");
-                    if (String.IsNullOrWhiteSpace(guideReference.Href))
+                    if (string.IsNullOrWhiteSpace(guideReference.Href))
                         throw new Exception("Incorrect EPUB guide: item href is missing");
-                    result.Add(guideReference);
+                    references.Add(guideReference);
                 }
-            return result;
+            }
+
+            return new EpubGuide { References = references.AsReadOnly() };
         }
     }
 }

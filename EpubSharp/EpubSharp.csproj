@@ -62,9 +62,6 @@
     <Compile Include="Format\Navigation\EpubNavigationPageTargetType.cs" />
     <Compile Include="Format\Navigation\EpubNavigationPoint.cs" />
     <Compile Include="Format\Navigation\EpubNavigationTarget.cs" />
-    <Compile Include="Format\Opf\EpubGuide.cs" />
-    <Compile Include="Format\Opf\EpubGuideReference.cs" />
-    <Compile Include="Format\Opf\EpubSpineItemRef.cs" />
     <Compile Include="Utils\XmlUtils.cs" />
     <Compile Include="Utils\ZipPathUtils.cs" />
   </ItemGroup>
