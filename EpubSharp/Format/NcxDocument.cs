@@ -11,7 +11,7 @@ namespace EpubSharp.Format
         public IReadOnlyCollection<EpubNcxMetadata> Metadata { get; internal set; }
         public IReadOnlyCollection<string> DocTitle { get; internal set; }
         public IReadOnlyCollection<string> DocAuthors { get; internal set; }
-        public IReadOnlyCollection<EpubNcxNavigationPoint> NavMap { get; internal set; }
+        public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationPoints { get; internal set; }
         public IReadOnlyCollection<EpubNavigationPageTarget> PageList { get; internal set; }
         public IReadOnlyCollection<EpubNavigationList> NavLists { get; internal set; }
     }
@@ -30,7 +30,7 @@ namespace EpubSharp.Format
         public string PlayOrder { get; internal set; }
         public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
         public string ContentSource { get; internal set; }
-        public List<EpubNcxNavigationPoint> ChildNavigationPoints { get; internal set; }
+        public List<EpubNcxNavigationPoint> NavigationPoints { get; internal set; }
 
         public override string ToString()
         {

@@ -84,7 +84,7 @@ namespace EpubSharp
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
         {
-            return LoadChapters(book, book.Format.Ncx.NavMap, epubArchive);
+            return LoadChapters(book, book.Format.Ncx.NavigationPoints, epubArchive);
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
@@ -105,7 +105,7 @@ namespace EpubSharp
                 if (!book.Content.Html.TryGetValue(chapter.ContentFileName, out htmlContentFile))
                     throw new Exception($"Incorrect EPUB manifest: item with href = \"{chapter.ContentFileName}\" is missing");
                 chapter.HtmlContent = htmlContentFile.Content;
-                chapter.SubChapters = LoadChapters(book, navigationPoint.ChildNavigationPoints, epubArchive);
+                chapter.SubChapters = LoadChapters(book, navigationPoint.NavigationPoints, epubArchive);
                 result.Add(chapter);
             }
             return result;

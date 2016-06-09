@@ -33,7 +33,7 @@ namespace EpubSharp.Readers
             XmlNode navMapNode = xml.DocumentElement.SelectSingleNode("ncx:navMap", xmlNamespaceManager);
             if (navMapNode == null)
                 throw new Exception("EPUB parsing error: TOC file does not contain navMap element");
-            result.NavMap = ReadNavigationMap(navMapNode);
+            result.NavigationPoints = ReadNavigationMap(navMapNode);
             XmlNode pageListNode = xml.DocumentElement.SelectSingleNode("ncx:pageList", xmlNamespaceManager);
             if (pageListNode != null)
             {
@@ -119,7 +119,7 @@ namespace EpubSharp.Readers
             if (string.IsNullOrWhiteSpace(result.Id))
                 throw new Exception("Incorrect EPUB navigation point: point ID is missing");
             var navLabels = new List<string>();
-            result.ChildNavigationPoints = new List<EpubNcxNavigationPoint>();
+            result.NavigationPoints = new List<EpubNcxNavigationPoint>();
             foreach (XmlNode navigationPointChildNode in navigationPointNode.ChildNodes)
             {
                 switch (navigationPointChildNode.LocalName.ToLowerInvariant())
@@ -132,7 +132,7 @@ namespace EpubSharp.Readers
                         break;
                     case "navpoint":
                         EpubNcxNavigationPoint childNavigationPoint = ReadNavigationPoint(navigationPointChildNode);
-                        result.ChildNavigationPoints.Add(childNavigationPoint);
+                        result.NavigationPoints.Add(childNavigationPoint);
                         break;
                 }
             }
