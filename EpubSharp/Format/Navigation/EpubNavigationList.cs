@@ -6,7 +6,7 @@ namespace EpubSharp.Schema.Navigation
     {
         public string Id { get; set; }
         public string Class { get; set; }
-        public List<EpubNavigationLabel> NavigationLabels { get; set; }
+        public IReadOnlyCollection<string> NavigationLabels { get; set; }
         public List<EpubNavigationTarget> NavigationTargets { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace EpubSharp.Schema.Navigation
         public EpubNavigationPageTargetType Type { get; set; }
         public string Class { get; set; }
         public string PlayOrder { get; set; }
-        public List<EpubNavigationLabel> NavigationLabels { get; set; }
-        public EpubNavigationContent Content { get; set; }
+        public IReadOnlyCollection<string> NavigationLabels { get; set; }
+        public string ContentSource { get; set; }
     }
 }

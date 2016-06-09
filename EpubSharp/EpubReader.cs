@@ -87,19 +87,19 @@ namespace EpubSharp
             return LoadChapters(book, book.Format.Ncx.NavMap, epubArchive);
         }
 
-        private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNavigationPoint> navigationPoints, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
             {
-                var chapter = new EpubChapter { Title = navigationPoint.NavigationLabels.First().Text };
-                var contentSourceAnchorCharIndex = navigationPoint.Content.Source.IndexOf('#');
+                var chapter = new EpubChapter { Title = navigationPoint.NavigationLabels.First() };
+                var contentSourceAnchorCharIndex = navigationPoint.ContentSource.IndexOf('#');
                 if (contentSourceAnchorCharIndex == -1)
-                    chapter.ContentFileName = navigationPoint.Content.Source;
+                    chapter.ContentFileName = navigationPoint.ContentSource;
                 else
                 {
-                    chapter.ContentFileName = navigationPoint.Content.Source.Substring(0, contentSourceAnchorCharIndex);
-                    chapter.Anchor = navigationPoint.Content.Source.Substring(contentSourceAnchorCharIndex + 1);
+                    chapter.ContentFileName = navigationPoint.ContentSource.Substring(0, contentSourceAnchorCharIndex);
+                    chapter.Anchor = navigationPoint.ContentSource.Substring(contentSourceAnchorCharIndex + 1);
                 }
                 EpubTextContentFile htmlContentFile;
                 if (!book.Content.Html.TryGetValue(chapter.ContentFileName, out htmlContentFile))
