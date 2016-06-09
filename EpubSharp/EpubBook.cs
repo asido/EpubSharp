@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using EpubSharp.Format;
 using EpubSharp.Schema.Navigation;
 using EpubSharp.Schema.Opf;
 
@@ -11,19 +12,12 @@ namespace EpubSharp
         public string Title { get; set; }
         public string Author { get; set; }
         public List<string> AuthorList { get; set; }
-        public EpubSchema Schema { get; set; }
+        public EpubFormat Format { get; set; }
         public EpubContent Content { get; set; }
         public Image CoverImage { get; set; }
         public List<EpubChapter> Chapters { get; set; }
     }
-
-    public class EpubSchema
-    {
-        public EpubPackage Package { get; set; }
-        public EpubNavigation Navigation { get; set; }
-        public string ContentDirectoryPath { get; set; }
-    }
-
+    
     public class EpubChapter
     {
         public string Title { get; set; }

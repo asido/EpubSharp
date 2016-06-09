@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using EpubSharp.Format;
 using EpubSharp.Readers;
 using EpubSharp.Schema.Navigation;
 
@@ -18,9 +19,10 @@ namespace EpubSharp
             var book = new EpubBook { FilePath = filePath };
             using (var archive = ZipFile.OpenRead(filePath))
             {
-                book.Schema = SchemaReader.ReadSchema(archive);
-                book.Title = book.Schema.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
-                book.AuthorList = book.Schema.Package.Metadata.Creators.Select(creator => creator.Creator).ToList();
+                book.Format = new EpubFormat();
+                book.Format.PackageDocument = SchemaReader.ReadSchema(archive);
+                book.Title = book.Format.PackageDocument.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
+                book.AuthorList = book.Format.PackageDocument.Package.Metadata.Creators.Select(creator => creator.Creator).ToList();
                 book.Author = string.Join(", ", book.AuthorList);
                 book.Content = ContentReader.ReadContentFiles(archive, book);
                 book.CoverImage = LoadCoverImage(book);
@@ -31,7 +33,7 @@ namespace EpubSharp
 
         private static Image LoadCoverImage(EpubBook book)
         {
-            var metaItems = book.Schema.Package.Metadata.MetaItems;
+            var metaItems = book.Format.PackageDocument.Package.Metadata.MetaItems;
             if (metaItems == null || !metaItems.Any())
                 return null;
             var coverMetaItem = metaItems.FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
@@ -39,7 +41,7 @@ namespace EpubSharp
                 return null;
             if (string.IsNullOrEmpty(coverMetaItem.Content))
                 throw new Exception("Incorrect EPUB metadata: cover item content is missing");
-            var coverManifestItem = book.Schema.Package.Manifest.FirstOrDefault(manifestItem => string.Compare(manifestItem.Id, coverMetaItem.Content, StringComparison.OrdinalIgnoreCase) == 0);
+            var coverManifestItem = book.Format.PackageDocument.Package.Manifest.FirstOrDefault(manifestItem => string.Compare(manifestItem.Id, coverMetaItem.Content, StringComparison.OrdinalIgnoreCase) == 0);
             if (coverManifestItem == null)
                 throw new Exception($"Incorrect EPUB manifest: item with ID = \"{coverMetaItem.Content}\" is missing");
             EpubByteContentFile coverImageContentFile;
@@ -51,7 +53,7 @@ namespace EpubSharp
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
         {
-            return LoadChapters(book, book.Schema.Navigation.NavMap, epubArchive);
+            return LoadChapters(book, book.Format.PackageDocument.Navigation.NavMap, epubArchive);
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNavigationPoint> navigationPoints, ZipArchive epubArchive)

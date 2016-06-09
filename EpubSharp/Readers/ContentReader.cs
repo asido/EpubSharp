@@ -18,9 +18,9 @@ namespace EpubSharp.Readers
                 Fonts = new Dictionary<string, EpubByteContentFile>(),
                 AllFiles = new Dictionary<string, EpubContentFile>()
             };
-            foreach (var manifestItem in book.Schema.Package.Manifest)
+            foreach (var manifestItem in book.Format.PackageDocument.Package.Manifest)
             {
-                var contentFilePath = ZipPathUtils.Combine(book.Schema.ContentDirectoryPath, manifestItem.Href);
+                var contentFilePath = ZipPathUtils.Combine(book.Format.PackageDocument.ContentDirectoryPath, manifestItem.Href);
                 var contentFileEntry = epubArchive.GetEntryIgnoringSlashDirection(contentFilePath);
                 if (contentFileEntry == null)
                     throw new Exception($"EPUB parsing error: file {contentFilePath} not found in archive.");
