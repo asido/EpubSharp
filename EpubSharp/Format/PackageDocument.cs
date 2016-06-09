@@ -13,7 +13,7 @@ namespace EpubSharp.Format
     {
         public EpubVersion EpubVersion { get; internal set; }
         public EpubMetadata Metadata { get; internal set; }
-        public IReadOnlyCollection<EpubManifestItem> Manifest { get; internal set; }
+        public EpubManifest Manifest { get; internal set; }
         public EpubSpine Spine { get; internal set; }
         public EpubGuide Guide { get; internal set; }
     }
@@ -63,6 +63,11 @@ namespace EpubSharp.Format
         public string Scheme { get; internal set; }
     }
 
+    public class EpubManifest
+    {
+        public IReadOnlyCollection<EpubManifestItem> Items { get; internal set; }
+    }
+
     public class EpubManifestItem
     {
         public string Id { get; internal set; }
@@ -77,5 +82,11 @@ namespace EpubSharp.Format
         {
             return $"Id: {Id}, Href = {Href}, MediaType = {MediaType}";
         }
+    }
+
+    public class EpubSpine
+    {
+        public string Toc { get; internal set; }
+        public IReadOnlyCollection<EpubSpineItemRef> ItemRefs { get; internal set; }
     }
 }

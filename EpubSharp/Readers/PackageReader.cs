@@ -30,7 +30,8 @@ namespace EpubSharp.Readers
             XmlNode manifestNode = packageNode.SelectSingleNode("opf:manifest", xmlNamespaceManager);
             if (manifestNode == null)
                 throw new Exception("EPUB parsing error: manifest not found in the package.");
-            result.Manifest = ReadManifest(manifestNode);
+            result.Manifest = new EpubManifest();
+            result.Manifest.Items = ReadManifestItems(manifestNode);
             XmlNode spineNode = packageNode.SelectSingleNode("opf:spine", xmlNamespaceManager);
             if (spineNode == null)
                 throw new Exception("EPUB parsing error: spine not found in the package.");
@@ -240,10 +241,10 @@ namespace EpubSharp.Readers
 
         private static EpubMetadataMeta ReadMetadataMetaVersion3(XmlNode metadataMetaNode)
         {
-            EpubMetadataMeta result = new EpubMetadataMeta();
+            var result = new EpubMetadataMeta();
             foreach (XmlAttribute metadataMetaNodeAttribute in metadataMetaNode.Attributes)
             {
-                string attributeValue = metadataMetaNodeAttribute.Value;
+                var attributeValue = metadataMetaNodeAttribute.Value;
                 switch (metadataMetaNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "id":
@@ -264,13 +265,13 @@ namespace EpubSharp.Readers
             return result;
         }
 
-        private static IReadOnlyCollection<EpubManifestItem> ReadManifest(XmlNode manifestNode)
+        private static IReadOnlyCollection<EpubManifestItem> ReadManifestItems(XmlNode manifestNode)
         {
             var result = new List<EpubManifestItem>();
             foreach (XmlNode manifestItemNode in manifestNode.ChildNodes)
-                if (String.Compare(manifestItemNode.LocalName, "item", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(manifestItemNode.LocalName, "item", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    EpubManifestItem manifestItem = new EpubManifestItem();
+                    var manifestItem = new EpubManifestItem();
                     foreach (XmlAttribute manifestItemNodeAttribute in manifestItemNode.Attributes)
                     {
                         string attributeValue = manifestItemNodeAttribute.Value;
@@ -299,36 +300,43 @@ namespace EpubSharp.Readers
                                 break;
                         }
                     }
-                    if (String.IsNullOrWhiteSpace(manifestItem.Id))
+                    if (string.IsNullOrWhiteSpace(manifestItem.Id))
                         throw new Exception("Incorrect EPUB manifest: item ID is missing");
-                    if (String.IsNullOrWhiteSpace(manifestItem.Href))
+                    if (string.IsNullOrWhiteSpace(manifestItem.Href))
                         throw new Exception("Incorrect EPUB manifest: item href is missing");
-                    if (String.IsNullOrWhiteSpace(manifestItem.MediaType))
+                    if (string.IsNullOrWhiteSpace(manifestItem.MediaType))
                         throw new Exception("Incorrect EPUB manifest: item media type is missing");
                     result.Add(manifestItem);
                 }
-            return result;
+            return result.AsReadOnly();
         }
 
         private static EpubSpine ReadSpine(XmlNode spineNode)
         {
-            EpubSpine result = new EpubSpine();
-            XmlAttribute tocAttribute = spineNode.Attributes["toc"];
-            if (tocAttribute == null || string.IsNullOrWhiteSpace(tocAttribute.Value))
+            var result = new EpubSpine();
+            var tocAttribute = spineNode.Attributes["toc"];
+            if (string.IsNullOrWhiteSpace(tocAttribute?.Value))
+            {
                 throw new Exception("Incorrect EPUB spine: TOC is missing");
+            }
+
             result.Toc = tocAttribute.Value;
+            var itemRefs = new List<EpubSpineItemRef>();
             foreach (XmlNode spineItemNode in spineNode.ChildNodes)
-                if (String.Compare(spineItemNode.LocalName, "itemref", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                if (string.Compare(spineItemNode.LocalName, "itemref", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    EpubSpineItemRef spineItemRef = new EpubSpineItemRef();
-                    XmlAttribute idRefAttribute = spineItemNode.Attributes["idref"];
-                    if (idRefAttribute == null || String.IsNullOrWhiteSpace(idRefAttribute.Value))
+                    var spineItemRef = new EpubSpineItemRef();
+                    var idRefAttribute = spineItemNode.Attributes["idref"];
+                    if (string.IsNullOrWhiteSpace(idRefAttribute?.Value))
                         throw new Exception("Incorrect EPUB spine: item ID ref is missing");
                     spineItemRef.IdRef = idRefAttribute.Value;
                     XmlAttribute linearAttribute = spineItemNode.Attributes["linear"];
-                    spineItemRef.IsLinear = linearAttribute == null || String.Compare(linearAttribute.Value, "no", StringComparison.OrdinalIgnoreCase) != 0;
-                    result.Add(spineItemRef);
+                    spineItemRef.IsLinear = linearAttribute == null || string.Compare(linearAttribute.Value, "no", StringComparison.OrdinalIgnoreCase) != 0;
+                    itemRefs.Add(spineItemRef);
                 }
+            }
+            result.ItemRefs = itemRefs.AsReadOnly();
             return result;
         }
 

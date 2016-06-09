@@ -38,7 +38,7 @@ namespace EpubSharp
                 string tocId = book.Format.Package.Spine.Toc;
                 if (String.IsNullOrEmpty(tocId))
                     throw new Exception("EPUB parsing error: TOC ID is empty.");
-                var tocManifestItem = book.Format.Package.Manifest.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
+                var tocManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
                 if (tocManifestItem == null)
                     throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
 
@@ -72,7 +72,7 @@ namespace EpubSharp
                 return null;
             if (string.IsNullOrEmpty(coverMetaItem.Content))
                 throw new Exception("Incorrect EPUB metadata: cover item content is missing");
-            var coverManifestItem = book.Format.Package.Manifest.FirstOrDefault(manifestItem => string.Compare(manifestItem.Id, coverMetaItem.Content, StringComparison.OrdinalIgnoreCase) == 0);
+            var coverManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(manifestItem => string.Compare(manifestItem.Id, coverMetaItem.Content, StringComparison.OrdinalIgnoreCase) == 0);
             if (coverManifestItem == null)
                 throw new Exception($"Incorrect EPUB manifest: item with ID = \"{coverMetaItem.Content}\" is missing");
             EpubByteContentFile coverImageContentFile;
