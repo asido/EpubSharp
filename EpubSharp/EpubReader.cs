@@ -53,7 +53,7 @@ namespace EpubSharp
 
                 book.Format.Ncx = NcxReader.Read(containerDocument);
                 book.Title = book.Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
-                book.AuthorList = book.Format.Package.Metadata.Creators.Select(creator => creator.Creator).ToList();
+                book.AuthorList = book.Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
                 book.Author = string.Join(", ", book.AuthorList);
                 book.Content = ContentReader.ReadContentFiles(archive, book);
                 book.CoverImage = LoadCoverImage(book);

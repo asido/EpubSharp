@@ -15,16 +15,7 @@ namespace EpubSharp.Format
     {
         public string RootFile { get; internal set; }
     }
-
-    public class PackageDocument
-    {
-        public EpubVersion EpubVersion { get; internal set; }
-        public EpubMetadata Metadata { get; internal set; }
-        public EpubManifest Manifest { get; internal set; }
-        public EpubSpine Spine { get; internal set; }
-        public EpubGuide Guide { get; internal set; }
-    }
-
+    
     public class NcxDocument
     {
         public IReadOnlyCollection<EpubNavigationHeadMeta> Head { get; internal set; }
