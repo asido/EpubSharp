@@ -11,15 +11,15 @@ namespace EpubSharp.Readers
         public static string GetRootFilePath(ZipArchive epubArchive)
         {
             const string epubContainerFilePath = "META-INF/container.xml";
-            ZipArchiveEntry containerFileEntry = epubArchive.GetEntryIgnoringSlashDirection(epubContainerFilePath);
+            var containerFileEntry = epubArchive.GetEntryIgnoringSlashDirection(epubContainerFilePath);
             if (containerFileEntry == null)
-                throw new Exception(string.Format("EPUB parsing error: {0} file not found in archive.", epubContainerFilePath));
+                throw new Exception($"EPUB parsing error: {epubContainerFilePath} file not found in archive.");
             XmlDocument containerDocument;
-            using (Stream containerStream = containerFileEntry.Open())
+            using (var containerStream = containerFileEntry.Open())
                 containerDocument = XmlUtils.LoadDocument(containerStream);
-            XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(containerDocument.NameTable);
+            var xmlNamespaceManager = new XmlNamespaceManager(containerDocument.NameTable);
             xmlNamespaceManager.AddNamespace("cns", "urn:oasis:names:tc:opendocument:xmlns:container");
-            XmlNode rootFileNode = containerDocument.DocumentElement.SelectSingleNode("/cns:container/cns:rootfiles/cns:rootfile", xmlNamespaceManager);
+            var rootFileNode = containerDocument.DocumentElement.SelectSingleNode("/cns:container/cns:rootfiles/cns:rootfile", xmlNamespaceManager);
             return rootFileNode.Attributes["full-path"].Value;
         }
     }
