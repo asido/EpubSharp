@@ -32,7 +32,7 @@ namespace EpubSharp
                     containerDocument = XmlUtils.LoadDocument(containerStream);
                 }
 
-                book.Format.Package = PackageDocumentReader.Read(containerDocument);
+                book.Format.Package = PackageReader.Read(containerDocument);
 
                 string tocId = book.Format.Package.Spine.Toc;
                 if (String.IsNullOrEmpty(tocId))

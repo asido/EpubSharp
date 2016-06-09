@@ -7,7 +7,7 @@ namespace EpubSharp.Readers
 {
     internal static class PackageReader
     {
-        public static PackageDocument ReadPackage(XmlDocument xml)
+        public static PackageDocument Read(XmlDocument xml)
         {
             XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
             xmlNamespaceManager.AddNamespace("opf", "http://www.idpf.org/2007/opf");
