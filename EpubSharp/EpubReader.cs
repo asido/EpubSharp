@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml;
 using EpubSharp.Format;
+using EpubSharp.Format.Readers;
 using EpubSharp.Readers;
 using EpubSharp.Utils;
 

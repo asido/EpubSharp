@@ -53,7 +53,7 @@
     <Compile Include="Readers\ContentReader.cs" />
     <Compile Include="Readers\NcxReader.cs" />
     <Compile Include="Readers\PackageReader.cs" />
-    <Compile Include="Readers\OcfReader.cs" />
+    <Compile Include="Format\Readers\OcfReader.cs" />
     <Compile Include="Utils\XmlUtils.cs" />
     <Compile Include="Utils\ZipPathUtils.cs" />
   </ItemGroup>

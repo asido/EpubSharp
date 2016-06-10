@@ -7,7 +7,7 @@ namespace EpubSharp.Format
         Epub2 = 2,
         Epub3
     }
-
+    
     public class PackageDocument
     {
         public EpubVersion EpubVersion { get; internal set; }

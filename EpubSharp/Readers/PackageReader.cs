@@ -314,12 +314,11 @@ namespace EpubSharp.Readers
         {
             var result = new EpubSpine();
             var tocAttribute = spineNode.Attributes["toc"];
-            if (string.IsNullOrWhiteSpace(tocAttribute?.Value))
+            if (!string.IsNullOrWhiteSpace(tocAttribute?.Value))
             {
-                throw new Exception("Incorrect EPUB spine: TOC is missing");
+                result.Toc = tocAttribute.Value;
             }
-
-            result.Toc = tocAttribute.Value;
+            
             var itemRefs = new List<EpubSpineItemRef>();
             foreach (XmlNode spineItemNode in spineNode.ChildNodes)
             {
