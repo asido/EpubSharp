@@ -7,15 +7,17 @@ namespace EpubSharp.Utils
     {
         public static XmlDocument LoadDocument(Stream stream)
         {
-            var result = new XmlDocument();
             var xmlReaderSettings = new XmlReaderSettings
             {
                 XmlResolver = null,
                 DtdProcessing = DtdProcessing.Ignore
             };
-            using (var xmlReader = XmlReader.Create(stream, xmlReaderSettings))
-                result.Load(xmlReader);
-            return result;
+            using (var reader = XmlReader.Create(stream, xmlReaderSettings))
+            {
+                var doc = new XmlDocument();
+                doc.Load(reader);
+                return doc;
+            }
         }
     }
 }
