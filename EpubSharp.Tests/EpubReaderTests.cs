@@ -45,7 +45,7 @@ namespace EpubSharp.Tests
 
                 try
                 {
-                    EpubReader.OpenBook(archivePath);
+                    EpubReader.Read(archivePath);
                 }
                 catch (Exception ex)
                 {

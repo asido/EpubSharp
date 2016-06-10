@@ -14,10 +14,13 @@ namespace EpubSharp
 {
     public static class EpubReader
     {
-        public static EpubBook OpenBook(string filePath)
+        public static EpubBook Read(string filePath)
         {
             if (!File.Exists(filePath))
+            {
                 throw new FileNotFoundException("Specified epub file not found.", filePath);
+            }
+
             var book = new EpubBook { FilePath = filePath };
             using (var archive = ZipFile.OpenRead(filePath))
             {

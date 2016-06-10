@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EpubBook.cs" />
+    <Compile Include="EpubException.cs" />
     <Compile Include="EpubReader.cs" />
     <Compile Include="Extensions\ZipArchive.cs" />
     <Compile Include="Format\EpubFormat.cs" />
