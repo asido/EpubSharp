@@ -2,12 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 using EpubSharp.Format;
 
 namespace EpubSharp.Readers
 {
     internal static class NcxReader
     {
+        private static readonly XNamespace NcxNamespace = "http://www.daisy.org/z3986/2005/ncx/";
+
+        private static class NcxElements
+        {
+            public static readonly XName Head = NcxNamespace + "head";
+            public static readonly XName Meta = NcxNamespace + "meta";
+            public static readonly XName DocTitle = NcxNamespace + "docTitle";
+            public static readonly XName DocAuthor = NcxNamespace + "docAuthor";
+            public static readonly XName Text = NcxNamespace + "text";
+            public static readonly XName NavMap = NcxNamespace + "navMap";
+            public static readonly XName NavPoint = NcxNamespace + "navPoint";
+            public static readonly XName NavList = NcxNamespace + "navList";
+            public static readonly XName PageList = NcxNamespace + "pageList";
+            public static readonly XName PageTarget = NcxNamespace + "pageTarget";
+            public static readonly XName NavLabel = NcxNamespace + "navLabel";
+            public static readonly XName NavTarget = NcxNamespace + "navTarget";
+            public static readonly XName Content = NcxNamespace + "content";
+        }
+
         public static NcxDocument Read(XmlDocument xml)
         {
             if (xml == null) throw new ArgumentNullException(nameof(xml));
@@ -15,7 +35,7 @@ namespace EpubSharp.Readers
 
             var ncx = new NcxDocument();
             var xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
-            xmlNamespaceManager.AddNamespace("ncx", "http://www.daisy.org/z3986/2005/ncx/");
+            xmlNamespaceManager.AddNamespace("ncx", NcxNamespace.NamespaceName);
 
             var headNode = xml.DocumentElement.SelectSingleNode("ncx:head", xmlNamespaceManager);
             if (headNode == null)
@@ -30,14 +50,14 @@ namespace EpubSharp.Readers
                 throw new EpubException("EPUB parsing error: TOC file does not contain docTitle element");
             }
 
-            ncx.DocTitle = ReadNavigationDocTitle(docTitleNode);
+            ncx.DocTitle = ReadNavigationDocTitle(docTitleNode).SingleOrDefault();
 
             var authors = new List<string>();
             foreach (XmlNode docAuthorNode in xml.DocumentElement.SelectNodes("ncx:docAuthor", xmlNamespaceManager))
             {
                 authors.AddRange(ReadNavigationDocAuthor(docAuthorNode));
             }
-            ncx.DocAuthors = authors.AsReadOnly();
+            ncx.DocAuthor = authors.FirstOrDefault();
 
             var navMapNode = xml.DocumentElement.SelectSingleNode("ncx:navMap", xmlNamespaceManager);
             if (navMapNode == null)
@@ -49,8 +69,70 @@ namespace EpubSharp.Readers
                 ncx.PageList = ReadNavigationPageList(pageListNode);
             }
             ncx.NavigationList = (from XmlNode navigationListNode in xml.DocumentElement.SelectNodes("ncx:navList", xmlNamespaceManager)
-                               select ReadNavigationList(navigationListNode)).ToList().AsReadOnly();
+                               select ReadNavigationList(navigationListNode)).SingleOrDefault();
             return ncx;
+        }
+
+        public static NcxDocument Read(XDocument xml)
+        {
+            if (xml == null) throw new ArgumentNullException(nameof(xml));
+            if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
+
+            var navList = xml.Root.Element(NcxElements.NavList);
+
+            var ncx = new NcxDocument
+            {
+                Metadata = xml.Root.Element(NcxElements.Head)?.Elements(NcxElements.Meta).Select(elem => new EpubNcxMetadata
+                {
+                    Name = (string)elem.Attribute("name"),
+                    Content = (string)elem.Attribute("content"),
+                    Scheme = (string)elem.Attribute("scheme")
+                }).ToList().AsReadOnly(),
+                DocTitle = xml.Root.Element(NcxElements.DocTitle)?.Element(NcxElements.Text)?.Value,
+                DocAuthor = xml.Root.Element(NcxElements.DocAuthor)?.Element(NcxElements.Text)?.Value,
+                NavigationMap = xml.Root.Element(NcxElements.NavMap)?.Elements(NcxElements.NavPoint).Select(ReadNavigationPoint).ToList().AsReadOnly(),
+                PageList = xml.Root.Element(NcxElements.PageList)?.Elements(NcxElements.PageTarget).Select(elem => new EpubNcxPageTarget
+                {
+                    Id = (string)elem.Attribute("id"),
+                    Class = (string)elem.Attribute("class"),
+                    Value = (int)elem.Attribute("value"),
+                    Type = (EpubNcxPageTargetType?)(elem.Attribute("type") == null ? null : Enum.Parse(typeof(EpubNcxPageTargetType), (string)elem.Attribute("type"))),
+                    Label = elem.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
+                    ContentSource = (string)elem.Element(NcxElements.Content)?.Attribute("src")
+                }).ToList().AsReadOnly(),
+                NavigationList = navList == null ? null : new EpubNcxNavigationList
+                {
+                    Id = (string)navList.Attribute("id"),
+                    Class = (string)navList.Attribute("class"),
+                    Label = navList.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
+                    NavigationTargets = navList.Elements(NcxElements.NavTarget).Select(elem => new EpubNcxNavigationTarget
+                    {
+                        Id = (string)elem.Attribute("id"),
+                        Class = (string)elem.Attribute("class"),
+                        Label = navList.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
+                        PlayOrder = (int?)elem.Attribute("playOrder"),
+                        ContentSource = (string)elem.Element(NcxElements.Content)?.Attribute("src")
+                    }).ToList().AsReadOnly()
+                }
+            };
+            
+            return ncx;
+        }
+
+        private static EpubNcxNavigationPoint ReadNavigationPoint(XElement element)
+        {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+            if (element.Name != NcxElements.NavPoint) throw new ArgumentException("The element is not <navPoint>", nameof(element));
+
+            return new EpubNcxNavigationPoint
+            {
+                Id = (string)element.Attribute("id"),
+                Class = (string)element.Attribute("class"),
+                Label = element.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
+                ContentSource = (string)element.Element(NcxElements.Content)?.Attribute("src"),
+                PlayOrder = (int?)element.Attribute("playOrder"),
+                NavigationPoints = element.Elements(NcxElements.NavPoint).Select(ReadNavigationPoint).ToList().AsReadOnly()
+            };
         }
 
         private static IReadOnlyCollection<EpubNcxMetadata> ReadNavigationHead(XmlNode headNode)
@@ -120,33 +202,31 @@ namespace EpubSharp.Readers
                     case "class":
                         result.Class = attributeValue;
                         break;
-                    case "playOrder":
-                        result.PlayOrder = attributeValue;
+                    case "playorder":
+                        result.PlayOrder = int.Parse(attributeValue);
                         break;
                 }
             }
             if (string.IsNullOrWhiteSpace(result.Id))
                 throw new Exception("Incorrect EPUB navigation point: point ID is missing");
-            var navLabels = new List<string>();
-            result.NavigationPoints = new List<EpubNcxNavigationPoint>();
+            var navigationPoints = new List<EpubNcxNavigationPoint>();
             foreach (XmlNode navigationPointChildNode in navigationPointNode.ChildNodes)
             {
                 switch (navigationPointChildNode.LocalName.ToLowerInvariant())
                 {
                     case "navlabel":
-                        navLabels.Add(ReadNavigationLabel(navigationPointChildNode));
+                        result.Label = ReadNavigationLabel(navigationPointChildNode);
                         break;
                     case "content":
                         result.ContentSource = ReadNavigationContent(navigationPointChildNode);
                         break;
                     case "navpoint":
-                        EpubNcxNavigationPoint childNavigationPoint = ReadNavigationPoint(navigationPointChildNode);
-                        result.NavigationPoints.Add(childNavigationPoint);
+                        navigationPoints.Add(ReadNavigationPoint(navigationPointChildNode));
                         break;
                 }
             }
-            result.NavigationLabels = navLabels.AsReadOnly();
-            if (!result.NavigationLabels.Any())
+            result.NavigationPoints = navigationPoints.AsReadOnly();
+            if (!result.Label.Any())
                 throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain at least one navigation label");
             if (result.ContentSource == null)
                 throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain content");
@@ -186,7 +266,7 @@ namespace EpubSharp.Readers
                         result.Id = attributeValue;
                         break;
                     case "value":
-                        result.Value = attributeValue;
+                        result.Value = int.Parse(attributeValue);
                         break;
                     case "type":
                         EpubNcxPageTargetType type;
@@ -197,9 +277,6 @@ namespace EpubSharp.Readers
                     case "class":
                         result.Class = attributeValue;
                         break;
-                    case "playOrder":
-                        result.PlayOrder = attributeValue;
-                        break;
                 }
             }
             if (result.Type == default(EpubNcxPageTargetType))
@@ -207,21 +284,19 @@ namespace EpubSharp.Readers
                 throw new Exception("Incorrect EPUB navigation page target: page target type is missing");
             }
 
-            var navLabels = new List<string>();
             foreach (XmlNode navigationPageTargetChildNode in navigationPageTargetNode.ChildNodes)
             {
                 switch (navigationPageTargetChildNode.LocalName.ToLowerInvariant())
                 {
                     case "navlabel":
-                        navLabels.Add(ReadNavigationLabel(navigationPageTargetChildNode));
+                        result.Label = ReadNavigationLabel(navigationPageTargetChildNode);
                         break;
                     case "content":
                         result.ContentSource = ReadNavigationContent(navigationPageTargetChildNode);
                         break;
                 }
             }
-            result.NavigationLabels = navLabels.AsReadOnly();
-            if (!result.NavigationLabels.Any())
+            if (!result.Label.Any())
                 throw new Exception("Incorrect EPUB navigation page target: at least one navLabel element is required");
             return result;
         }
@@ -242,22 +317,21 @@ namespace EpubSharp.Readers
                         break;
                 }
             }
-            var navLabels = new List<string>();
+            var navigationTargets = new List<EpubNcxNavigationTarget>();
             foreach (XmlNode navigationListChildNode in navigationListNode.ChildNodes)
             {
                 switch (navigationListChildNode.LocalName.ToLowerInvariant())
                 {
                     case "navlabel":
-                        navLabels.Add(ReadNavigationLabel(navigationListChildNode));
+                        result.Label = ReadNavigationLabel(navigationListChildNode);
                         break;
                     case "navTarget":
-                        var navigationTarget = ReadNavigationTarget(navigationListChildNode);
-                        result.NavigationTargets.Add(navigationTarget);
+                        navigationTargets.Add(ReadNavigationTarget(navigationListChildNode));
                         break;
                 }
             }
-            result.NavigationLabels = navLabels.AsReadOnly();
-            if (!result.NavigationLabels.Any())
+            result.NavigationTargets = navigationTargets.AsReadOnly();
+            if (!result.Label.Any())
                 throw new Exception("Incorrect EPUB navigation page target: at least one navLabel element is required");
             return result;
         }
@@ -273,26 +347,22 @@ namespace EpubSharp.Readers
                     case "id":
                         result.Id = attributeValue;
                         break;
-                    case "value":
-                        result.Value = attributeValue;
-                        break;
                     case "class":
                         result.Class = attributeValue;
                         break;
                     case "playOrder":
-                        result.PlayOrder = attributeValue;
+                        result.PlayOrder = int.Parse(attributeValue);
                         break;
                 }
             }
             if (string.IsNullOrWhiteSpace(result.Id))
                 throw new Exception("Incorrect EPUB navigation target: navigation target ID is missing");
-            var navLabels = new List<string>();
             foreach (XmlNode navigationTargetChildNode in navigationTargetNode.ChildNodes)
             {
                 switch (navigationTargetChildNode.LocalName.ToLowerInvariant())
                 {
                     case "navlabel":
-                        navLabels.Add(ReadNavigationLabel(navigationTargetChildNode));
+                        result.Label = ReadNavigationLabel(navigationTargetChildNode);
                         break;
                     case "content":
                         var content = ReadNavigationContent(navigationTargetChildNode);
@@ -300,8 +370,7 @@ namespace EpubSharp.Readers
                         break;
                 }
             }
-            result.NavigationLabels = navLabels.AsReadOnly();
-            if (!result.NavigationLabels.Any())
+            if (!result.Label.Any())
                 throw new Exception("Incorrect EPUB navigation target: at least one navLabel element is required");
             return result;
         }

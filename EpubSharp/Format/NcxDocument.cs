@@ -8,11 +8,11 @@ namespace EpubSharp.Format
     public class NcxDocument
     {
         public IReadOnlyCollection<EpubNcxMetadata> Metadata { get; internal set; }
-        public IReadOnlyCollection<string> DocTitle { get; internal set; }
-        public IReadOnlyCollection<string> DocAuthors { get; internal set; }
+        public string DocTitle { get; internal set; }
+        public string DocAuthor { get; internal set; }
         public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationMap { get; internal set; }
         public IReadOnlyCollection<EpubNcxPageTarget> PageList { get; internal set; }
-        public IReadOnlyCollection<EpubNcxNavigationList> NavigationList { get; internal set; }
+        public EpubNcxNavigationList NavigationList { get; internal set; }
     }
 
     public class EpubNcxMetadata
@@ -26,10 +26,10 @@ namespace EpubSharp.Format
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }
-        public string PlayOrder { get; internal set; }
-        public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
+        public int? PlayOrder { get; internal set; }
+        public string Label { get; internal set; }
         public string ContentSource { get; internal set; }
-        public List<EpubNcxNavigationPoint> NavigationPoints { get; internal set; }
+        public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationPoints { get; internal set; }
 
         public override string ToString()
         {
@@ -47,11 +47,10 @@ namespace EpubSharp.Format
     public class EpubNcxPageTarget
     {
         public string Id { get; internal set; }
-        public string Value { get; internal set; }
+        public int Value { get; internal set; }
         public string Class { get; internal set; }
-        public string PlayOrder { get; internal set; }
-        public EpubNcxPageTargetType Type { get; internal set; }
-        public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
+        public EpubNcxPageTargetType? Type { get; internal set; }
+        public string Label { get; internal set; }
         public string ContentSource { get; internal set; }
     }
 
@@ -59,17 +58,16 @@ namespace EpubSharp.Format
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }
-        public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
-        public List<EpubNcxNavigationTarget> NavigationTargets { get; internal set; }
+        public string Label { get; internal set; }
+        public IReadOnlyCollection<EpubNcxNavigationTarget> NavigationTargets { get; internal set; }
     }
 
     public class EpubNcxNavigationTarget
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }
-        public string Value { get; internal set; }
-        public string PlayOrder { get; internal set; }
-        public IReadOnlyCollection<string> NavigationLabels { get; internal set; }
+        public int? PlayOrder { get; internal set; }
+        public string Label { get; internal set; }
         public string ContentSource { get; internal set; }
     }
 }

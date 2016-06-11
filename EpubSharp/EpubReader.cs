@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Readers;
 using EpubSharp.Readers;
@@ -55,6 +56,7 @@ namespace EpubSharp
                     containerDocument = XmlUtils.LoadDocument(containerStream);
 
                 book.Format.Ncx = NcxReader.Read(containerDocument);
+                book.Format.NewNcx = NcxReader.Read(XDocument.Load(tocFileEntry.Open()));
                 book.Title = book.Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
                 book.AuthorList = book.Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
                 book.Author = string.Join(", ", book.AuthorList);
@@ -95,7 +97,7 @@ namespace EpubSharp
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
             {
-                var chapter = new EpubChapter { Title = navigationPoint.NavigationLabels.First() };
+                var chapter = new EpubChapter { Title = navigationPoint.Label };
                 var contentSourceAnchorCharIndex = navigationPoint.ContentSource.IndexOf('#');
                 if (contentSourceAnchorCharIndex == -1)
                     chapter.ContentFileName = navigationPoint.ContentSource;
