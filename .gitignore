@@ -250,3 +250,6 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+EpubSharp.Tests/Samples/epub-assorted/
+EpubSharp.Tests/Samples/epub30/
+EpubSharp.Tests/Samples/epub31/
