@@ -2,11 +2,23 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace EpubSharp.Format.Readers
 {
     internal static class PackageReader
     {
+        private static readonly XNamespace PackageNamespace = "http://www.idpf.org/2007/opf";
+        private static readonly XNamespace MetadataNamespace = "http://purl.org/dc/elements/1.1/";
+
+        private static class PackageElements
+        {
+            public static readonly XName Metadata = PackageNamespace + "metadata";
+            public static readonly XName Contributor = MetadataNamespace + "contributor";
+            public static readonly XName Coverages = MetadataNamespace + "coverages";
+            public static readonly XName Creator = MetadataNamespace + "creator";
+        }
+
         public static PackageDocument Read(XmlDocument xml)
         {
             var xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
@@ -55,6 +67,48 @@ namespace EpubSharp.Format.Readers
             package.CoverPath = FindCoverPath(package);
 
             return package;
+        }
+
+        public static PackageDocument Read(XDocument xml)
+        {
+            if (xml == null) throw new ArgumentNullException(nameof(xml));
+            if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
+
+            Func<XElement, PackageMetadataCreator> readCreator = elem => new PackageMetadataCreator
+            {
+                Role = (string) elem.Attribute("role"),
+                FileAs = (string) elem.Attribute("file-as"),
+                AlternateScript = (string) elem.Attribute("alternate-script"),
+                Text = elem.Value
+            };
+
+            var package = new PackageDocument
+            {
+                EpubVersion = GetAndValidateVersion((string)xml.Root.Attribute("version")),
+                Metadata = new PackageMetadata
+                {
+                    Creators = xml.Root.Element(PackageElements.Metadata)?.Elements(PackageElements.Creator).Select(readCreator).ToList().AsReadOnly(),
+                    Contributors = xml.Root.Element(PackageElements.Metadata)?.Elements(PackageElements.Contributor).Select(readCreator).ToList().AsReadOnly(),
+                    Coverages = xml.Root.Element(PackageElements.Metadata)?.Elements(PackageElements.Coverages).Select(elem => elem.Value).ToList().AsReadOnly(),
+                }
+            };
+            return package;
+        }
+
+        private static EpubVersion GetAndValidateVersion(string version)
+        {
+            if (string.IsNullOrWhiteSpace(version)) throw new ArgumentNullException(nameof(version));
+
+            if (version == "2.0")
+            {
+                return EpubVersion.Epub2;
+            }
+            if (version == "3.0" || version == "3.0.1" || version == "3.1")
+            {
+                return EpubVersion.Epub3;
+            }
+
+            throw new Exception($"Unsupported EPUB version: {version}.");
         }
 
         private static string FindCoverPath(PackageDocument package)

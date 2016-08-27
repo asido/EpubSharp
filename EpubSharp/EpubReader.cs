@@ -35,12 +35,13 @@ namespace EpubSharp
                 throw new FileNotFoundException("Specified epub file not found.", filePath);
             }
 
-            using (var archive = ZipFile.OpenRead(filePath))
+            using (var archive = ZipFile.Open(filePath, ZipArchiveMode.Read, System.Text.Encoding.UTF8))
             {
                 var format = new EpubFormat();
                 format.Ocf = OcfReader.Read(archive.LoadXml("META-INF/container.xml"));
                 format.NewOcf = OcfReader.Read(archive.LoadXDocument("META-INF/container.xml"));
                 format.Package = PackageReader.Read(archive.LoadXml(format.Ocf.RootFile));
+                format.NewPackage = PackageReader.Read(archive.LoadXDocument(format.Ocf.RootFile));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
                 if (!string.IsNullOrWhiteSpace(format.Package.NcxPath))

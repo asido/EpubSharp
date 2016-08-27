@@ -14,51 +14,96 @@ namespace EpubSharp.Tests
         [TestMethod]
         public void OpenEpub30Test()
         {
-            OpenEpubTest(@"../../Samples/epub30");
+            ZipAndMoveAndTestEpubOpen(@"../../Samples/epub30");
         }
 
         [TestMethod]
         public void OpenEpub31Test()
         {
-            OpenEpubTest(@"../../Samples/epub31");
+            ZipAndMoveAndTestEpubOpen(@"../../Samples/epub31");
         }
 
-        private void OpenEpubTest(string samplePath)
+        [TestMethod]
+        public void OpenEpubAssortedTest()
+        {
+            MoveAndTestEpubOpen(@"../../Samples/epub-assorted");
+        }
+
+        private void ZipAndMoveAndTestEpubOpen(string samplePath)
         {
             if (samplePath == null) throw new ArgumentNullException(nameof(samplePath));
 
-            var exceptions = new List<string>();
-
             var destination = Path.Combine("Samples", Path.GetFileName(samplePath));
-            if (Directory.Exists(destination))
+            if (!Directory.Exists(destination))
             {
-                Directory.Delete(destination, true);
+                Directory.CreateDirectory(destination);
             }
-            Directory.CreateDirectory(destination);
 
             var samples = Directory.GetDirectories(samplePath, "*", SearchOption.TopDirectoryOnly).ToList();
+            var archives = new List<string>();
 
             foreach (var source in samples)
             {
                 var archiveName = Path.GetFileName(source) + ".zip";
                 var archivePath = Path.Combine(destination, archiveName);
-                ZipFile.CreateFromDirectory(source, archivePath);
+                if (!File.Exists(archivePath))
+                {
+                    ZipFile.CreateFromDirectory(source, archivePath);
+                }
+                archives.Add(archivePath);
+            }
 
+            OpenEpubTest(archives);
+        }
+
+        private void MoveAndTestEpubOpen(string samplePath)
+        {
+            if (samplePath == null) throw new ArgumentNullException(nameof(samplePath));
+
+            var destination = Path.Combine("Samples", Path.GetFileName(samplePath));
+            if (!Directory.Exists(destination))
+            {
+                Directory.CreateDirectory(destination);
+            }
+
+            var samples = Directory.GetFiles(samplePath);
+            var archives = new List<string>();
+
+            foreach (var source in samples)
+            {
+                var archiveName = Path.GetFileName(source);
+                var archivePath = Path.Combine(destination, archiveName);
+                if (!File.Exists(archivePath))
+                {
+                    File.Copy(source, archivePath);
+                }
+                archives.Add(archivePath);
+            }
+
+            OpenEpubTest(archives);
+        }
+
+        private void OpenEpubTest(ICollection<string> files)
+        {
+            var exceptions = new List<string>();
+
+            foreach (var path in files)
+            {
                 try
                 {
-                    var book = EpubReader.Read(archivePath);
+                    var book = EpubReader.Read(path);
                     AssertOcf(book.Format.Ocf, book.Format.NewOcf);
                     AssertNcx(book.Format.Ncx, book.Format.NewNcx);
                 }
                 catch (Exception ex)
                 {
-                    exceptions.Add($"Failed to open book: '{archiveName}'. Exception: {ex.Message}");
+                    exceptions.Add($"Failed to open book: '{path}'. Exception: {ex.Message}");
                 }
             }
 
             if (exceptions.Any())
             {
-                var message = $"Failed to open {exceptions.Count}/{samples.Count} samples.{Environment.NewLine}{string.Join(Environment.NewLine, exceptions)}";
+                var message = $"Failed to open {exceptions.Count}/{files.Count} samples.{Environment.NewLine}{string.Join(Environment.NewLine, exceptions)}";
                 Assert.Fail(message);
             }
         }
@@ -168,6 +213,56 @@ namespace EpubSharp.Tests
         private void AssertOcf(OcfDocument expected, OcfDocument actual)
         {
             Assert.AreEqual(expected.RootFile, actual.RootFile);
+        }
+
+        private void AssertPackage(PackageDocument expected, PackageDocument actual)
+        {
+            Assert.AreEqual(expected == null, actual == null, nameof(actual));
+            if (expected != null && actual != null)
+            {
+                Assert.AreEqual(expected.EpubVersion, actual.EpubVersion, nameof(actual.EpubVersion));
+
+                Assert.AreEqual(expected.Metadata == null, actual.Metadata == null, nameof(actual.Metadata));
+                if (expected.Metadata != null && actual.Metadata != null)
+                {
+                    AssertCreators(expected.Metadata.Creators, actual.Metadata.Creators, nameof(actual.Metadata.Creators));
+                    AssertCreators(expected.Metadata.Contributors, actual.Metadata.Contributors, nameof(actual.Metadata.Contributors));
+
+                    Assert.AreEqual(expected.Metadata.Coverages == null, actual.Metadata.Coverages == null, nameof(actual.Metadata.Coverages));
+                    if (expected.Metadata.Coverages != null && actual.Metadata.Coverages != null)
+                    {
+                        var old = expected.Metadata.Coverages.ToList();
+                        var @new = actual.Metadata.Coverages.ToList();
+
+                        Assert.AreEqual(old.Count, @new.Count, "Coverages.Count");
+
+                        for (var i = 0; i < @new.Count; ++i)
+                        {
+                            Assert.IsTrue(@new.Contains(old[i]), "Contributor");
+                        }
+                    }
+                }
+            }
+        }
+
+        private void AssertCreators(IEnumerable<PackageMetadataCreator> expected, IEnumerable<PackageMetadataCreator> actual, string name)
+        {
+            Assert.AreEqual(expected == null, actual == null, name);
+            if (expected != null && actual != null)
+            {
+                var old = expected.ToList();
+                var @new = actual.ToList();
+
+                Assert.AreEqual(old.Count, @new.Count, $"{name}.Count");
+
+                for (var i = 0; i < @new.Count; ++i)
+                {
+                    Assert.AreEqual(old[i].AlternateScript, @new[i].AlternateScript, $"{name}.AlternateScript");
+                    Assert.AreEqual(old[i].FileAs, @new[i].FileAs, $"{name}.FileAs");
+                    Assert.AreEqual(old[i].Role, @new[i].Role, $"{name}.Role");
+                    Assert.AreEqual(old[i].Text, @new[i].Text, $"{name}.Text");
+                }
+            }
         }
     }
 }
