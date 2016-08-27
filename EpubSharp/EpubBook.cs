@@ -7,7 +7,6 @@ namespace EpubSharp
 {
     public class EpubBook
     {
-        public string FilePath { get; set; }
         public string Title => Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
         public List<string> Authors => Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
         public string Author => string.Join(", ", Authors);

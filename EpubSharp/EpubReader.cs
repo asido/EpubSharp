@@ -20,7 +20,7 @@ namespace EpubSharp
                 throw new FileNotFoundException("Specified epub file not found.", filePath);
             }
 
-            var book = new EpubBook { FilePath = filePath };
+            var book = new EpubBook();
             using (var archive = ZipFile.OpenRead(filePath))
             {
                 book.Format = new EpubFormat();
