@@ -127,8 +127,8 @@ namespace EpubSharp.Readers
             {
                 Id = (string)element.Attribute("id"),
                 Class = (string)element.Attribute("class"),
-                Label = element.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
-                ContentSource = (string)element.Element(NcxElements.Content)?.Attribute("src"),
+                LabelText = element.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
+                ContentSrc = (string)element.Element(NcxElements.Content)?.Attribute("src"),
                 PlayOrder = (int?)element.Attribute("playOrder"),
                 NavigationPoints = element.Elements(NcxElements.NavPoint).Select(ReadNavigationPoint).ToList().AsReadOnly()
             };
@@ -214,10 +214,10 @@ namespace EpubSharp.Readers
                 switch (navigationPointChildNode.LocalName.ToLowerInvariant())
                 {
                     case "navlabel":
-                        result.Label = ReadNavigationLabel(navigationPointChildNode);
+                        result.LabelText = ReadNavigationLabel(navigationPointChildNode);
                         break;
                     case "content":
-                        result.ContentSource = ReadNavigationContent(navigationPointChildNode);
+                        result.ContentSrc = ReadNavigationContent(navigationPointChildNode);
                         break;
                     case "navpoint":
                         navigationPoints.Add(ReadNavigationPoint(navigationPointChildNode));
@@ -225,9 +225,9 @@ namespace EpubSharp.Readers
                 }
             }
             result.NavigationPoints = navigationPoints.AsReadOnly();
-            if (!result.Label.Any())
+            if (!result.LabelText.Any())
                 throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain at least one navigation label");
-            if (result.ContentSource == null)
+            if (result.ContentSrc == null)
                 throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain content");
             return result;
         }

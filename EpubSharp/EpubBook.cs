@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using EpubSharp.Format;
 
 namespace EpubSharp
@@ -7,13 +8,13 @@ namespace EpubSharp
     public class EpubBook
     {
         public string FilePath { get; set; }
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public List<string> AuthorList { get; set; }
-        public EpubFormat Format { get; set; }
-        public EpubContent Content { get; set; }
-        public Image CoverImage { get; set; }
-        public List<EpubChapter> Chapters { get; set; }
+        public string Title => Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
+        public List<string> Authors => Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
+        public string Author => string.Join(", ", Authors);
+        public EpubFormat Format { get; internal set; }
+        public EpubContent Content { get; internal set; }
+        public Image CoverImage { get; internal set; }
+        public List<EpubChapter> Chapters { get; internal set; }
     }
     
     public class EpubChapter
@@ -32,11 +33,11 @@ namespace EpubSharp
     
     public class EpubContent
     {
-        public Dictionary<string, EpubTextContentFile> Html { get; set; }
-        public Dictionary<string, EpubTextContentFile> Css { get; set; }
-        public Dictionary<string, EpubByteContentFile> Images { get; set; }
-        public Dictionary<string, EpubByteContentFile> Fonts { get; set; }
-        public Dictionary<string, EpubContentFile> AllFiles { get; set; }
+        public Dictionary<string, EpubTextContentFile> Html { get; internal set; }
+        public Dictionary<string, EpubTextContentFile> Css { get; internal set; }
+        public Dictionary<string, EpubByteContentFile> Images { get; internal set; }
+        public Dictionary<string, EpubByteContentFile> Fonts { get; internal set; }
+        public Dictionary<string, EpubContentFile> AllFiles { get; internal set; }
     }
 
     public enum EpubContentType

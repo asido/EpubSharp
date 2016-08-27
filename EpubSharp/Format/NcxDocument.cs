@@ -27,13 +27,13 @@ namespace EpubSharp.Format
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public int? PlayOrder { get; internal set; }
-        public string Label { get; internal set; }
-        public string ContentSource { get; internal set; }
+        public string LabelText { get; internal set; }
+        public string ContentSrc { get; internal set; }
         public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationPoints { get; internal set; }
 
         public override string ToString()
         {
-            return $"Id: {Id}, ContentSource: {ContentSource}";
+            return $"Id: {Id}, ContentSource: {ContentSrc}";
         }
     }
 

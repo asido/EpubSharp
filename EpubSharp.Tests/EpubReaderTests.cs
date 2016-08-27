@@ -91,7 +91,7 @@ namespace EpubSharp.Tests
                 {
                     Assert.AreEqual(expected.NavigationList.Id, actual.NavigationList.Id, "NavigationList.Id");
                     Assert.AreEqual(expected.NavigationList.Class, actual.NavigationList.Class, "NavigationList.Class");
-                    Assert.AreEqual(expected.NavigationList.Label, actual.NavigationList.Label, "NavigationList.Label");
+                    Assert.AreEqual(expected.NavigationList.Label, actual.NavigationList.Label, "NavigationList.LabelText");
 
                     var old = expected.NavigationList.NavigationTargets.ToList();
                     var @new = actual.NavigationList.NavigationTargets.ToList();
@@ -102,9 +102,9 @@ namespace EpubSharp.Tests
                     {
                         Assert.AreEqual(old[i].Id, @new[i].Id, "NavigationTarget.Id");
                         Assert.AreEqual(old[i].Class, @new[i].Class, "NavigationTarget.Class");
-                        Assert.AreEqual(old[i].Label, @new[i].Label, "NavigationTarget.Label");
+                        Assert.AreEqual(old[i].Label, @new[i].Label, "NavigationTarget.LabelText");
                         Assert.AreEqual(old[i].PlayOrder, @new[i].PlayOrder, "NavigationTarget.PlayOrder");
-                        Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "NavigationTarget.ContentSource");
+                        Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "NavigationTarget.ContentSrc");
                     }
                 }
 
@@ -118,9 +118,9 @@ namespace EpubSharp.Tests
                     {
                         Assert.AreEqual(old[i].Id, @new[i].Id, "NavigationMap.Id");
                         Assert.AreEqual(old[i].PlayOrder, @new[i].PlayOrder, "NavigationMap.PlayOrder");
-                        Assert.AreEqual(old[i].Label, @new[i].Label, "NavigationMap.PlayOrder");
+                        Assert.AreEqual(old[i].LabelText, @new[i].LabelText, "NavigationMap.PlayOrder");
                         Assert.AreEqual(old[i].Class, @new[i].Class, "NavigationMap.Class");
-                        Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "NavigationMap.ContentSorce");
+                        Assert.AreEqual(old[i].ContentSrc, @new[i].ContentSrc, "NavigationMap.ContentSorce");
                         AssertNavigationPoints(old[i].NavigationPoints, @new[i].NavigationPoints);
                     }
                 }
@@ -135,8 +135,8 @@ namespace EpubSharp.Tests
                     {
                         Assert.AreEqual(old[i].Id, @new[i].Id, "PageList.Id");
                         Assert.AreEqual(old[i].Class, @new[i].Class, "PageList.Class");
-                        Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "PageList.ContentSource");
-                        Assert.AreEqual(old[i].Label, @new[i].Label, "PageList.Label");
+                        Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "PageList.ContentSrc");
+                        Assert.AreEqual(old[i].Label, @new[i].Label, "PageList.LabelText");
                         Assert.AreEqual(old[i].Type, @new[i].Type, "PageList.Type");
                         Assert.AreEqual(old[i].Value, @new[i].Value, "PageList.Value");
                     }
@@ -153,8 +153,8 @@ namespace EpubSharp.Tests
             {
                 Assert.AreEqual(old[i].Id, @new[i].Id, "NavigationPoint.Id");
                 Assert.AreEqual(old[i].Class, @new[i].Class, "NavigationPoint.Class");
-                Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "NavigationPoint.ContentSource");
-                Assert.AreEqual(old[i].Label, @new[i].Label, "NavigationPoint.Label");
+                Assert.AreEqual(old[i].ContentSrc, @new[i].ContentSrc, "NavigationPoint.ContentSrc");
+                Assert.AreEqual(old[i].LabelText, @new[i].LabelText, "NavigationPoint.LabelText");
                 Assert.AreEqual(old[i].PlayOrder, @new[i].PlayOrder, "NavigationPoint.PlayOrder");
                 Assert.AreEqual(old[i].NavigationPoints == null, @new[i].NavigationPoints == null, "NavigationPoint.NavigationPoints");
                 if (old[i].NavigationPoints != null && @new[i].NavigationPoints != null)
