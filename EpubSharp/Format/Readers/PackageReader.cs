@@ -17,6 +17,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Contributor = MetadataNamespace + "contributor";
             public static readonly XName Coverages = MetadataNamespace + "coverages";
             public static readonly XName Creator = MetadataNamespace + "creator";
+            public static readonly XName Date = MetadataNamespace + "date";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -76,20 +77,27 @@ namespace EpubSharp.Format.Readers
 
             Func<XElement, PackageMetadataCreator> readCreator = elem => new PackageMetadataCreator
             {
-                Role = (string) elem.Attribute("role"),
-                FileAs = (string) elem.Attribute("file-as"),
-                AlternateScript = (string) elem.Attribute("alternate-script"),
+                Role = (string) elem.Attribute(PackageNamespace + "role"),
+                FileAs = (string) elem.Attribute(PackageNamespace + "file-as"),
+                AlternateScript = (string) elem.Attribute(PackageNamespace + "alternate-script"),
                 Text = elem.Value
             };
+
+            var metadata = xml.Root.Element(PackageElements.Metadata);
 
             var package = new PackageDocument
             {
                 EpubVersion = GetAndValidateVersion((string)xml.Root.Attribute("version")),
                 Metadata = new PackageMetadata
                 {
-                    Creators = xml.Root.Element(PackageElements.Metadata)?.Elements(PackageElements.Creator).Select(readCreator).ToList().AsReadOnly(),
-                    Contributors = xml.Root.Element(PackageElements.Metadata)?.Elements(PackageElements.Contributor).Select(readCreator).ToList().AsReadOnly(),
-                    Coverages = xml.Root.Element(PackageElements.Metadata)?.Elements(PackageElements.Coverages).Select(elem => elem.Value).ToList().AsReadOnly(),
+                    Creators = metadata?.Elements(PackageElements.Creator).Select(readCreator).ToList().AsReadOnly(),
+                    Contributors = metadata?.Elements(PackageElements.Contributor).Select(readCreator).ToList().AsReadOnly(),
+                    Coverages = metadata?.Elements(PackageElements.Coverages).Select(elem => elem.Value).ToList().AsReadOnly(),
+                    Dates = metadata?.Elements(PackageElements.Date).Select(elem => new PackageMetadataDate
+                    {
+                        Text = elem.Value,
+                        Event = (string)elem.Attribute(PackageNamespace + "event")
+                    }).ToList().AsReadOnly()
                 }
             };
             return package;
@@ -178,7 +186,7 @@ namespace EpubSharp.Format.Readers
             var subjects = new List<string>();
             var publishers = new List<string>();
             var contributors = new List<PackageMetadataCreator>();
-            var date = "";
+            var dates = new List<PackageMetadataDate>();
             var types = new List<string>();
             var formats = new List<string>();
             var identifiers = new List<PackageMetadataIdentifier>();
@@ -216,7 +224,11 @@ namespace EpubSharp.Format.Readers
                         contributors.Add(contributor);
                         break;
                     case "date":
-                        date = metadataItemNode.InnerText;
+                        dates.Add(new PackageMetadataDate
+                        {
+                            Text = metadataItemNode.InnerText,
+                            Event = metadataItemNode.Attributes?["opf:event"]?.Value
+                        });
                         break;
                     case "type":
                         types.Add(innerText);
@@ -238,7 +250,10 @@ namespace EpubSharp.Format.Readers
                         relations.Add(innerText);
                         break;
                     case "coverage":
-                        coverages.Add(innerText);
+                        if (!string.IsNullOrWhiteSpace(innerText))
+                        {
+                            coverages.Add(innerText);
+                        }
                         break;
                     case "rights":
                         rights.Add(innerText);
@@ -265,7 +280,7 @@ namespace EpubSharp.Format.Readers
                 Subjects = subjects,
                 Publishers = publishers,
                 Contributors = contributors,
-                Date = date,
+                Dates = dates,
                 Types = types,
                 Formats = formats,
                 Identifiers = identifiers,
@@ -288,12 +303,15 @@ namespace EpubSharp.Format.Readers
                 switch (metadataCreatorNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "opf:role":
+                    case "ns0:role":
                         result.Role = attributeValue;
                         break;
                     case "opf:file-as":
+                    case "ns0:file-as":
                         result.FileAs = attributeValue;
                         break;
                     case "opf:alternate-script":
+                    case "ns0:alternate-script":
                         result.AlternateScript = attributeValue;
                         break;
                 }
@@ -311,12 +329,15 @@ namespace EpubSharp.Format.Readers
                 switch (metadataContributorNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "opf:role":
+                    case "ns2:role":
                         result.Role = attributeValue;
                         break;
                     case "opf:file-as":
+                    case "ns2:file-as":
                         result.FileAs = attributeValue;
                         break;
                     case "opf:alternate-script":
+                    case "ns2:alternate-script":
                         result.AlternateScript = attributeValue;
                         break;
                 }

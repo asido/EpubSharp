@@ -30,7 +30,7 @@ namespace EpubSharp.Format
         public IReadOnlyCollection<string> Publishers { get; internal set; }
         public IReadOnlyCollection<PackageMetadataCreator> Creators { get; internal set; }
         public IReadOnlyCollection<PackageMetadataCreator> Contributors { get; internal set; }
-        public string Date { get; internal set; }
+        public IReadOnlyCollection<PackageMetadataDate> Dates { get; internal set; }
         public IReadOnlyCollection<string> Types { get; internal set; }
         public IReadOnlyCollection<string> Formats { get; internal set; }
         public IReadOnlyCollection<PackageMetadataIdentifier> Identifiers { get; internal set; }
@@ -40,6 +40,16 @@ namespace EpubSharp.Format
         public IReadOnlyCollection<string> Coverages { get; internal set; }
         public IReadOnlyCollection<string> Rights { get; internal set; }
         public IReadOnlyCollection<PackageMetadataMeta> MetaItems { get; internal set; }
+    }
+
+    public class PackageMetadataDate
+    {
+        public string Text { get; internal set; }
+
+        /// <summary>
+        /// i.e. "modification"
+        /// </summary>
+        public string Event { get; internal set; }
     }
 
     public class PackageMetadataCreator

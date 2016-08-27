@@ -93,6 +93,7 @@ namespace EpubSharp.Tests
                 {
                     var book = EpubReader.Read(path);
                     AssertOcf(book.Format.Ocf, book.Format.NewOcf);
+                    AssertPackage(book.Format.Package, book.Format.NewPackage);
                     AssertNcx(book.Format.Ncx, book.Format.NewNcx);
                 }
                 catch (Exception ex)
@@ -238,7 +239,22 @@ namespace EpubSharp.Tests
 
                         for (var i = 0; i < @new.Count; ++i)
                         {
-                            Assert.IsTrue(@new.Contains(old[i]), "Contributor");
+                            Assert.IsTrue(@new.Contains(old[i]), "Coverage");
+                        }
+                    }
+
+                    Assert.AreEqual(expected.Metadata.Dates == null, actual.Metadata.Dates == null, nameof(actual.Metadata.Dates));
+                    if (expected.Metadata.Dates != null && actual.Metadata.Dates != null)
+                    {
+                        var old = expected.Metadata.Dates.ToList();
+                        var @new = actual.Metadata.Dates.ToList();
+
+                        Assert.AreEqual(old.Count, @new.Count, "Dates.Count");
+
+                        for (var i = 0; i < @new.Count; ++i)
+                        {
+                            Assert.AreEqual(old[i].Text, @new[i].Text, "Date.Text");
+                            Assert.AreEqual(old[i].Event, @new[i].Event, "Date.Event");
                         }
                     }
                 }
