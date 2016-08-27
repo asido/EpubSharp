@@ -19,6 +19,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Creator = MetadataNamespace + "creator";
             public static readonly XName Date = MetadataNamespace + "date";
             public static readonly XName Description = MetadataNamespace + "description";
+            public static readonly XName Format = MetadataNamespace + "format";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -99,7 +100,8 @@ namespace EpubSharp.Format.Readers
                         Text = elem.Value,
                         Event = (string)elem.Attribute(PackageNamespace + "event")
                     }).ToList().AsReadOnly(),
-                    Descriptions = metadata?.Elements(PackageElements.Description).Select(elem => elem.Value).ToList().AsReadOnly()
+                    Descriptions = metadata?.Elements(PackageElements.Description).Select(elem => elem.Value).ToList().AsReadOnly(),
+                    Formats = metadata?.Elements(PackageElements.Format).Select(elem => elem.Value).ToList().AsReadOnly()
                 }
             };
             return package;
