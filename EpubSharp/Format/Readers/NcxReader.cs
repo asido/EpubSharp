@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using EpubSharp.Format;
 
-namespace EpubSharp.Readers
+namespace EpubSharp.Format.Readers
 {
     internal static class NcxReader
     {

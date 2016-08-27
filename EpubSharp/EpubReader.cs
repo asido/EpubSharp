@@ -7,7 +7,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using EpubSharp.Format;
-using EpubSharp.Readers;
+using EpubSharp.Format.Readers;
 
 namespace EpubSharp
 {

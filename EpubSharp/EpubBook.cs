@@ -7,10 +7,14 @@ namespace EpubSharp
 {
     public class EpubBook
     {
+        /// <summary>
+        /// Raw epub format structures. This is populated only when the instance is retrieved using EpubReader.Read()
+        /// </summary>
+        public EpubFormat Format { get; internal set; }
+
         public string Title => Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
         public List<string> Authors => Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
         public string Author => string.Join(", ", Authors);
-        public EpubFormat Format { get; internal set; }
         public EpubContent Content { get; internal set; }
         public Image CoverImage { get; internal set; }
         public List<EpubChapter> Chapters { get; internal set; }

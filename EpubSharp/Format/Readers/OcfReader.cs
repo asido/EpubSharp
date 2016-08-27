@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO.Compression;
 using System.Xml;
-using EpubSharp.Format;
 
-namespace EpubSharp.Readers
+namespace EpubSharp.Format.Readers
 {
     internal static class OcfReader
     {

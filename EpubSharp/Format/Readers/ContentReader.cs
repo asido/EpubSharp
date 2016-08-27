@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 
-namespace EpubSharp.Readers
+namespace EpubSharp.Format.Readers
 {
     internal static class ContentReader
     {

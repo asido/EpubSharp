@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Xml;
-using EpubSharp.Format;
 
-namespace EpubSharp.Readers
+namespace EpubSharp.Format.Readers
 {
     internal static class PackageReader
     {
