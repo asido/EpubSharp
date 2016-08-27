@@ -24,18 +24,8 @@ namespace EpubSharp
             using (var archive = ZipFile.OpenRead(filePath))
             {
                 book.Format = new EpubFormat();
-                book.Format.Ocf = OcfReader.Read(archive);
-
-                var rootFileEntry = archive.GetEntryIgnoringSlashDirection(book.Format.Ocf.RootFile);
-                if (rootFileEntry == null)
-                    throw new Exception("EPUB parsing error: root file not found in archive.");
-                XmlDocument containerDocument;
-                using (var containerStream = rootFileEntry.Open())
-                {
-                    containerDocument = XmlExt.LoadDocument(containerStream);
-                }
-
-                book.Format.Package = PackageReader.Read(containerDocument);
+                book.Format.Ocf = OcfReader.Read(archive.LoadXml("META-INF/container.xml"));
+                book.Format.Package = PackageReader.Read(archive.LoadXml(book.Format.Ocf.RootFile));
 
                 LoadNcx(archive, book);
                 
@@ -63,7 +53,7 @@ namespace EpubSharp
                 return;
             }
 
-            var tocFileEntryPath = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), tocManifestItem.Href);
+            var tocFileEntryPath = PathExt.Combine(PathExt.GetDirectoryPath(book.Format.Ocf.RootFile), tocManifestItem.Href);
             var tocFileEntry = archive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
             if (tocFileEntry == null)
             {
