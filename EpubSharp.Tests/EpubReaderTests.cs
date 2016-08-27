@@ -47,6 +47,7 @@ namespace EpubSharp.Tests
                 try
                 {
                     var book = EpubReader.Read(archivePath);
+                    AssertOcf(book.Format.Ocf, book.Format.NewOcf);
                     AssertNcx(book.Format.Ncx, book.Format.NewNcx);
                 }
                 catch (Exception ex)
@@ -162,6 +163,11 @@ namespace EpubSharp.Tests
                     AssertNavigationPoints(old[i].NavigationPoints, @new[i].NavigationPoints);
                 }
             }
+        }
+
+        private void AssertOcf(OcfDocument expected, OcfDocument actual)
+        {
+            Assert.AreEqual(expected.RootFile, actual.RootFile);
         }
     }
 }

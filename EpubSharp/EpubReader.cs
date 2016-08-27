@@ -39,6 +39,7 @@ namespace EpubSharp
             {
                 var format = new EpubFormat();
                 format.Ocf = OcfReader.Read(archive.LoadXml("META-INF/container.xml"));
+                format.NewOcf = OcfReader.Read(archive.LoadXDocument("META-INF/container.xml"));
                 format.Package = PackageReader.Read(archive.LoadXml(format.Ocf.RootFile));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
