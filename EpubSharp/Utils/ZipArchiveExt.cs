@@ -1,4 +1,6 @@
-﻿using System.IO.Compression;
+﻿using System;
+using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -16,13 +18,30 @@ namespace EpubSharp
 
             if (entry == null)
             {
+                var namesToTry = new List<string>();
+                
+                // I've seen epubs, where manifest href's are url encoded, but files in archive not.
+                namesToTry.Add(Uri.UnescapeDataString(entryName));
+
+                // Such epubs aren't common, but zip archives created on windows uses backslashes.
+                // That could happen if an epub is re-archived manually.
                 foreach (var newName in new[]
                 {
                     entryName.Replace(@"\", @"/"),
                     entryName.Replace("/", @"\")
                 }.Where(newName => newName != entryName))
                 {
+                    namesToTry.Add(newName);
+                    namesToTry.Add(Uri.UnescapeDataString(newName));
+                }
+
+                foreach (var newName in namesToTry)
+                {
                     entry = archive.GetEntry(newName);
+                    if (entry != null)
+                    {
+                        break;
+                    }
                 }
             }
 
