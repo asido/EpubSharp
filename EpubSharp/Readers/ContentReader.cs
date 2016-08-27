@@ -20,7 +20,7 @@ namespace EpubSharp.Readers
             };
             foreach (var manifestItem in book.Format.Package.Manifest.Items)
             {
-                var contentFilePath = ZipPathUtils.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), manifestItem.Href);
+                var contentFilePath = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), manifestItem.Href);
                 var contentFileEntry = epubArchive.GetEntryIgnoringSlashDirection(contentFilePath);
                 if (contentFileEntry == null)
                     throw new Exception($"EPUB parsing error: file {contentFilePath} not found in archive.");

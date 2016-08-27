@@ -34,7 +34,7 @@ namespace EpubSharp
                 XmlDocument containerDocument;
                 using (var containerStream = rootFileEntry.Open())
                 {
-                    containerDocument = XmlUtils.LoadDocument(containerStream);
+                    containerDocument = XmlExt.LoadDocument(containerStream);
                 }
 
                 book.Format.Package = PackageReader.Read(containerDocument);
@@ -68,7 +68,7 @@ namespace EpubSharp
                 return;
             }
 
-            var tocFileEntryPath = ZipPathUtils.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), tocManifestItem.Href);
+            var tocFileEntryPath = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), tocManifestItem.Href);
             var tocFileEntry = archive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
             if (tocFileEntry == null)
             {
@@ -83,7 +83,7 @@ namespace EpubSharp
 
             using (var containerStream = tocFileEntry.Open())
             {
-                var doc = XmlUtils.LoadDocument(containerStream);
+                var doc = XmlExt.LoadDocument(containerStream);
                 book.Format.Ncx = NcxReader.Read(doc);
             }
             book.Format.NewNcx = NcxReader.Read(XDocument.Load(tocFileEntry.Open()));
@@ -134,7 +134,7 @@ namespace EpubSharp
                     chapter.Anchor = navigationPoint.ContentSource.Substring(contentSourceAnchorCharIndex + 1);
                 }
 
-                var contentPath = ZipPathUtils.Combine(ZipPathUtils.GetDirectoryPath(book.Format.Package.NcxPath), chapter.ContentFileName);
+                var contentPath = PathExt.Combine(PathExt.GetDirectoryPath(book.Format.Package.NcxPath), chapter.ContentFileName);
                 EpubTextContentFile html;
                 if (book.Content.Html.TryGetValue(contentPath, out html))
                 {

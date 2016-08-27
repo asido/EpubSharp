@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace EpubSharp.Utils
 {
-    internal static class XmlUtils
+    internal static class XmlExt
     {
         public static XmlDocument LoadDocument(Stream stream)
         {

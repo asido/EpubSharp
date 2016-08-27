@@ -19,7 +19,7 @@ namespace EpubSharp.Format.Readers
             XmlDocument containerDocument;
             using (var containerStream = containerFileEntry.Open())
             {
-                containerDocument = XmlUtils.LoadDocument(containerStream);
+                containerDocument = XmlExt.LoadDocument(containerStream);
             }
             var xmlNamespaceManager = new XmlNamespaceManager(containerDocument.NameTable);
             xmlNamespaceManager.AddNamespace("cns", "urn:oasis:names:tc:opendocument:xmlns:container");

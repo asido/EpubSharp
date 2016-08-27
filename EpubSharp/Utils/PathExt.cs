@@ -2,7 +2,7 @@
 
 namespace EpubSharp.Utils
 {
-    internal static class ZipPathUtils
+    internal static class PathExt
     {
         public static string GetDirectoryPath(string filePath)
         {

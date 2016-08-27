@@ -55,8 +55,8 @@
     <Compile Include="Readers\NcxReader.cs" />
     <Compile Include="Readers\PackageReader.cs" />
     <Compile Include="Format\Readers\OcfReader.cs" />
-    <Compile Include="Utils\XmlUtils.cs" />
-    <Compile Include="Utils\ZipPathUtils.cs" />
+    <Compile Include="Utils\XmlExt.cs" />
+    <Compile Include="Utils\PathExt.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
