@@ -144,7 +144,7 @@ namespace EpubSharp.Tests
             }
         }
 
-        private void AssertNavigationPoints(IEnumerable<EpubNcxNavigationPoint> expected, IEnumerable<EpubNcxNavigationPoint> actual)
+        private void AssertNavigationPoints(IEnumerable<NcxNavigationPoint> expected, IEnumerable<NcxNavigationPoint> actual)
         {
             var old = expected.ToList();
             var @new = actual.ToList();

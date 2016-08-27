@@ -87,7 +87,7 @@ namespace EpubSharp
             return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChapterFromNcx(EpubBook book, IReadOnlyCollection<EpubNcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChapterFromNcx(EpubBook book, IReadOnlyCollection<NcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)

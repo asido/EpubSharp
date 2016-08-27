@@ -7,29 +7,29 @@ namespace EpubSharp.Format
     /// </summary>
     public class NcxDocument
     {
-        public IReadOnlyCollection<EpubNcxMetadata> Metadata { get; internal set; }
+        public IReadOnlyCollection<NcxMetadata> Metadata { get; internal set; }
         public string DocTitle { get; internal set; }
         public string DocAuthor { get; internal set; }
-        public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationMap { get; internal set; }
-        public IReadOnlyCollection<EpubNcxPageTarget> PageList { get; internal set; }
-        public EpubNcxNavigationList NavigationList { get; internal set; }
+        public IReadOnlyCollection<NcxNavigationPoint> NavigationMap { get; internal set; }
+        public IReadOnlyCollection<NcxPageTarget> PageList { get; internal set; }
+        public NcxNavigationList NavigationList { get; internal set; }
     }
 
-    public class EpubNcxMetadata
+    public class NcxMetadata
     {
         public string Name { get; internal set; }
         public string Content { get; internal set; }
         public string Scheme { get; internal set; }
     }
 
-    public class EpubNcxNavigationPoint
+    public class NcxNavigationPoint
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public int? PlayOrder { get; internal set; }
         public string LabelText { get; internal set; }
         public string ContentSrc { get; internal set; }
-        public IReadOnlyCollection<EpubNcxNavigationPoint> NavigationPoints { get; internal set; }
+        public IReadOnlyCollection<NcxNavigationPoint> NavigationPoints { get; internal set; }
 
         public override string ToString()
         {
@@ -37,7 +37,7 @@ namespace EpubSharp.Format
         }
     }
 
-    public enum EpubNcxPageTargetType
+    public enum NcxPageTargetType
     {
         Front = 1,
         Normal,
@@ -45,25 +45,25 @@ namespace EpubSharp.Format
         Body
     }
 
-    public class EpubNcxPageTarget
+    public class NcxPageTarget
     {
         public string Id { get; internal set; }
         public int? Value { get; internal set; }
         public string Class { get; internal set; }
-        public EpubNcxPageTargetType? Type { get; internal set; }
+        public NcxPageTargetType? Type { get; internal set; }
         public string Label { get; internal set; }
         public string ContentSource { get; internal set; }
     }
 
-    public class EpubNcxNavigationList
+    public class NcxNavigationList
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public string Label { get; internal set; }
-        public IReadOnlyCollection<EpubNcxNavigationTarget> NavigationTargets { get; internal set; }
+        public IReadOnlyCollection<NcxNavigationTarget> NavigationTargets { get; internal set; }
     }
 
-    public class EpubNcxNavigationTarget
+    public class NcxNavigationTarget
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }

@@ -36,17 +36,17 @@ namespace EpubSharp.Format.Readers
             XmlNode manifestNode = packageNode.SelectSingleNode("opf:manifest", xmlNamespaceManager);
             if (manifestNode == null)
                 throw new Exception("EPUB parsing error: manifest not found in the package.");
-            package.Manifest = new EpubManifest();
+            package.Manifest = new PackageManifest();
             package.Manifest.Items = ReadManifestItems(manifestNode);
             XmlNode spineNode = packageNode.SelectSingleNode("opf:spine", xmlNamespaceManager);
             if (spineNode == null)
                 throw new Exception("EPUB parsing error: spine not found in the package.");
-            EpubSpine spine = ReadSpine(spineNode);
+            PackageSpine spine = ReadSpine(spineNode);
             package.Spine = spine;
             XmlNode guideNode = packageNode.SelectSingleNode("opf:guide", xmlNamespaceManager);
             if (guideNode != null)
             {
-                EpubGuide guide = ReadGuide(guideNode);
+                PackageGuide guide = ReadGuide(guideNode);
                 package.Guide = guide;
             }
 
@@ -117,23 +117,23 @@ namespace EpubSharp.Format.Readers
             return navItem?.Href;
         }
 
-        private static EpubPackageMetadata ReadMetadata(XmlNode metadataNode, EpubVersion epubVersion)
+        private static PackageMetadata ReadMetadata(XmlNode metadataNode, EpubVersion epubVersion)
         {
             var titles = new List<string>();
-            var creators = new List<EpubMetadataCreator>();
+            var creators = new List<PackageMetadataCreator>();
             var subjects = new List<string>();
             var publishers = new List<string>();
-            var contributors = new List<EpubMetadataCreator>();
+            var contributors = new List<PackageMetadataCreator>();
             var date = "";
             var types = new List<string>();
             var formats = new List<string>();
-            var identifiers = new List<EpubMetadataIdentifier>();
+            var identifiers = new List<PackageMetadataIdentifier>();
             var sources = new List<string>();
             var languages = new List<string>();
             var relations = new List<string>();
             var coverages = new List<string>();
             var rights = new List<string>();
-            var metaItems = new List<EpubMetadataMeta>();
+            var metaItems = new List<PackageMetadataMeta>();
             var description = "";
 
             foreach (XmlNode metadataItemNode in metadataNode.ChildNodes)
@@ -204,7 +204,7 @@ namespace EpubSharp.Format.Readers
                 }
             }
             
-            return new EpubPackageMetadata
+            return new PackageMetadata
             {
                 Titles = titles,
                 Creators = creators,
@@ -225,9 +225,9 @@ namespace EpubSharp.Format.Readers
             };
         }
 
-        private static EpubMetadataCreator ReadMetadataCreator(XmlNode metadataCreatorNode)
+        private static PackageMetadataCreator ReadMetadataCreator(XmlNode metadataCreatorNode)
         {
-            var result = new EpubMetadataCreator();
+            var result = new PackageMetadataCreator();
             foreach (XmlAttribute metadataCreatorNodeAttribute in metadataCreatorNode.Attributes)
             {
                 var attributeValue = metadataCreatorNodeAttribute.Value;
@@ -248,9 +248,9 @@ namespace EpubSharp.Format.Readers
             return result;
         }
 
-        private static EpubMetadataCreator ReadMetadataContributor(XmlNode metadataContributorNode)
+        private static PackageMetadataCreator ReadMetadataContributor(XmlNode metadataContributorNode)
         {
-            var result = new EpubMetadataCreator();
+            var result = new PackageMetadataCreator();
             foreach (XmlAttribute metadataContributorNodeAttribute in metadataContributorNode.Attributes)
             {
                 var attributeValue = metadataContributorNodeAttribute.Value;
@@ -271,9 +271,9 @@ namespace EpubSharp.Format.Readers
             return result;
         }
 
-        private static EpubMetadataIdentifier ReadMetadataIdentifier(XmlNode metadataIdentifierNode)
+        private static PackageMetadataIdentifier ReadMetadataIdentifier(XmlNode metadataIdentifierNode)
         {
-            EpubMetadataIdentifier result = new EpubMetadataIdentifier();
+            PackageMetadataIdentifier result = new PackageMetadataIdentifier();
             foreach (XmlAttribute metadataIdentifierNodeAttribute in metadataIdentifierNode.Attributes)
             {
                 string attributeValue = metadataIdentifierNodeAttribute.Value;
@@ -291,9 +291,9 @@ namespace EpubSharp.Format.Readers
             return result;
         }
 
-        private static EpubMetadataMeta ReadMetadataMetaVersion2(XmlNode metadataMetaNode)
+        private static PackageMetadataMeta ReadMetadataMetaVersion2(XmlNode metadataMetaNode)
         {
-            EpubMetadataMeta result = new EpubMetadataMeta();
+            PackageMetadataMeta result = new PackageMetadataMeta();
             foreach (XmlAttribute metadataMetaNodeAttribute in metadataMetaNode.Attributes)
             {
                 string attributeValue = metadataMetaNodeAttribute.Value;
@@ -310,9 +310,9 @@ namespace EpubSharp.Format.Readers
             return result;
         }
 
-        private static EpubMetadataMeta ReadMetadataMetaVersion3(XmlNode metadataMetaNode)
+        private static PackageMetadataMeta ReadMetadataMetaVersion3(XmlNode metadataMetaNode)
         {
-            var result = new EpubMetadataMeta();
+            var result = new PackageMetadataMeta();
             foreach (XmlAttribute metadataMetaNodeAttribute in metadataMetaNode.Attributes)
             {
                 var attributeValue = metadataMetaNodeAttribute.Value;
@@ -336,13 +336,13 @@ namespace EpubSharp.Format.Readers
             return result;
         }
 
-        private static IReadOnlyCollection<EpubManifestItem> ReadManifestItems(XmlNode manifestNode)
+        private static IReadOnlyCollection<PackageManifestItem> ReadManifestItems(XmlNode manifestNode)
         {
-            var result = new List<EpubManifestItem>();
+            var result = new List<PackageManifestItem>();
             foreach (XmlNode manifestItemNode in manifestNode.ChildNodes)
                 if (string.Compare(manifestItemNode.LocalName, "item", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    var manifestItem = new EpubManifestItem();
+                    var manifestItem = new PackageManifestItem();
                     foreach (XmlAttribute manifestItemNodeAttribute in manifestItemNode.Attributes)
                     {
                         string attributeValue = manifestItemNodeAttribute.Value;
@@ -385,21 +385,21 @@ namespace EpubSharp.Format.Readers
             return result.AsReadOnly();
         }
 
-        private static EpubSpine ReadSpine(XmlNode spineNode)
+        private static PackageSpine ReadSpine(XmlNode spineNode)
         {
-            var result = new EpubSpine();
+            var result = new PackageSpine();
             var tocAttribute = spineNode.Attributes["toc"];
             if (!string.IsNullOrWhiteSpace(tocAttribute?.Value))
             {
                 result.Toc = tocAttribute.Value;
             }
             
-            var itemRefs = new List<EpubSpineItemRef>();
+            var itemRefs = new List<PackageSpineItemRef>();
             foreach (XmlNode spineItemNode in spineNode.ChildNodes)
             {
                 if (string.Compare(spineItemNode.LocalName, "itemref", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    var spineItemRef = new EpubSpineItemRef();
+                    var spineItemRef = new PackageSpineItemRef();
                     var idRefAttribute = spineItemNode.Attributes["idref"];
                     if (string.IsNullOrWhiteSpace(idRefAttribute?.Value))
                         throw new Exception("Incorrect EPUB spine: item ID ref is missing");
@@ -413,15 +413,15 @@ namespace EpubSharp.Format.Readers
             return result;
         }
 
-        private static EpubGuide ReadGuide(XmlNode guideNode)
+        private static PackageGuide ReadGuide(XmlNode guideNode)
         {
-            var references = new List<EpubGuideReference>();
+            var references = new List<PackageGuideReference>();
 
             foreach (XmlNode guideReferenceNode in guideNode.ChildNodes)
             {
                 if (string.Compare(guideReferenceNode.LocalName, "reference", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    EpubGuideReference guideReference = new EpubGuideReference();
+                    PackageGuideReference guideReference = new PackageGuideReference();
                     foreach (XmlAttribute guideReferenceNodeAttribute in guideReferenceNode.Attributes)
                     {
                         string attributeValue = guideReferenceNodeAttribute.Value;
@@ -446,7 +446,7 @@ namespace EpubSharp.Format.Readers
                 }
             }
 
-            return new EpubGuide { References = references.AsReadOnly() };
+            return new PackageGuide { References = references.AsReadOnly() };
         }
     }
 }
