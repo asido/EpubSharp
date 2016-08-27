@@ -117,21 +117,12 @@ namespace EpubSharp.Tests
                 Assert.AreEqual(expected.DocAuthor, actual.DocAuthor, nameof(actual.DocAuthor));
                 Assert.AreEqual(expected.DocTitle, actual.DocTitle, nameof(actual.DocTitle));
 
-                Assert.AreEqual(expected.Metadata == null, actual.Metadata == null, "Metadata");
-                if (expected.Metadata != null && actual.Metadata != null)
+                AssertCollection(expected.Metadata, actual.Metadata, nameof(actual.Metadata), (old, @new, i) =>
                 {
-                    var old = expected.Metadata.ToList();
-                    var @new = actual.Metadata.ToList();
-
-                    Assert.AreEqual(old.Count, @new.Count, "Metadata.Count");
-
-                    for (var i = 0; i < @new.Count; ++i)
-                    {
-                        Assert.AreEqual(old[i].Name, @new[i].Name, "Metadata.Name");
-                        Assert.AreEqual(old[i].Content, @new[i].Content, "Metadata.Content");
-                        Assert.AreEqual(old[i].Scheme, @new[i].Scheme, "Metadata.Scheme");
-                    }
-                }
+                    Assert.AreEqual(old[i].Name, @new[i].Name, "Metadata.Name");
+                    Assert.AreEqual(old[i].Content, @new[i].Content, "Metadata.Content");
+                    Assert.AreEqual(old[i].Scheme, @new[i].Scheme, "Metadata.Scheme");
+                });
 
                 Assert.AreEqual(expected.NavigationList == null, actual.NavigationList == null, "NavigationList");
                 if (expected.NavigationList != null && actual.NavigationList != null)
@@ -140,63 +131,41 @@ namespace EpubSharp.Tests
                     Assert.AreEqual(expected.NavigationList.Class, actual.NavigationList.Class, "NavigationList.Class");
                     Assert.AreEqual(expected.NavigationList.Label, actual.NavigationList.Label, "NavigationList.LabelText");
 
-                    var old = expected.NavigationList.NavigationTargets.ToList();
-                    var @new = actual.NavigationList.NavigationTargets.ToList();
-
-                    Assert.AreEqual(old.Count, @new.Count, "NavigationTargets.Count");
-
-                    for (var i = 0; i < @new.Count; ++i)
+                    AssertCollection(expected.NavigationList.NavigationTargets, actual.NavigationList.NavigationTargets, nameof(actual.NavigationList.NavigationTargets), (old, @new, i) =>
                     {
                         Assert.AreEqual(old[i].Id, @new[i].Id, "NavigationTarget.Id");
                         Assert.AreEqual(old[i].Class, @new[i].Class, "NavigationTarget.Class");
                         Assert.AreEqual(old[i].Label, @new[i].Label, "NavigationTarget.LabelText");
                         Assert.AreEqual(old[i].PlayOrder, @new[i].PlayOrder, "NavigationTarget.PlayOrder");
                         Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "NavigationTarget.ContentSrc");
-                    }
+                    });
                 }
 
-                Assert.AreEqual(expected.NavigationMap == null, actual.NavigationMap == null, "NavigationMap");
-                if (expected.NavigationMap != null && actual.NavigationMap != null)
+                AssertCollection(expected.NavigationMap, actual.NavigationMap, nameof(actual.NavigationMap), (old, @new, i) =>
                 {
-                    var old = expected.NavigationMap.ToList();
-                    var @new = actual.NavigationMap.ToList();
+                    Assert.AreEqual(old[i].Id, @new[i].Id, "NavigationMap.Id");
+                    Assert.AreEqual(old[i].PlayOrder, @new[i].PlayOrder, "NavigationMap.PlayOrder");
+                    Assert.AreEqual(old[i].LabelText, @new[i].LabelText, "NavigationMap.PlayOrder");
+                    Assert.AreEqual(old[i].Class, @new[i].Class, "NavigationMap.Class");
+                    Assert.AreEqual(old[i].ContentSrc, @new[i].ContentSrc, "NavigationMap.ContentSorce");
+                    AssertNavigationPoints(old[i].NavigationPoints, @new[i].NavigationPoints);
+                });
 
-                    for (var i = 0; i < @new.Count; ++i)
-                    {
-                        Assert.AreEqual(old[i].Id, @new[i].Id, "NavigationMap.Id");
-                        Assert.AreEqual(old[i].PlayOrder, @new[i].PlayOrder, "NavigationMap.PlayOrder");
-                        Assert.AreEqual(old[i].LabelText, @new[i].LabelText, "NavigationMap.PlayOrder");
-                        Assert.AreEqual(old[i].Class, @new[i].Class, "NavigationMap.Class");
-                        Assert.AreEqual(old[i].ContentSrc, @new[i].ContentSrc, "NavigationMap.ContentSorce");
-                        AssertNavigationPoints(old[i].NavigationPoints, @new[i].NavigationPoints);
-                    }
-                }
-
-                Assert.AreEqual(expected.PageList == null, actual.PageList == null, "PageList");
-                if (expected.PageList != null && actual.PageList != null)
+                AssertCollection(expected.PageList, actual.PageList, nameof(actual.PageList), (old, @new, i) =>
                 {
-                    var old = expected.PageList.ToList();
-                    var @new = actual.PageList.ToList();
-
-                    for (var i = 0; i < @new.Count; ++i)
-                    {
-                        Assert.AreEqual(old[i].Id, @new[i].Id, "PageList.Id");
-                        Assert.AreEqual(old[i].Class, @new[i].Class, "PageList.Class");
-                        Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "PageList.ContentSrc");
-                        Assert.AreEqual(old[i].Label, @new[i].Label, "PageList.LabelText");
-                        Assert.AreEqual(old[i].Type, @new[i].Type, "PageList.Type");
-                        Assert.AreEqual(old[i].Value, @new[i].Value, "PageList.Value");
-                    }
-                }
+                    Assert.AreEqual(old[i].Id, @new[i].Id, "PageList.Id");
+                    Assert.AreEqual(old[i].Class, @new[i].Class, "PageList.Class");
+                    Assert.AreEqual(old[i].ContentSource, @new[i].ContentSource, "PageList.ContentSrc");
+                    Assert.AreEqual(old[i].Label, @new[i].Label, "PageList.LabelText");
+                    Assert.AreEqual(old[i].Type, @new[i].Type, "PageList.Type");
+                    Assert.AreEqual(old[i].Value, @new[i].Value, "PageList.Value");
+                });
             }
         }
 
         private void AssertNavigationPoints(IEnumerable<NcxNavigationPoint> expected, IEnumerable<NcxNavigationPoint> actual)
         {
-            var old = expected.ToList();
-            var @new = actual.ToList();
-
-            for (var i = 0; i < @new.Count; ++i)
+            AssertCollection(expected, actual, "NavigationPoint", (old, @new, i) =>
             {
                 Assert.AreEqual(old[i].Id, @new[i].Id, "NavigationPoint.Id");
                 Assert.AreEqual(old[i].Class, @new[i].Class, "NavigationPoint.Class");
@@ -208,7 +177,7 @@ namespace EpubSharp.Tests
                 {
                     AssertNavigationPoints(old[i].NavigationPoints, @new[i].NavigationPoints);
                 }
-            }
+            });
         }
 
         private void AssertOcf(OcfDocument expected, OcfDocument actual)
@@ -229,53 +198,37 @@ namespace EpubSharp.Tests
                     AssertCreators(expected.Metadata.Creators, actual.Metadata.Creators, nameof(actual.Metadata.Creators));
                     AssertCreators(expected.Metadata.Contributors, actual.Metadata.Contributors, nameof(actual.Metadata.Contributors));
 
-                    Assert.AreEqual(expected.Metadata.Coverages == null, actual.Metadata.Coverages == null, nameof(actual.Metadata.Coverages));
-                    if (expected.Metadata.Coverages != null && actual.Metadata.Coverages != null)
+                    AssertCollection(expected.Metadata.Coverages, actual.Metadata.Coverages, nameof(actual.Metadata.Coverages), (old, @new, i) =>
                     {
-                        var old = expected.Metadata.Coverages.ToList();
-                        var @new = actual.Metadata.Coverages.ToList();
+                        Assert.IsTrue(@new.Contains(old[i]), "Coverage");
+                    });
 
-                        Assert.AreEqual(old.Count, @new.Count, "Coverages.Count");
-
-                        for (var i = 0; i < @new.Count; ++i)
-                        {
-                            Assert.IsTrue(@new.Contains(old[i]), "Coverage");
-                        }
-                    }
-
-                    Assert.AreEqual(expected.Metadata.Dates == null, actual.Metadata.Dates == null, nameof(actual.Metadata.Dates));
-                    if (expected.Metadata.Dates != null && actual.Metadata.Dates != null)
+                    AssertCollection(expected.Metadata.Dates, actual.Metadata.Dates, nameof(actual.Metadata.Dates), (old, @new, i) =>
                     {
-                        var old = expected.Metadata.Dates.ToList();
-                        var @new = actual.Metadata.Dates.ToList();
+                        Assert.AreEqual(old[i].Text, @new[i].Text, "Date.Text");
+                        Assert.AreEqual(old[i].Event, @new[i].Event, "Date.Event");
+                    });
 
-                        Assert.AreEqual(old.Count, @new.Count, "Dates.Count");
-
-                        for (var i = 0; i < @new.Count; ++i)
-                        {
-                            Assert.AreEqual(old[i].Text, @new[i].Text, "Date.Text");
-                            Assert.AreEqual(old[i].Event, @new[i].Event, "Date.Event");
-                        }
-                    }
-
-                    Assert.AreEqual(expected.Metadata.Descriptions == null, actual.Metadata.Descriptions == null, nameof(actual.Metadata.Descriptions));
-                    if (expected.Metadata.Descriptions != null && actual.Metadata.Descriptions != null)
+                    AssertCollection(expected.Metadata.Descriptions, actual.Metadata.Descriptions, nameof(actual.Metadata.Descriptions), (old, @new, i) =>
                     {
-                        var old = expected.Metadata.Descriptions.ToList();
-                        var @new = actual.Metadata.Descriptions.ToList();
-
-                        Assert.AreEqual(old.Count, @new.Count, "Descriptions.Count");
-
-                        for (var i = 0; i < @new.Count; ++i)
-                        {
-                            Assert.IsTrue(@new.Contains(old[i]), "Description");
-                        }
-                    }
+                        Assert.IsTrue(@new.Contains(old[i]), "Description");
+                    });
                 }
             }
         }
 
         private void AssertCreators(IEnumerable<PackageMetadataCreator> expected, IEnumerable<PackageMetadataCreator> actual, string name)
+        {
+            AssertCollection(expected, actual, name, (old, @new, i) =>
+            {
+                Assert.AreEqual(old[i].AlternateScript, @new[i].AlternateScript, $"{name}.AlternateScript");
+                Assert.AreEqual(old[i].FileAs, @new[i].FileAs, $"{name}.FileAs");
+                Assert.AreEqual(old[i].Role, @new[i].Role, $"{name}.Role");
+                Assert.AreEqual(old[i].Text, @new[i].Text, $"{name}.Text");
+            });
+        }
+
+        private void AssertCollection<T>(IEnumerable<T> expected, IEnumerable<T> actual, string name, Action<List<T>, List<T>, int> assert)
         {
             Assert.AreEqual(expected == null, actual == null, name);
             if (expected != null && actual != null)
@@ -287,10 +240,7 @@ namespace EpubSharp.Tests
 
                 for (var i = 0; i < @new.Count; ++i)
                 {
-                    Assert.AreEqual(old[i].AlternateScript, @new[i].AlternateScript, $"{name}.AlternateScript");
-                    Assert.AreEqual(old[i].FileAs, @new[i].FileAs, $"{name}.FileAs");
-                    Assert.AreEqual(old[i].Role, @new[i].Role, $"{name}.Role");
-                    Assert.AreEqual(old[i].Text, @new[i].Text, $"{name}.Text");
+                    assert(old, @new, i);
                 }
             }
         }
