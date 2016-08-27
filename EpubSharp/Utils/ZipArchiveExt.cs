@@ -28,7 +28,7 @@ namespace EpubSharp
 
             if (entry == null)
             {
-                throw new EpubException($"EPUB parsing error: {entryName} file not found in archive.");
+                throw new EpubParseException($"{entryName} file not found in archive.");
             }
 
             return entry;

@@ -30,17 +30,17 @@ namespace EpubSharp.Format.Readers
 
             var metadataNode = packageNode.SelectSingleNode("opf:metadata", xmlNamespaceManager);
             if (metadataNode == null)
-                throw new Exception("EPUB parsing error: metadata not found in the package.");
+                throw new EpubParseException("metadata not found in the package.");
             var metadata = ReadMetadata(metadataNode, package.EpubVersion);
             package.Metadata = metadata;
             XmlNode manifestNode = packageNode.SelectSingleNode("opf:manifest", xmlNamespaceManager);
             if (manifestNode == null)
-                throw new Exception("EPUB parsing error: manifest not found in the package.");
+                throw new EpubParseException("manifest not found in the package.");
             package.Manifest = new PackageManifest();
             package.Manifest.Items = ReadManifestItems(manifestNode);
             XmlNode spineNode = packageNode.SelectSingleNode("opf:spine", xmlNamespaceManager);
             if (spineNode == null)
-                throw new Exception("EPUB parsing error: spine not found in the package.");
+                throw new EpubParseException("spine not found in the package.");
             PackageSpine spine = ReadSpine(spineNode);
             package.Spine = spine;
             XmlNode guideNode = packageNode.SelectSingleNode("opf:guide", xmlNamespaceManager);

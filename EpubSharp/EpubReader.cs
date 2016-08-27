@@ -144,11 +144,11 @@ namespace EpubSharp
 
                 if (entry == null)
                 {
-                    throw new EpubException($"EPUB parsing error: file {path} not found in archive.");
+                    throw new EpubParseException($"file {path} not found in archive.");
                 }
                 if (entry.Length > int.MaxValue)
                 {
-                    throw new EpubException($"EPUB parsing error: file {path} is bigger than 2 Gb.");
+                    throw new EpubParseException($"file {path} is bigger than 2 Gb.");
                 }
 
                 var fileName = item.Href;

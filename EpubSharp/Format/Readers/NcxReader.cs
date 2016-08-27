@@ -39,14 +39,14 @@ namespace EpubSharp.Format.Readers
             var headNode = xml.DocumentElement.SelectSingleNode("ncx:head", xmlNamespaceManager);
             if (headNode == null)
             {
-                throw new EpubException("EPUB parsing error: TOC file does not contain head element");
+                throw new EpubParseException("TOC file does not contain head element");
             }
             
             ncx.Metadata = ReadNavigationHead(headNode);
             var docTitleNode = xml.DocumentElement.SelectSingleNode("ncx:docTitle", xmlNamespaceManager);
             if (docTitleNode == null)
             {
-                throw new EpubException("EPUB parsing error: TOC file does not contain docTitle element");
+                throw new EpubParseException("TOC file does not contain docTitle element");
             }
 
             ncx.DocTitle = ReadNavigationDocTitle(docTitleNode).SingleOrDefault();
@@ -60,7 +60,7 @@ namespace EpubSharp.Format.Readers
 
             var navMapNode = xml.DocumentElement.SelectSingleNode("ncx:navMap", xmlNamespaceManager);
             if (navMapNode == null)
-                throw new Exception("EPUB parsing error: TOC file does not contain navMap element");
+                throw new EpubParseException("TOC file does not contain navMap element");
             ncx.NavigationMap = ReadNavigationMap(navMapNode);
             var pageListNode = xml.DocumentElement.SelectSingleNode("ncx:pageList", xmlNamespaceManager);
             if (pageListNode != null)
@@ -225,9 +225,9 @@ namespace EpubSharp.Format.Readers
             }
             result.NavigationPoints = navigationPoints.AsReadOnly();
             if (!result.LabelText.Any())
-                throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain at least one navigation label");
+                throw new EpubParseException($"navigation point {result.Id} should contain at least one navigation label");
             if (result.ContentSrc == null)
-                throw new Exception($"EPUB parsing error: navigation point {result.Id} should contain content");
+                throw new EpubParseException($"navigation point {result.Id} should contain content");
             return result;
         }
 
