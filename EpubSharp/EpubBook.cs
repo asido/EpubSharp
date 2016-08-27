@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using EpubSharp.Format;
 
@@ -16,7 +18,10 @@ namespace EpubSharp
         public List<string> Authors => Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
         public string Author => string.Join(", ", Authors);
         public EpubContent Content { get; internal set; }
-        public Image CoverImage { get; internal set; }
+
+        internal Lazy<Image> LazyCoverImage = null;
+        public Image CoverImage => LazyCoverImage?.Value;
+
         public List<EpubChapter> Chapters { get; internal set; }
     }
     

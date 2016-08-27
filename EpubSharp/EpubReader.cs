@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Xml;
-using System.Xml.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Readers;
 
@@ -13,6 +10,24 @@ namespace EpubSharp
 {
     public static class EpubReader
     {
+        private static readonly IReadOnlyDictionary<string, EpubContentType> MimeTypeToContentType = new Dictionary<string, EpubContentType>
+        {
+            { "application/xhtml+xml", EpubContentType.Xhtml11 },
+            { "application/x-dtbook+xml", EpubContentType.Dtbook },
+            { "application/x-dtbncx+xml", EpubContentType.DtbookNcx },
+            { "text/x-oeb1-document", EpubContentType.Oeb1Document },
+            { "application/xml", EpubContentType.Xml },
+            { "text/css", EpubContentType.Css },
+            { "text/x-oeb1-css", EpubContentType.Oeb1Css },
+            { "image/gif", EpubContentType.ImageGif },
+            { "image/jpeg", EpubContentType.ImageJpeg },
+            { "image/png", EpubContentType.ImagePng },
+            { "image/svg+xml", EpubContentType.ImageSvg },
+            { "font/truetype", EpubContentType.FontTruetype },
+            { "font/opentype", EpubContentType.FontOpentype },
+            { "application/vnd.ms-opentype", EpubContentType.FontOpentype }
+        };
+
         public static EpubBook Read(string filePath)
         {
             if (!File.Exists(filePath))
@@ -20,100 +35,46 @@ namespace EpubSharp
                 throw new FileNotFoundException("Specified epub file not found.", filePath);
             }
 
-            var book = new EpubBook();
             using (var archive = ZipFile.OpenRead(filePath))
             {
-                book.Format = new EpubFormat();
-                book.Format.Ocf = OcfReader.Read(archive.LoadXml("META-INF/container.xml"));
-                book.Format.Package = PackageReader.Read(archive.LoadXml(book.Format.Ocf.RootFile));
+                var format = new EpubFormat();
+                format.Ocf = OcfReader.Read(archive.LoadXml("META-INF/container.xml"));
+                format.Package = PackageReader.Read(archive.LoadXml(format.Ocf.RootFile));
 
-                LoadNcx(archive, book);
-                
-                book.Content = ContentReader.ReadContentFiles(archive, book);
-                book.CoverImage = LoadCoverImage(book);
+                // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
+                if (!string.IsNullOrWhiteSpace(format.Package.NcxPath))
+                {
+                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(format.Ocf.RootFile), format.Package.NcxPath);
+                    format.Ncx = NcxReader.Read(archive.LoadXml(absolutePath));
+                    format.NewNcx = NcxReader.Read(archive.LoadXDocument(absolutePath));
+                }
+
+                var book = new EpubBook { Format = format };
+                book.Content = LoadContent(archive, book);
+                book.LazyCoverImage = LazyLoadCoverImage(book);
                 book.Chapters = LoadChapters(book, archive);
+                return book;
             }
-            return book;
         }
 
-        private static void LoadNcx(ZipArchive archive, EpubBook book)
+        private static Lazy<Image> LazyLoadCoverImage(EpubBook book)
         {
             if (book == null) throw new ArgumentNullException(nameof(book));
+            if (book.Format == null) throw new ArgumentNullException(nameof(book.Format));
 
-            var tocId = book.Format.Package.Spine.Toc;
-            if (string.IsNullOrEmpty(tocId))
+            return new Lazy<Image>(() =>
             {
-                return;
-            }
-
-            var tocManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
-            if (tocManifestItem == null)
-            {
-                //throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
-                return;
-            }
-
-            var tocFileEntryPath = PathExt.Combine(PathExt.GetDirectoryPath(book.Format.Ocf.RootFile), tocManifestItem.Href);
-            var tocFileEntry = archive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
-            if (tocFileEntry == null)
-            {
-                //throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} not found in archive.");
-                return;
-            }
-            if (tocFileEntry.Length > int.MaxValue)
-            {
-                //throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} is bigger than 2 Gb.");
-                return;
-            }
-
-            using (var containerStream = tocFileEntry.Open())
-            {
-                var doc = XmlExt.LoadDocument(containerStream);
-                book.Format.Ncx = NcxReader.Read(doc);
-            }
-            book.Format.NewNcx = NcxReader.Read(XDocument.Load(tocFileEntry.Open()));
-        }
-
-        private static Image LoadCoverImage(EpubBook book)
-        {
-            string coverId = null;
-
-            var coverMetaItem = book.Format.Package.Metadata.MetaItems
-                .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
-            if (coverMetaItem != null)
-            {
-                coverId = coverMetaItem.Content;
-            }
-            else
-            {
-                var item = book.Format.Package.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
-                if (item != null)
+                EpubByteContentFile coverImageContentFile;
+                if (!book.Content.Images.TryGetValue(book.Format.Package.CoverPath, out coverImageContentFile))
                 {
-                    coverId = item.Href;
+                    return null;
                 }
-            }
 
-            if (coverId == null)
-            {
-                return null;
-            }
-
-            var coverManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(item => item.Id == coverId);
-            if (coverManifestItem == null)
-            {
-                return null;
-            }
-
-            EpubByteContentFile coverImageContentFile;
-            if (!book.Content.Images.TryGetValue(coverManifestItem.Href, out coverImageContentFile))
-            {
-                return null;
-            }
-
-            using (var coverImageStream = new MemoryStream(coverImageContentFile.Content))
-            {
-                return Image.FromStream(coverImageStream);
-            }
+                using (var coverImageStream = new MemoryStream(coverImageContentFile.Content))
+                {
+                    return Image.FromStream(coverImageStream);
+                }
+            });
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
@@ -134,7 +95,9 @@ namespace EpubSharp
                 var chapter = new EpubChapter { Title = navigationPoint.LabelText };
                 var contentSourceAnchorCharIndex = navigationPoint.ContentSrc.IndexOf('#');
                 if (contentSourceAnchorCharIndex == -1)
+                {
                     chapter.ContentFileName = navigationPoint.ContentSrc;
+                }
                 else
                 {
                     chapter.ContentFileName = navigationPoint.ContentSrc.Substring(0, contentSourceAnchorCharIndex);
@@ -153,11 +116,126 @@ namespace EpubSharp
                 }
                 else
                 {
-                    throw new Exception($"Incorrect EPUB manifest: item with href = '{contentPath}' is missing");
+                    throw new EpubException($"Incorrect EPUB manifest: item with href = '{contentPath}' is missing");
                 }
 
                 chapter.SubChapters = LoadChapterFromNcx(book, navigationPoint.NavigationPoints, epubArchive);
                 result.Add(chapter);
+            }
+            return result;
+        }
+
+        public static EpubContent LoadContent(ZipArchive epubArchive, EpubBook book)
+        {
+            var result = new EpubContent
+            {
+                Html = new Dictionary<string, EpubTextContentFile>(),
+                Css = new Dictionary<string, EpubTextContentFile>(),
+                Images = new Dictionary<string, EpubByteContentFile>(),
+                Fonts = new Dictionary<string, EpubByteContentFile>(),
+                AllFiles = new Dictionary<string, EpubContentFile>()
+            };
+
+            foreach (var manifestItem in book.Format.Package.Manifest.Items)
+            {
+                var contentFilePath = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), manifestItem.Href);
+                var contentFileEntry = epubArchive.GetEntryIgnoringSlashDirection(contentFilePath);
+
+                if (contentFileEntry == null)
+                {
+                    throw new EpubException($"EPUB parsing error: file {contentFilePath} not found in archive.");
+                }
+                if (contentFileEntry.Length > int.MaxValue)
+                {
+                    throw new EpubException($"EPUB parsing error: file {contentFilePath} is bigger than 2 Gb.");
+                }
+
+                var fileName = manifestItem.Href;
+                var contentMimeType = manifestItem.MediaType;
+
+                EpubContentType contentType;
+                contentType = MimeTypeToContentType.TryGetValue(contentMimeType, out contentType)
+                    ? contentType
+                    : EpubContentType.Other;
+
+                switch (contentType)
+                {
+                    case EpubContentType.Xhtml11:
+                    case EpubContentType.Css:
+                    case EpubContentType.Oeb1Document:
+                    case EpubContentType.Oeb1Css:
+                    case EpubContentType.Xml:
+                    case EpubContentType.Dtbook:
+                    case EpubContentType.DtbookNcx:
+                        var epubTextContentFile = new EpubTextContentFile
+                        {
+                            FileName = fileName,
+                            ContentMimeType = contentMimeType,
+                            ContentType = contentType
+                        };
+
+                        using (var stream = contentFileEntry.Open())
+                        {
+                            if (stream == null)
+                            {
+                                throw new EpubException($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
+                            }
+
+                            using (var reader = new StreamReader(stream))
+                            {
+                                epubTextContentFile.Content = reader.ReadToEnd();
+                            }
+                        }
+
+                        switch (contentType)
+                        {
+                            case EpubContentType.Xhtml11:
+                                result.Html.Add(fileName, epubTextContentFile);
+                                break;
+                            case EpubContentType.Css:
+                                result.Css.Add(fileName, epubTextContentFile);
+                                break;
+                        }
+                        result.AllFiles.Add(fileName, epubTextContentFile);
+                        break;
+                    default:
+                        var epubByteContentFile = new EpubByteContentFile
+                        {
+                            FileName = fileName,
+                            ContentMimeType = contentMimeType,
+                            ContentType = contentType
+                        };
+
+                        using (var stream = contentFileEntry.Open())
+                        {
+                            if (stream == null)
+                            {
+                                throw new EpubException($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
+                            }
+
+                            using (var memoryStream = new MemoryStream((int)contentFileEntry.Length))
+                            {
+                                stream.CopyTo(memoryStream);
+                                epubByteContentFile.Content = memoryStream.ToArray();
+                            }
+                        }
+
+                        switch (contentType)
+                        {
+                            case EpubContentType.ImageGif:
+                            case EpubContentType.ImageJpeg:
+                            case EpubContentType.ImagePng:
+                            case EpubContentType.ImageSvg:
+                                result.Images.Add(fileName, epubByteContentFile);
+                                break;
+                            case EpubContentType.FontTruetype:
+                            case EpubContentType.FontOpentype:
+                                result.Fonts.Add(fileName, epubByteContentFile);
+                                break;
+                        }
+                        result.AllFiles.Add(fileName, epubByteContentFile);
+                        break;
+                }
             }
             return result;
         }

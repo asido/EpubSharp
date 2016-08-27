@@ -12,16 +12,16 @@ namespace EpubSharp.Format.Readers
             var xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
             xmlNamespaceManager.AddNamespace("opf", "http://www.idpf.org/2007/opf");
             var packageNode = xml.DocumentElement.SelectSingleNode("/opf:package", xmlNamespaceManager);
-            var result = new PackageDocument();
+            var package = new PackageDocument();
 
             var epubVersionValue = packageNode.Attributes["version"].Value;
             if (epubVersionValue == "2.0")
             {
-                result.EpubVersion = EpubVersion.Epub2;
+                package.EpubVersion = EpubVersion.Epub2;
             }
             else if (epubVersionValue == "3.0" || epubVersionValue == "3.0.1" || epubVersionValue == "3.1")
             {
-                result.EpubVersion = EpubVersion.Epub3;
+                package.EpubVersion = EpubVersion.Epub3;
             }
             else
             {
@@ -31,35 +31,66 @@ namespace EpubSharp.Format.Readers
             var metadataNode = packageNode.SelectSingleNode("opf:metadata", xmlNamespaceManager);
             if (metadataNode == null)
                 throw new Exception("EPUB parsing error: metadata not found in the package.");
-            var metadata = ReadMetadata(metadataNode, result.EpubVersion);
-            result.Metadata = metadata;
+            var metadata = ReadMetadata(metadataNode, package.EpubVersion);
+            package.Metadata = metadata;
             XmlNode manifestNode = packageNode.SelectSingleNode("opf:manifest", xmlNamespaceManager);
             if (manifestNode == null)
                 throw new Exception("EPUB parsing error: manifest not found in the package.");
-            result.Manifest = new EpubManifest();
-            result.Manifest.Items = ReadManifestItems(manifestNode);
+            package.Manifest = new EpubManifest();
+            package.Manifest.Items = ReadManifestItems(manifestNode);
             XmlNode spineNode = packageNode.SelectSingleNode("opf:spine", xmlNamespaceManager);
             if (spineNode == null)
                 throw new Exception("EPUB parsing error: spine not found in the package.");
             EpubSpine spine = ReadSpine(spineNode);
-            result.Spine = spine;
+            package.Spine = spine;
             XmlNode guideNode = packageNode.SelectSingleNode("opf:guide", xmlNamespaceManager);
             if (guideNode != null)
             {
                 EpubGuide guide = ReadGuide(guideNode);
-                result.Guide = guide;
+                package.Guide = guide;
             }
 
-            var navItem = result.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
-            if (navItem != null)
+            package.NavPath = FindNavPath(package);
+            package.NcxPath = FindNcxPath(package);
+            package.CoverPath = FindCoverPath(package);
+
+            return package;
+        }
+
+        private static string FindCoverPath(PackageDocument package)
+        {
+            string coverId = null;
+
+            var coverMetaItem = package.Metadata.MetaItems
+                .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
+            if (coverMetaItem != null)
             {
-                result.NavPath = navItem.Href;
+                coverId = coverMetaItem.Content;
+            }
+            else
+            {
+                var item = package.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
+                if (item != null)
+                {
+                    coverId = item.Href;
+                }
             }
 
-            var ncxItem = result.Manifest.Items.FirstOrDefault(e => e.MediaType == "application/x-dtbncx+xml");
+            if (coverId == null)
+            {
+                return null;
+            }
+
+            var coverItem = package.Manifest.Items.FirstOrDefault(item => item.Id == coverId);
+            return coverItem?.Href;
+        }
+
+        private static string FindNcxPath(PackageDocument package)
+        {
+            var ncxItem = package.Manifest.Items.FirstOrDefault(e => e.MediaType == "application/x-dtbncx+xml");
             if (ncxItem != null)
             {
-                result.NcxPath = ncxItem.Href;
+                package.NcxPath = ncxItem.Href;
             }
             else
             {
@@ -67,17 +98,23 @@ namespace EpubSharp.Format.Readers
                 // according to http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm#Section2.4.1.2,
                 // "The item that describes the NCX must be referenced by the spine toc attribute."
 
-                if (!string.IsNullOrWhiteSpace(result.Spine.Toc))
+                if (!string.IsNullOrWhiteSpace(package.Spine.Toc))
                 {
-                    var tocItem = result.Manifest.Items.FirstOrDefault(e => e.Id == result.Spine.Toc);
+                    var tocItem = package.Manifest.Items.FirstOrDefault(e => e.Id == package.Spine.Toc);
                     if (tocItem != null)
                     {
-                        result.NcxPath = tocItem.Href;
+                        return tocItem.Href;
                     }
                 }
             }
 
-            return result;
+            return null;
+        }
+
+        private static string FindNavPath(PackageDocument package)
+        {
+            var navItem = package.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
+            return navItem?.Href;
         }
 
         private static EpubPackageMetadata ReadMetadata(XmlNode metadataNode, EpubVersion epubVersion)
@@ -190,10 +227,10 @@ namespace EpubSharp.Format.Readers
 
         private static EpubMetadataCreator ReadMetadataCreator(XmlNode metadataCreatorNode)
         {
-            EpubMetadataCreator result = new EpubMetadataCreator();
+            var result = new EpubMetadataCreator();
             foreach (XmlAttribute metadataCreatorNodeAttribute in metadataCreatorNode.Attributes)
             {
-                string attributeValue = metadataCreatorNodeAttribute.Value;
+                var attributeValue = metadataCreatorNodeAttribute.Value;
                 switch (metadataCreatorNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "opf:role":
@@ -216,7 +253,7 @@ namespace EpubSharp.Format.Readers
             var result = new EpubMetadataCreator();
             foreach (XmlAttribute metadataContributorNodeAttribute in metadataContributorNode.Attributes)
             {
-                string attributeValue = metadataContributorNodeAttribute.Value;
+                var attributeValue = metadataContributorNodeAttribute.Value;
                 switch (metadataContributorNodeAttribute.Name.ToLowerInvariant())
                 {
                     case "opf:role":

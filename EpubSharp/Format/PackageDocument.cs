@@ -15,8 +15,11 @@ namespace EpubSharp.Format
         public EpubManifest Manifest { get; internal set; }
         public EpubSpine Spine { get; internal set; }
         public EpubGuide Guide { get; internal set; }
+
+        // Below are helper properties, which aren't part of the format.
         public string NavPath { get; internal set; }
         public string NcxPath { get; internal set; }
+        public string CoverPath { get; internal set; }
     }
 
     public class EpubPackageMetadata

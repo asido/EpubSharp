@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace EpubSharp
 {
@@ -35,10 +36,20 @@ namespace EpubSharp
 
         public static XmlDocument LoadXml(this ZipArchive archive, string entryName)
         {
-            var containerFileEntry = archive.GetEntryIgnoringSlashDirection(entryName);
-            using (var containerStream = containerFileEntry.Open())
+            var entry = archive.GetEntryIgnoringSlashDirection(entryName);
+            using (var stream = entry.Open())
             {
-                return XmlExt.LoadDocument(containerStream);
+                return XmlExt.LoadDocument(stream);
+            }
+        }
+
+        public static XDocument LoadXDocument(this ZipArchive archive, string entryName)
+        {
+            var entry = archive.GetEntryIgnoringSlashDirection(entryName);
+
+            using (var stream = entry.Open())
+            {
+                return XDocument.Load(stream);
             }
         }
     }
