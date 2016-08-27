@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using EpubSharp.Format;
 
 namespace EpubSharp
@@ -70,17 +71,14 @@ namespace EpubSharp
     {
         public string FileName { get; set; }
         public EpubContentType ContentType { get; set; }
-        public string ContentMimeType { get; set; }
+        public string MimeType { get; set; }
         public byte[] Content { get; set; }
     }
 
-    public class EpubByteContentFile : EpubContentFile
-    {
-        public new byte[] Content { get; set; }
-    }
+    public class EpubByteContentFile : EpubContentFile { }
     
     public class EpubTextContentFile : EpubContentFile
     {
-        public new string Content { get; set; }
+        public string TextContent => Encoding.UTF8.GetString(Content);
     }
 }

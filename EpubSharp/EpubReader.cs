@@ -108,7 +108,7 @@ namespace EpubSharp
                 EpubTextContentFile html;
                 if (book.Content.Html.TryGetValue(contentPath, out html))
                 {
-                    chapter.HtmlContent = html.Content;
+                    chapter.HtmlContent = html.TextContent;
                 }
                 else if (book.Content.Images.ContainsKey(contentPath))
                 {
@@ -136,25 +136,25 @@ namespace EpubSharp
                 AllFiles = new Dictionary<string, EpubContentFile>()
             };
 
-            foreach (var manifestItem in book.Format.Package.Manifest.Items)
+            foreach (var item in book.Format.Package.Manifest.Items)
             {
-                var contentFilePath = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), manifestItem.Href);
-                var contentFileEntry = epubArchive.GetEntryIgnoringSlashDirection(contentFilePath);
+                var path = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), item.Href);
+                var entry = epubArchive.GetEntryIgnoringSlashDirection(path);
 
-                if (contentFileEntry == null)
+                if (entry == null)
                 {
-                    throw new EpubException($"EPUB parsing error: file {contentFilePath} not found in archive.");
+                    throw new EpubException($"EPUB parsing error: file {path} not found in archive.");
                 }
-                if (contentFileEntry.Length > int.MaxValue)
+                if (entry.Length > int.MaxValue)
                 {
-                    throw new EpubException($"EPUB parsing error: file {contentFilePath} is bigger than 2 Gb.");
+                    throw new EpubException($"EPUB parsing error: file {path} is bigger than 2 Gb.");
                 }
 
-                var fileName = manifestItem.Href;
-                var contentMimeType = manifestItem.MediaType;
+                var fileName = item.Href;
+                var mimeType = item.MediaType;
 
                 EpubContentType contentType;
-                contentType = MimeTypeToContentType.TryGetValue(contentMimeType, out contentType)
+                contentType = MimeTypeToContentType.TryGetValue(mimeType, out contentType)
                     ? contentType
                     : EpubContentType.Other;
 
@@ -167,56 +167,51 @@ namespace EpubSharp
                     case EpubContentType.Xml:
                     case EpubContentType.Dtbook:
                     case EpubContentType.DtbookNcx:
-                        var epubTextContentFile = new EpubTextContentFile
+                    {
+                        var file = new EpubTextContentFile
                         {
                             FileName = fileName,
-                            ContentMimeType = contentMimeType,
+                            MimeType = mimeType,
                             ContentType = contentType
                         };
 
-                        using (var stream = contentFileEntry.Open())
+                        using (var stream = entry.Open())
                         {
-                            if (stream == null)
-                            {
-                                throw new EpubException($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
-                            }
-
-                            using (var reader = new StreamReader(stream))
-                            {
-                                epubTextContentFile.Content = reader.ReadToEnd();
-                            }
+                            file.Content = stream.ReadToEnd();
                         }
 
                         switch (contentType)
                         {
                             case EpubContentType.Xhtml11:
-                                result.Html.Add(fileName, epubTextContentFile);
+                                result.Html.Add(fileName, file);
                                 break;
                             case EpubContentType.Css:
-                                result.Css.Add(fileName, epubTextContentFile);
+                                result.Css.Add(fileName, file);
                                 break;
                         }
-                        result.AllFiles.Add(fileName, epubTextContentFile);
+                        result.AllFiles.Add(fileName, file);
                         break;
+                    }
                     default:
-                        var epubByteContentFile = new EpubByteContentFile
+                    {
+                        var file = new EpubByteContentFile
                         {
                             FileName = fileName,
-                            ContentMimeType = contentMimeType,
+                            MimeType = mimeType,
                             ContentType = contentType
                         };
 
-                        using (var stream = contentFileEntry.Open())
+                        using (var stream = entry.Open())
                         {
                             if (stream == null)
                             {
                                 throw new EpubException($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
                             }
 
-                            using (var memoryStream = new MemoryStream((int)contentFileEntry.Length))
+                            using (var memoryStream = new MemoryStream((int) entry.Length))
                             {
                                 stream.CopyTo(memoryStream);
-                                epubByteContentFile.Content = memoryStream.ToArray();
+                                file.Content = memoryStream.ToArray();
                             }
                         }
 
@@ -226,15 +221,16 @@ namespace EpubSharp
                             case EpubContentType.ImageJpeg:
                             case EpubContentType.ImagePng:
                             case EpubContentType.ImageSvg:
-                                result.Images.Add(fileName, epubByteContentFile);
+                                result.Images.Add(fileName, file);
                                 break;
                             case EpubContentType.FontTruetype:
                             case EpubContentType.FontOpentype:
-                                result.Fonts.Add(fileName, epubByteContentFile);
+                                result.Fonts.Add(fileName, file);
                                 break;
                         }
-                        result.AllFiles.Add(fileName, epubByteContentFile);
+                        result.AllFiles.Add(fileName, file);
                         break;
+                    }
                 }
             }
             return result;

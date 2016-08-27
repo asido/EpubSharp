@@ -46,6 +46,7 @@
     <Compile Include="EpubBook.cs" />
     <Compile Include="EpubException.cs" />
     <Compile Include="EpubReader.cs" />
+    <Compile Include="Utils\StreamExt.cs" />
     <Compile Include="Utils\ZipArchiveExt.cs" />
     <Compile Include="Format\EpubFormat.cs" />
     <Compile Include="Format\NcxDocument.cs" />
