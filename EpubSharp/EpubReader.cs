@@ -38,10 +38,7 @@ namespace EpubSharp
                 book.Format.Package = PackageReader.Read(containerDocument);
 
                 LoadNcx(archive, book);
-
-                book.Title = book.Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
-                book.AuthorList = book.Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
-                book.Author = string.Join(", ", book.AuthorList);
+                
                 book.Content = ContentReader.ReadContentFiles(archive, book);
                 book.CoverImage = LoadCoverImage(book);
                 book.Chapters = LoadChapters(book, archive);
@@ -89,22 +86,44 @@ namespace EpubSharp
 
         private static Image LoadCoverImage(EpubBook book)
         {
-            var metaItems = book.Format.Package.Metadata.MetaItems;
-            if (metaItems == null || !metaItems.Any())
+            string coverId = null;
+
+            var coverMetaItem = book.Format.Package.Metadata.MetaItems
+                .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
+            if (coverMetaItem != null)
+            {
+                coverId = coverMetaItem.Content;
+            }
+            else
+            {
+                var item = book.Format.Package.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
+                if (item != null)
+                {
+                    coverId = item.Href;
+                }
+            }
+
+            if (coverId == null)
+            {
                 return null;
-            var coverMetaItem = metaItems.FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
-            if (coverMetaItem == null)
-                return null;
-            if (string.IsNullOrEmpty(coverMetaItem.Content))
-                throw new Exception("Incorrect EPUB metadata: cover item content is missing");
-            var coverManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(manifestItem => string.Compare(manifestItem.Id, coverMetaItem.Content, StringComparison.OrdinalIgnoreCase) == 0);
+            }
+
+            var coverManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(item => item.Id == coverId);
             if (coverManifestItem == null)
-                throw new Exception($"Incorrect EPUB manifest: item with ID = \"{coverMetaItem.Content}\" is missing");
+            {
+                return null;
+            }
+
             EpubByteContentFile coverImageContentFile;
             if (!book.Content.Images.TryGetValue(coverManifestItem.Href, out coverImageContentFile))
-                throw new Exception($"Incorrect EPUB manifest: item with href = \"{coverManifestItem.Href}\" is missing");
+            {
+                return null;
+            }
+
             using (var coverImageStream = new MemoryStream(coverImageContentFile.Content))
+            {
                 return Image.FromStream(coverImageStream);
+            }
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
@@ -122,14 +141,14 @@ namespace EpubSharp
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
             {
-                var chapter = new EpubChapter { Title = navigationPoint.Label };
-                var contentSourceAnchorCharIndex = navigationPoint.ContentSource.IndexOf('#');
+                var chapter = new EpubChapter { Title = navigationPoint.LabelText };
+                var contentSourceAnchorCharIndex = navigationPoint.ContentSrc.IndexOf('#');
                 if (contentSourceAnchorCharIndex == -1)
-                    chapter.ContentFileName = navigationPoint.ContentSource;
+                    chapter.ContentFileName = navigationPoint.ContentSrc;
                 else
                 {
-                    chapter.ContentFileName = navigationPoint.ContentSource.Substring(0, contentSourceAnchorCharIndex);
-                    chapter.Anchor = navigationPoint.ContentSource.Substring(contentSourceAnchorCharIndex + 1);
+                    chapter.ContentFileName = navigationPoint.ContentSrc.Substring(0, contentSourceAnchorCharIndex);
+                    chapter.Anchor = navigationPoint.ContentSrc.Substring(contentSourceAnchorCharIndex + 1);
                 }
 
                 var contentPath = PathExt.Combine(PathExt.GetDirectoryPath(book.Format.Package.NcxPath), chapter.ContentFileName);
