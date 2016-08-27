@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Xml;
 using EpubSharp.Format;
@@ -9,19 +10,26 @@ namespace EpubSharp.Readers
     {
         public static PackageDocument Read(XmlDocument xml)
         {
-            XmlNamespaceManager xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
+            var xmlNamespaceManager = new XmlNamespaceManager(xml.NameTable);
             xmlNamespaceManager.AddNamespace("opf", "http://www.idpf.org/2007/opf");
-            XmlNode packageNode = xml.DocumentElement.SelectSingleNode("/opf:package", xmlNamespaceManager);
+            var packageNode = xml.DocumentElement.SelectSingleNode("/opf:package", xmlNamespaceManager);
             var result = new PackageDocument();
-            string epubVersionValue = packageNode.Attributes["version"].Value;
+
+            var epubVersionValue = packageNode.Attributes["version"].Value;
             if (epubVersionValue == "2.0")
+            {
                 result.EpubVersion = EpubVersion.Epub2;
+            }
+            else if (epubVersionValue == "3.0" || epubVersionValue == "3.0.1" || epubVersionValue == "3.1")
+            {
+                result.EpubVersion = EpubVersion.Epub3;
+            }
             else
-                if (epubVersionValue == "3.0")
-                    result.EpubVersion = EpubVersion.Epub3;
-                else
-                    throw new Exception(String.Format("Unsupported EPUB version: {0}.", epubVersionValue));
-            XmlNode metadataNode = packageNode.SelectSingleNode("opf:metadata", xmlNamespaceManager);
+            {
+                throw new Exception($"Unsupported EPUB version: {epubVersionValue}.");
+            }
+
+            var metadataNode = packageNode.SelectSingleNode("opf:metadata", xmlNamespaceManager);
             if (metadataNode == null)
                 throw new Exception("EPUB parsing error: metadata not found in the package.");
             var metadata = ReadMetadata(metadataNode, result.EpubVersion);
@@ -42,6 +50,34 @@ namespace EpubSharp.Readers
                 EpubGuide guide = ReadGuide(guideNode);
                 result.Guide = guide;
             }
+
+            var navItem = result.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
+            if (navItem != null)
+            {
+                result.NavPath = navItem.Href;
+            }
+
+            var ncxItem = result.Manifest.Items.FirstOrDefault(e => e.MediaType == "application/x-dtbncx+xml");
+            if (ncxItem != null)
+            {
+                result.NcxPath = ncxItem.Href;
+            }
+            else
+            {
+                // If we can't find the toc by media-type then try to look for id of the item in the spine attributes as
+                // according to http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm#Section2.4.1.2,
+                // "The item that describes the NCX must be referenced by the spine toc attribute."
+
+                if (!string.IsNullOrWhiteSpace(result.Spine.Toc))
+                {
+                    var tocItem = result.Manifest.Items.FirstOrDefault(e => e.Id == result.Spine.Toc);
+                    if (tocItem != null)
+                    {
+                        result.NcxPath = tocItem.Href;
+                    }
+                }
+            }
+
             return result;
         }
 
@@ -281,6 +317,9 @@ namespace EpubSharp.Readers
                                 break;
                             case "href":
                                 manifestItem.Href = attributeValue;
+                                break;
+                            case "properties":
+                                manifestItem.Properties = attributeValue.Split(' ');
                                 break;
                             case "media-type":
                                 manifestItem.MediaType = attributeValue;

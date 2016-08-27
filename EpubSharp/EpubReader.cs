@@ -39,24 +39,8 @@ namespace EpubSharp
 
                 book.Format.Package = PackageReader.Read(containerDocument);
 
-                string tocId = book.Format.Package.Spine.Toc;
-                if (String.IsNullOrEmpty(tocId))
-                    throw new Exception("EPUB parsing error: TOC ID is empty.");
-                var tocManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
-                if (tocManifestItem == null)
-                    throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
+                LoadNcx(archive, book);
 
-                var tocFileEntryPath = ZipPathUtils.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), tocManifestItem.Href);
-                var tocFileEntry = archive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
-                if (tocFileEntry == null)
-                    throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} not found in archive.");
-                if (tocFileEntry.Length > int.MaxValue)
-                    throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} is bigger than 2 Gb.");
-                using (var containerStream = tocFileEntry.Open())
-                    containerDocument = XmlUtils.LoadDocument(containerStream);
-
-                book.Format.Ncx = NcxReader.Read(containerDocument);
-                book.Format.NewNcx = NcxReader.Read(XDocument.Load(tocFileEntry.Open()));
                 book.Title = book.Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
                 book.AuthorList = book.Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
                 book.Author = string.Join(", ", book.AuthorList);
@@ -65,6 +49,44 @@ namespace EpubSharp
                 book.Chapters = LoadChapters(book, archive);
             }
             return book;
+        }
+
+        private static void LoadNcx(ZipArchive archive, EpubBook book)
+        {
+            if (book == null) throw new ArgumentNullException(nameof(book));
+
+            var tocId = book.Format.Package.Spine.Toc;
+            if (string.IsNullOrEmpty(tocId))
+            {
+                return;
+            }
+
+            var tocManifestItem = book.Format.Package.Manifest.Items.FirstOrDefault(item => string.Compare(item.Id, tocId, StringComparison.OrdinalIgnoreCase) == 0);
+            if (tocManifestItem == null)
+            {
+                //throw new Exception($"EPUB parsing error: TOC item {tocId} not found in EPUB manifest.");
+                return;
+            }
+
+            var tocFileEntryPath = ZipPathUtils.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), tocManifestItem.Href);
+            var tocFileEntry = archive.GetEntryIgnoringSlashDirection(tocFileEntryPath);
+            if (tocFileEntry == null)
+            {
+                //throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} not found in archive.");
+                return;
+            }
+            if (tocFileEntry.Length > int.MaxValue)
+            {
+                //throw new Exception($"EPUB parsing error: TOC file {tocFileEntryPath} is bigger than 2 Gb.");
+                return;
+            }
+
+            using (var containerStream = tocFileEntry.Open())
+            {
+                var doc = XmlUtils.LoadDocument(containerStream);
+                book.Format.Ncx = NcxReader.Read(doc);
+            }
+            book.Format.NewNcx = NcxReader.Read(XDocument.Load(tocFileEntry.Open()));
         }
 
         private static Image LoadCoverImage(EpubBook book)
@@ -89,10 +111,15 @@ namespace EpubSharp
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
         {
-            return LoadChapters(book, book.Format.Ncx.NavigationMap, epubArchive);
+            if (book.Format.Ncx != null)
+            {
+                return LoadChapterFromNcx(book, book.Format.Ncx.NavigationMap, epubArchive);
+            }
+            
+            return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChapters(EpubBook book, IReadOnlyCollection<EpubNcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChapterFromNcx(EpubBook book, IReadOnlyCollection<EpubNcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
@@ -106,11 +133,23 @@ namespace EpubSharp
                     chapter.ContentFileName = navigationPoint.ContentSource.Substring(0, contentSourceAnchorCharIndex);
                     chapter.Anchor = navigationPoint.ContentSource.Substring(contentSourceAnchorCharIndex + 1);
                 }
-                EpubTextContentFile htmlContentFile;
-                if (!book.Content.Html.TryGetValue(chapter.ContentFileName, out htmlContentFile))
-                    throw new Exception($"Incorrect EPUB manifest: item with href = \"{chapter.ContentFileName}\" is missing");
-                chapter.HtmlContent = htmlContentFile.Content;
-                chapter.SubChapters = LoadChapters(book, navigationPoint.NavigationPoints, epubArchive);
+
+                var contentPath = ZipPathUtils.Combine(ZipPathUtils.GetDirectoryPath(book.Format.Package.NcxPath), chapter.ContentFileName);
+                EpubTextContentFile html;
+                if (book.Content.Html.TryGetValue(contentPath, out html))
+                {
+                    chapter.HtmlContent = html.Content;
+                }
+                else if (book.Content.Images.ContainsKey(contentPath))
+                {
+                    chapter.HtmlContent = "";
+                }
+                else
+                {
+                    throw new Exception($"Incorrect EPUB manifest: item with href = '{contentPath}' is missing");
+                }
+
+                chapter.SubChapters = LoadChapterFromNcx(book, navigationPoint.NavigationPoints, epubArchive);
                 result.Add(chapter);
             }
             return result;

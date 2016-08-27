@@ -15,6 +15,8 @@ namespace EpubSharp.Format
         public EpubManifest Manifest { get; internal set; }
         public EpubSpine Spine { get; internal set; }
         public EpubGuide Guide { get; internal set; }
+        public string NavPath { get; internal set; }
+        public string NcxPath { get; internal set; }
     }
 
     public class EpubPackageMetadata
@@ -71,6 +73,7 @@ namespace EpubSharp.Format
     {
         public string Id { get; internal set; }
         public string Href { get; internal set; }
+        public ICollection<string> Properties { get; internal set; } = new List<string>();
         public string MediaType { get; internal set; }
         public string RequiredNamespace { get; internal set; }
         public string RequiredModules { get; internal set; }

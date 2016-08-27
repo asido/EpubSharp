@@ -41,13 +41,14 @@ namespace EpubSharp.Format
     {
         Front = 1,
         Normal,
-        Special
+        Special,
+        Body
     }
 
     public class EpubNcxPageTarget
     {
         public string Id { get; internal set; }
-        public int Value { get; internal set; }
+        public int? Value { get; internal set; }
         public string Class { get; internal set; }
         public EpubNcxPageTargetType? Type { get; internal set; }
         public string Label { get; internal set; }

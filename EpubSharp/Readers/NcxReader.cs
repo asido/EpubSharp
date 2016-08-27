@@ -79,7 +79,6 @@ namespace EpubSharp.Readers
             if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
 
             var navList = xml.Root.Element(NcxElements.NavList);
-
             var ncx = new NcxDocument
             {
                 Metadata = xml.Root.Element(NcxElements.Head)?.Elements(NcxElements.Meta).Select(elem => new EpubNcxMetadata
@@ -95,8 +94,8 @@ namespace EpubSharp.Readers
                 {
                     Id = (string)elem.Attribute("id"),
                     Class = (string)elem.Attribute("class"),
-                    Value = (int)elem.Attribute("value"),
-                    Type = (EpubNcxPageTargetType?)(elem.Attribute("type") == null ? null : Enum.Parse(typeof(EpubNcxPageTargetType), (string)elem.Attribute("type"))),
+                    Value = (int?)elem.Attribute("value"),
+                    Type = (EpubNcxPageTargetType?)(elem.Attribute("type") == null ? null : Enum.Parse(typeof(EpubNcxPageTargetType), (string)elem.Attribute("type"), true)),
                     Label = elem.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
                     ContentSource = (string)elem.Element(NcxElements.Content)?.Attribute("src")
                 }).ToList().AsReadOnly(),
@@ -270,7 +269,7 @@ namespace EpubSharp.Readers
                         break;
                     case "type":
                         EpubNcxPageTargetType type;
-                        if (!Enum.TryParse(attributeValue, out type))
+                        if (!Enum.TryParse(attributeValue, true, out type))
                             throw new Exception($"Incorrect EPUB navigation page target: {attributeValue} is incorrect value for page target type");
                         result.Type = type;
                         break;
