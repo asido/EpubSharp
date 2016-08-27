@@ -3,13 +3,11 @@ using System.Linq;
 
 namespace EpubSharp
 {
-    internal static class ZipArchiveExtensions
+    internal static class ZipArchiveExt
     {
         /// <summary>
         /// ZIP's are slash-side sensitive and ZIP's created on Windows and Linux can contain their own variation.
         /// </summary>
-        /// <param name="entryName"></param>
-        /// <returns></returns>
         public static ZipArchiveEntry GetEntryIgnoringSlashDirection(this ZipArchive archive, string entryName)
         {
             var entry = archive.GetEntry(entryName);

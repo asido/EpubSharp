@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Xml;
 
-namespace EpubSharp.Utils
+namespace EpubSharp
 {
     internal static class XmlExt
     {

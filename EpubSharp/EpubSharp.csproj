@@ -46,7 +46,7 @@
     <Compile Include="EpubBook.cs" />
     <Compile Include="EpubException.cs" />
     <Compile Include="EpubReader.cs" />
-    <Compile Include="Extensions\ZipArchive.cs" />
+    <Compile Include="Utils\ZipArchiveExt.cs" />
     <Compile Include="Format\EpubFormat.cs" />
     <Compile Include="Format\NcxDocument.cs" />
     <Compile Include="Format\PackageDocument.cs" />
@@ -54,11 +54,13 @@
     <Compile Include="Readers\ContentReader.cs" />
     <Compile Include="Readers\NcxReader.cs" />
     <Compile Include="Readers\PackageReader.cs" />
-    <Compile Include="Format\Readers\OcfReader.cs" />
+    <Compile Include="Readers\OcfReader.cs" />
     <Compile Include="Utils\XmlExt.cs" />
     <Compile Include="Utils\PathExt.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
