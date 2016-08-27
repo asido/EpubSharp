@@ -18,6 +18,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Coverages = MetadataNamespace + "coverages";
             public static readonly XName Creator = MetadataNamespace + "creator";
             public static readonly XName Date = MetadataNamespace + "date";
+            public static readonly XName Description = MetadataNamespace + "description";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -97,7 +98,8 @@ namespace EpubSharp.Format.Readers
                     {
                         Text = elem.Value,
                         Event = (string)elem.Attribute(PackageNamespace + "event")
-                    }).ToList().AsReadOnly()
+                    }).ToList().AsReadOnly(),
+                    Descriptions = metadata?.Elements(PackageElements.Description).Select(elem => elem.Value).ToList().AsReadOnly()
                 }
             };
             return package;
@@ -196,7 +198,7 @@ namespace EpubSharp.Format.Readers
             var coverages = new List<string>();
             var rights = new List<string>();
             var metaItems = new List<PackageMetadataMeta>();
-            var description = "";
+            var descriptions = new List<string>();
 
             foreach (XmlNode metadataItemNode in metadataNode.ChildNodes)
             {
@@ -214,7 +216,7 @@ namespace EpubSharp.Format.Readers
                         subjects.Add(innerText);
                         break;
                     case "description":
-                        description = innerText;
+                        descriptions.Add(innerText);
                         break;
                     case "publisher":
                         publishers.Add(innerText);
@@ -290,7 +292,7 @@ namespace EpubSharp.Format.Readers
                 Coverages = coverages,
                 Rights = rights,
                 MetaItems = metaItems,
-                Description = description
+                Descriptions = descriptions
             };
         }
 

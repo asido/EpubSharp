@@ -257,6 +257,20 @@ namespace EpubSharp.Tests
                             Assert.AreEqual(old[i].Event, @new[i].Event, "Date.Event");
                         }
                     }
+
+                    Assert.AreEqual(expected.Metadata.Descriptions == null, actual.Metadata.Descriptions == null, nameof(actual.Metadata.Descriptions));
+                    if (expected.Metadata.Descriptions != null && actual.Metadata.Descriptions != null)
+                    {
+                        var old = expected.Metadata.Descriptions.ToList();
+                        var @new = actual.Metadata.Descriptions.ToList();
+
+                        Assert.AreEqual(old.Count, @new.Count, "Descriptions.Count");
+
+                        for (var i = 0; i < @new.Count; ++i)
+                        {
+                            Assert.IsTrue(@new.Contains(old[i]), "Description");
+                        }
+                    }
                 }
             }
         }
