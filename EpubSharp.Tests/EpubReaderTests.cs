@@ -272,6 +272,10 @@ namespace EpubSharp.Tests
                         AssertPrimitiveCollection(old[i].Properties, @new[i].Properties, "ItemRef.Properties", "ItemRef.Property");
                     });
                 }
+
+                Assert.AreEqual(expected.CoverPath, actual.CoverPath, nameof(actual.CoverPath));
+                Assert.AreEqual(expected.NavPath, actual.NavPath, nameof(actual.NavPath));
+                Assert.AreEqual(expected.NcxPath, actual.NcxPath, nameof(actual.NcxPath));
             }
         }
 

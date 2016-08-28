@@ -184,6 +184,10 @@ namespace EpubSharp.Format.Readers
                 }
             };
 
+            package.NavPath = FindNavPath(package);
+            package.NcxPath = FindNcxPath(package);
+            package.CoverPath = FindCoverPath(package);
+
             return package;
         }
 
