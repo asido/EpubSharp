@@ -27,6 +27,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Relation = MetadataNamespace + "relation";
             public static readonly XName Rights = MetadataNamespace + "rights";
             public static readonly XName Source = MetadataNamespace + "source";
+            public static readonly XName Subject = MetadataNamespace + "subject";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -129,7 +130,8 @@ namespace EpubSharp.Format.Readers
                     Publishers = metadata?.Elements(PackageElements.Publisher).Select(elem => elem.Value).ToList().AsReadOnly(),
                     Relations = metadata?.Elements(PackageElements.Relation).Select(elem => elem.Value).ToList().AsReadOnly(),
                     Rights = metadata?.Elements(PackageElements.Rights).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Sources = metadata?.Elements(PackageElements.Source).Select(elem => elem.Value).ToList().AsReadOnly()
+                    Sources = metadata?.Elements(PackageElements.Source).Select(elem => elem.Value).ToList().AsReadOnly(),
+                    Subjects = metadata?.Elements(PackageElements.Subject).Select(elem => elem.Value).ToList().AsReadOnly()
                 }
             };
             
