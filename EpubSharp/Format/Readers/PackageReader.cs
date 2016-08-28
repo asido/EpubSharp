@@ -25,6 +25,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Meta = PackageNamespace + "meta";
             public static readonly XName Publisher = MetadataNamespace + "publisher";
             public static readonly XName Relation = MetadataNamespace + "relation";
+            public static readonly XName Rights = MetadataNamespace + "rights";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -125,7 +126,8 @@ namespace EpubSharp.Format.Readers
                         Text = epubVersion == EpubVersion.Epub2 ? (string) elem.Attribute("content") : elem.Value
                     }).ToList().AsReadOnly(),
                     Publishers = metadata?.Elements(PackageElements.Publisher).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Relations = metadata?.Elements(PackageElements.Relation).Select(elem => elem.Value).ToList().AsReadOnly()
+                    Relations = metadata?.Elements(PackageElements.Relation).Select(elem => elem.Value).ToList().AsReadOnly(),
+                    Rights = metadata?.Elements(PackageElements.Rights).Select(elem => elem.Value).ToList().AsReadOnly()
                 }
             };
             

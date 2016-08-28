@@ -245,6 +245,11 @@ namespace EpubSharp.Tests
                     {
                         Assert.IsTrue(@new.Contains(old[i]), "Relation");
                     });
+
+                    AssertCollection(expected.Metadata.Rights, actual.Metadata.Rights, nameof(actual.Metadata.Rights), (old, @new, i) =>
+                    {
+                        Assert.IsTrue(@new.Contains(old[i]), "Right");
+                    });
                 }
             }
         }
