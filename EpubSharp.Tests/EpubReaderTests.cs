@@ -250,6 +250,11 @@ namespace EpubSharp.Tests
                     {
                         Assert.IsTrue(@new.Contains(old[i]), "Right");
                     });
+
+                    AssertCollection(expected.Metadata.Sources, actual.Metadata.Sources, nameof(actual.Metadata.Sources), (old, @new, i) =>
+                    {
+                        Assert.IsTrue(@new.Contains(old[i]), "Source");
+                    });
                 }
             }
         }
