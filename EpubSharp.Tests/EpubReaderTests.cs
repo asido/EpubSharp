@@ -225,6 +225,16 @@ namespace EpubSharp.Tests
                     {
                         Assert.IsTrue(@new.Contains(old[i]), "Language");
                     });
+
+                    AssertCollection(expected.Metadata.Metas, actual.Metadata.Metas, nameof(actual.Metadata.Metas), (old, @new, i) =>
+                    {
+                        Assert.AreEqual(old[i].Id, @new[i].Id, "Meta.Id");
+                        Assert.AreEqual(old[i].Name, @new[i].Name, "Meta.Name");
+                        Assert.AreEqual(old[i].Property, @new[i].Property, "Meta.Property");
+                        Assert.AreEqual(old[i].Refines, @new[i].Refines, "Meta.Refines");
+                        Assert.AreEqual(old[i].Scheme, @new[i].Scheme, "Meta.Scheme");
+                        Assert.AreEqual(old[i].Text, @new[i].Text, "Meta.Text");
+                    });
                 }
             }
         }

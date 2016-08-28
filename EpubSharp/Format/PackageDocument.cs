@@ -39,7 +39,7 @@ namespace EpubSharp.Format
         public IReadOnlyCollection<string> Relations { get; internal set; }
         public IReadOnlyCollection<string> Coverages { get; internal set; }
         public IReadOnlyCollection<string> Rights { get; internal set; }
-        public IReadOnlyCollection<PackageMetadataMeta> MetaItems { get; internal set; }
+        public IReadOnlyCollection<PackageMetadataMeta> Metas { get; internal set; }
     }
 
     public class PackageMetadataDate
@@ -70,11 +70,11 @@ namespace EpubSharp.Format
     public class PackageMetadataMeta
     {
         public string Name { get; internal set; }
-        public string Content { get; internal set; }
         public string Id { get; internal set; }
         public string Refines { get; internal set; }
         public string Property { get; internal set; }
         public string Scheme { get; internal set; }
+        public string Text { get; internal set; }
     }
 
     public class PackageManifest

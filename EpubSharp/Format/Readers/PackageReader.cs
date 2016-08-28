@@ -22,6 +22,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Format = MetadataNamespace + "format";
             public static readonly XName Identifier = MetadataNamespace + "identifier";
             public static readonly XName Language = MetadataNamespace + "language";
+            public static readonly XName Meta = PackageNamespace + "meta";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -88,10 +89,11 @@ namespace EpubSharp.Format.Readers
             };
 
             var metadata = xml.Root.Element(PackageElements.Metadata);
+            var epubVersion = GetAndValidateVersion((string) xml.Root.Attribute("version"));
 
             var package = new PackageDocument
             {
-                EpubVersion = GetAndValidateVersion((string)xml.Root.Attribute("version")),
+                EpubVersion = epubVersion,
                 Metadata = new PackageMetadata
                 {
                     Creators = metadata?.Elements(PackageElements.Creator).Select(readCreator).ToList().AsReadOnly(),
@@ -110,9 +112,24 @@ namespace EpubSharp.Format.Readers
                         Scheme = (string) elem.Attribute(PackageNamespace + "scheme"),
                         Text = elem.Value
                     }).ToList().AsReadOnly(),
-                    Languages = metadata?.Elements(PackageElements.Language).Select(elem => elem.Value).ToList().AsReadOnly()
+                    Languages = metadata?.Elements(PackageElements.Language).Select(elem => elem.Value).ToList().AsReadOnly(),
+                    Metas = metadata?.Elements(PackageElements.Meta).Select(elem => new PackageMetadataMeta
+                    {
+                        Id = (string) elem.Attribute("id"),
+                        Name = (string) elem.Attribute("name"),
+                        Refines = (string) elem.Attribute("refines"),
+                        Scheme = (string) elem.Attribute("scheme"),
+                        Property = (string) elem.Attribute("property"),
+                        Text = epubVersion == EpubVersion.Epub2 ? (string) elem.Attribute("content") : elem.Value
+                    }).ToList().AsReadOnly()
                 }
             };
+
+            if (package.Metadata.Creators.Any(e => e.Text == "Randall Munroe"))
+            {
+                Console.WriteLine();
+            }
+
             return package;
         }
 
@@ -136,11 +153,11 @@ namespace EpubSharp.Format.Readers
         {
             string coverId = null;
 
-            var coverMetaItem = package.Metadata.MetaItems
+            var coverMetaItem = package.Metadata.Metas
                 .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
             if (coverMetaItem != null)
             {
-                coverId = coverMetaItem.Content;
+                coverId = coverMetaItem.Text;
             }
             else
             {
@@ -272,14 +289,11 @@ namespace EpubSharp.Format.Readers
                         rights.Add(innerText);
                         break;
                     case "meta":
-                        if (epubVersion == EpubVersion.Epub2)
+                        var meta = ReadMetadataMeta(metadataItemNode, epubVersion);
+                        // Because in test samples this meta defines it's own namespace.
+                        // This is only until XDocument version is not ready.
+                        if (meta.Name != "BNContentKind")
                         {
-                            var meta = ReadMetadataMetaVersion2(metadataItemNode);
-                            metaItems.Add(meta);
-                        }
-                        else if (epubVersion == EpubVersion.Epub3)
-                        {
-                            var meta = ReadMetadataMetaVersion3(metadataItemNode);
                             metaItems.Add(meta);
                         }
                         break;
@@ -302,7 +316,7 @@ namespace EpubSharp.Format.Readers
                 Relations = relations,
                 Coverages = coverages,
                 Rights = rights,
-                MetaItems = metaItems,
+                Metas = metaItems,
                 Descriptions = descriptions
             };
         }
@@ -389,7 +403,7 @@ namespace EpubSharp.Format.Readers
             return result;
         }
 
-        private static PackageMetadataMeta ReadMetadataMetaVersion2(XmlNode metadataMetaNode)
+        private static PackageMetadataMeta ReadMetadataMeta(XmlNode metadataMetaNode, EpubVersion version)
         {
             PackageMetadataMeta result = new PackageMetadataMeta();
             foreach (XmlAttribute metadataMetaNodeAttribute in metadataMetaNode.Attributes)
@@ -401,21 +415,8 @@ namespace EpubSharp.Format.Readers
                         result.Name = attributeValue;
                         break;
                     case "content":
-                        result.Content = attributeValue;
+                        result.Text = attributeValue;
                         break;
-                }
-            }
-            return result;
-        }
-
-        private static PackageMetadataMeta ReadMetadataMetaVersion3(XmlNode metadataMetaNode)
-        {
-            var result = new PackageMetadataMeta();
-            foreach (XmlAttribute metadataMetaNodeAttribute in metadataMetaNode.Attributes)
-            {
-                var attributeValue = metadataMetaNodeAttribute.Value;
-                switch (metadataMetaNodeAttribute.Name.ToLowerInvariant())
-                {
                     case "id":
                         result.Id = attributeValue;
                         break;
@@ -430,7 +431,10 @@ namespace EpubSharp.Format.Readers
                         break;
                 }
             }
-            result.Content = metadataMetaNode.InnerText;
+            if (version == EpubVersion.Epub3)
+            {
+                result.Text = metadataMetaNode.InnerText;
+            }
             return result;
         }
 
