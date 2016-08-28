@@ -29,6 +29,17 @@ namespace EpubSharp.Tests
             MoveAndTestEpubOpen(@"../../Samples/epub-assorted");
         }
 
+        [TestMethod]
+        public void EpubAsPlainTextTest()
+        {
+            var book = EpubReader.Read(@"../../Samples/epub-assorted/boothbyg3249432494-8epub.epub");
+
+            Func<string, string> normalize = text => text.Replace("\r", "").Replace("\n", "").Replace(" ", "");
+            var expected = File.ReadAllText(@"../../Samples/epub-assorted/boothbyg3249432494-8epub.txt");
+            var actual = book.ToPlainText();
+            Assert.AreEqual(normalize(expected), normalize(actual));
+        }
+
         private void ZipAndMoveAndTestEpubOpen(string samplePath)
         {
             if (samplePath == null) throw new ArgumentNullException(nameof(samplePath));
@@ -121,7 +132,7 @@ namespace EpubSharp.Tests
                 AssertCollection(expected.Metadata, actual.Metadata, nameof(actual.Metadata), (old, @new, i) =>
                 {
                     Assert.AreEqual(old[i].Name, @new[i].Name, "Metadata.Name");
-                    Assert.AreEqual(old[i].Content, @new[i].Content, "Metadata.Content");
+                    Assert.AreEqual(old[i].Resources, @new[i].Resources, "Metadata.Resources");
                     Assert.AreEqual(old[i].Scheme, @new[i].Scheme, "Metadata.Scheme");
                 });
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using EpubSharp.Format;
@@ -18,12 +17,23 @@ namespace EpubSharp
         public string Title => Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
         public List<string> Authors => Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
         public string Author => string.Join(", ", Authors);
-        public EpubContent Content { get; internal set; }
+        public EpubResources Resources { get; internal set; }
 
         internal Lazy<Image> LazyCoverImage = null;
         public Image CoverImage => LazyCoverImage?.Value;
 
         public List<EpubChapter> Chapters { get; internal set; }
+
+        public string ToPlainText()
+        {
+            var builder = new StringBuilder();
+            foreach (var html in Resources.HtmlInReadingOrder)
+            {
+                builder.Append(HtmlProcessor.GetContentAsPlainText(html.TextContent));
+                builder.Append('\n');
+            }
+            return builder.ToString().Trim();
+        }
     }
     
     public class EpubChapter
@@ -40,13 +50,14 @@ namespace EpubSharp
         }
     }
     
-    public class EpubContent
+    public class EpubResources
     {
         public Dictionary<string, EpubTextContentFile> Html { get; internal set; }
         public Dictionary<string, EpubTextContentFile> Css { get; internal set; }
         public Dictionary<string, EpubByteContentFile> Images { get; internal set; }
         public Dictionary<string, EpubByteContentFile> Fonts { get; internal set; }
         public Dictionary<string, EpubContentFile> AllFiles { get; internal set; }
+        public List<EpubTextContentFile> HtmlInReadingOrder { get; internal set; }
     }
 
     public enum EpubContentType

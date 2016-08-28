@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Readers;
 
@@ -49,7 +50,7 @@ namespace EpubSharp
                 }
 
                 var book = new EpubBook { Format = format };
-                book.Content = LoadContent(archive, book);
+                book.Resources = LoadResources(archive, book);
                 book.LazyCoverImage = LazyLoadCoverImage(book);
                 book.Chapters = LoadChapters(book, archive);
                 return book;
@@ -64,7 +65,7 @@ namespace EpubSharp
             return new Lazy<Image>(() =>
             {
                 EpubByteContentFile coverImageContentFile;
-                if (!book.Content.Images.TryGetValue(book.Format.Package.CoverPath, out coverImageContentFile))
+                if (!book.Resources.Images.TryGetValue(book.Format.Package.CoverPath, out coverImageContentFile))
                 {
                     return null;
                 }
@@ -80,13 +81,13 @@ namespace EpubSharp
         {
             if (book.Format.Ncx != null)
             {
-                return LoadChapterFromNcx(book, book.Format.Ncx.NavigationMap, epubArchive);
+                return LoadChaptersFromNcx(book, book.Format.Ncx.NavigationMap, epubArchive);
             }
             
             return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChapterFromNcx(EpubBook book, IReadOnlyCollection<NcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChaptersFromNcx(EpubBook book, IReadOnlyCollection<NcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
@@ -105,11 +106,11 @@ namespace EpubSharp
 
                 var contentPath = PathExt.Combine(PathExt.GetDirectoryPath(book.Format.Package.NcxPath), chapter.ContentFileName);
                 EpubTextContentFile html;
-                if (book.Content.Html.TryGetValue(contentPath, out html))
+                if (book.Resources.Html.TryGetValue(contentPath, out html))
                 {
                     chapter.ContentHtml = html.TextContent;
                 }
-                else if (book.Content.Images.ContainsKey(contentPath))
+                else if (book.Resources.Images.ContainsKey(contentPath))
                 {
                     chapter.ContentHtml = "";
                 }
@@ -118,22 +119,26 @@ namespace EpubSharp
                     throw new EpubException($"Incorrect EPUB manifest: item with href = '{contentPath}' is missing");
                 }
 
-                chapter.SubChapters = LoadChapterFromNcx(book, navigationPoint.NavigationPoints, epubArchive);
+                chapter.SubChapters = LoadChaptersFromNcx(book, navigationPoint.NavigationPoints, epubArchive);
                 result.Add(chapter);
             }
             return result;
         }
 
-        public static EpubContent LoadContent(ZipArchive epubArchive, EpubBook book)
+        public static EpubResources LoadResources(ZipArchive epubArchive, EpubBook book)
         {
-            var result = new EpubContent
+            var result = new EpubResources
             {
                 Html = new Dictionary<string, EpubTextContentFile>(),
                 Css = new Dictionary<string, EpubTextContentFile>(),
                 Images = new Dictionary<string, EpubByteContentFile>(),
                 Fonts = new Dictionary<string, EpubByteContentFile>(),
-                AllFiles = new Dictionary<string, EpubContentFile>()
+                AllFiles = new Dictionary<string, EpubContentFile>(),
+                HtmlInReadingOrder = new List<EpubTextContentFile>()
             };
+
+            // Saved items for creating reading order from spine.
+            var idToHtmlItems = new Dictionary<string, EpubTextContentFile>();
 
             foreach (var item in book.Format.Package.Manifest.Items)
             {
@@ -182,6 +187,7 @@ namespace EpubSharp
                         switch (contentType)
                         {
                             case EpubContentType.Xhtml11:
+                                idToHtmlItems.Add(item.Id, file);
                                 result.Html.Add(fileName, file);
                                 break;
                             case EpubContentType.Css:
@@ -232,6 +238,16 @@ namespace EpubSharp
                     }
                 }
             }
+
+            foreach (var item in book.Format.Package.Spine.ItemRefs)
+            {
+                EpubTextContentFile html;
+                if (idToHtmlItems.TryGetValue(item.IdRef, out html))
+                {
+                    result.HtmlInReadingOrder.Add(html);
+                }
+            }
+
             return result;
         }
     }
