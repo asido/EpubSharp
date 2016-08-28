@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace EpubSharp
@@ -48,7 +49,9 @@ namespace EpubSharp
         {
             if (text == null) return null;
             var regex = new Regex(@"(?<defined>(&nbsp|&quot|&mdash|&ldquo|&rdquo|\&\#8211|\&\#8212|&\#8230|\&\#171|&laquo|&raquo|&amp);?)|(?<other>\&\#\d+;?)", REO_ci);
-            return Regex.Replace(regex.Replace(text, SpecialSymbolsEvaluator), @"\ {2,}", " ", REO_c);
+            text = Regex.Replace(regex.Replace(text, SpecialSymbolsEvaluator), @"\ {2,}", " ", REO_c);
+            text = WebUtility.HtmlDecode(text);
+            return text;
         }
 
         private static string SpecialSymbolsEvaluator(Match m)
