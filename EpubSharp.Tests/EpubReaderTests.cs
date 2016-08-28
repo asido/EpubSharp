@@ -259,6 +259,19 @@ namespace EpubSharp.Tests
                         AssertPrimitiveCollection(old[i].Properties, @new[i].Properties, "Item.Properties", "Item.Property");
                     });
                 }
+
+                Assert.AreEqual(expected.Spine == null, actual.Spine == null, nameof(actual.Spine));
+                if (expected.Spine != null && actual.Spine != null)
+                {
+                    Assert.AreEqual(expected.Spine.Toc, actual.Spine.Toc, nameof(actual.Spine.Toc));
+                    AssertCollection(expected.Spine.ItemRefs, actual.Spine.ItemRefs, nameof(actual.Spine.ItemRefs), (old, @new, i) =>
+                    {
+                        Assert.AreEqual(old[i].Id, @new[i].Id, "ItemRef.Id");
+                        Assert.AreEqual(old[i].IdRef, @new[i].IdRef, "ItemRef.IdRef");
+                        Assert.AreEqual(old[i].Linear, @new[i].Linear, "ItemRef.Linear");
+                        AssertPrimitiveCollection(old[i].Properties, @new[i].Properties, "ItemRef.Properties", "ItemRef.Property");
+                    });
+                }
             }
         }
 

@@ -36,6 +36,9 @@ namespace EpubSharp.Format.Readers
 
             public static readonly XName Manifest = PackageNamespace + "manifest";
             public static readonly XName Item = PackageNamespace + "item";
+
+            public static readonly XName Spine = PackageNamespace + "spine";
+            public static readonly XName ItemRef = PackageNamespace + "itemref";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -104,6 +107,7 @@ namespace EpubSharp.Format.Readers
             var epubVersion = GetAndValidateVersion((string) xml.Root.Attribute("version"));
             var metadata = xml.Root.Element(PackageElements.Metadata);
             var guide = xml.Root.Element(PackageElements.Guide);
+            var spine = xml.Root.Element(PackageElements.Spine);
 
             var package = new PackageDocument
             {
@@ -166,8 +170,24 @@ namespace EpubSharp.Format.Readers
                         RequiredModules = (string) elem.Attribute("required-modules"),
                         RequiredNamespace = (string) elem.Attribute("required-namespace")
                     })
+                },
+                Spine = new PackageSpine
+                {
+                    ItemRefs = spine?.Elements(PackageElements.ItemRef).AsObjectList(elem => new PackageSpineItemRef
+                    {
+                        IdRef = (string) elem.Attribute("idref"),
+                        Linear = (string) elem.Attribute("linear") != "no",
+                        Id = (string) elem.Attribute("id"),
+                        Properties = ((string) elem.Attribute("properties"))?.Split(' ')
+                    }),
+                    Toc = spine?.Attribute("toc")?.Value
                 }
             };
+
+            if (package.Metadata.Titles.Any(e => e == "Bogtyven"))
+            {
+                Console.WriteLine();
+            }
 
             return package;
         }
@@ -546,7 +566,9 @@ namespace EpubSharp.Format.Readers
                         throw new Exception("Incorrect EPUB spine: item ID ref is missing");
                     spineItemRef.IdRef = idRefAttribute.Value;
                     XmlAttribute linearAttribute = spineItemNode.Attributes["linear"];
-                    spineItemRef.IsLinear = linearAttribute == null || string.Compare(linearAttribute.Value, "no", StringComparison.OrdinalIgnoreCase) != 0;
+                    spineItemRef.Linear = linearAttribute == null || string.Compare(linearAttribute.Value, "no", StringComparison.OrdinalIgnoreCase) != 0;
+                    spineItemRef.Id = spineItemNode.Attributes["id"]?.Value;
+                    spineItemRef.Properties = spineItemNode.Attributes["properties"]?.Value?.Split(' ');
                     itemRefs.Add(spineItemRef);
                 }
             }

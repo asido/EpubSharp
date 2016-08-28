@@ -108,7 +108,9 @@ namespace EpubSharp.Format
     public class PackageSpineItemRef
     {
         public string IdRef { get; internal set; }
-        public bool IsLinear { get; internal set; }
+        public bool Linear { get; internal set; }
+        public string Id { get; internal set; }
+        public string[] Properties { get; internal set; }
 
         public override string ToString()
         {
