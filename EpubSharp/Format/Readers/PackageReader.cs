@@ -21,6 +21,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Description = MetadataNamespace + "description";
             public static readonly XName Format = MetadataNamespace + "format";
             public static readonly XName Identifier = MetadataNamespace + "identifier";
+            public static readonly XName Language = MetadataNamespace + "language";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -108,7 +109,8 @@ namespace EpubSharp.Format.Readers
                         Id = (string) elem.Attribute("id"),
                         Scheme = (string) elem.Attribute(PackageNamespace + "scheme"),
                         Text = elem.Value
-                    }).ToList().AsReadOnly()
+                    }).ToList().AsReadOnly(),
+                    Languages = metadata?.Elements(PackageElements.Language).Select(elem => elem.Value).ToList().AsReadOnly()
                 }
             };
             return package;
