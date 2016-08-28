@@ -243,6 +243,22 @@ namespace EpubSharp.Tests
                         Assert.AreEqual(old[i].Href, @new[i].Href, "Reference.Href");
                     });
                 }
+
+                Assert.AreEqual(expected.Manifest == null, actual.Manifest == null, nameof(actual.Manifest));
+                if (expected.Manifest != null && actual.Manifest != null)
+                {
+                    AssertCollection(expected.Manifest.Items, actual.Manifest.Items, nameof(actual.Manifest.Items), (old, @new, i) =>
+                    {
+                        Assert.AreEqual(old[i].Fallback, @new[i].Fallback, "Item.Fallback");
+                        Assert.AreEqual(old[i].FallbackStyle, @new[i].FallbackStyle, "Item.FallbackStyle");
+                        Assert.AreEqual(old[i].Href, @new[i].Href, "Item.Href");
+                        Assert.AreEqual(old[i].Id, @new[i].Id, "Item.Id");
+                        Assert.AreEqual(old[i].MediaType, @new[i].MediaType, "Item.MediaType");
+                        Assert.AreEqual(old[i].RequiredModules, @new[i].RequiredModules, "Item.RequiredModules");
+                        Assert.AreEqual(old[i].RequiredNamespace, @new[i].RequiredNamespace, "Item.RequiredNamespace");
+                        AssertPrimitiveCollection(old[i].Properties, @new[i].Properties, "Item.Properties", "Item.Property");
+                    });
+                }
             }
         }
 

@@ -33,6 +33,9 @@ namespace EpubSharp.Format.Readers
 
             public static readonly XName Guide = PackageNamespace + "guide";
             public static readonly XName Reference = PackageNamespace + "reference";
+
+            public static readonly XName Manifest = PackageNamespace + "manifest";
+            public static readonly XName Item = PackageNamespace + "item";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -148,6 +151,20 @@ namespace EpubSharp.Format.Readers
                         Title = (string) elem.Attribute("title"),
                         Type = (string) elem.Attribute("type"),
                         Href = (string) elem.Attribute("href")
+                    })
+                },
+                Manifest = new PackageManifest
+                {
+                    Items = xml.Root.Element(PackageElements.Manifest)?.Elements(PackageElements.Item).AsObjectList(elem => new PackageManifestItem
+                    {
+                        Fallback = (string) elem.Attribute("fallback"),
+                        FallbackStyle = (string) elem.Attribute("fallback-style"),
+                        Href = (string) elem.Attribute("href"),
+                        Id = (string) elem.Attribute("id"),
+                        MediaType = (string) elem.Attribute("media-type"),
+                        Properties = ((string) elem.Attribute("properties"))?.Split(' ') ?? new string[0],
+                        RequiredModules = (string) elem.Attribute("required-modules"),
+                        RequiredNamespace = (string) elem.Attribute("required-namespace")
                     })
                 }
             };
