@@ -91,7 +91,7 @@ namespace EpubSharp.Tests
             {
                 try
                 {
-                    var book = EpubReader.Read(path);
+                    EpubReader.Read(path);
                     //AssertOcf(book.Format.Ocf, book.Format.NewOcf);
                     //AssertPackage(book.Format.Package, book.Format.NewPackage);
                     //AssertNcx(book.Format.Ncx, book.Format.NewNcx);
@@ -109,6 +109,7 @@ namespace EpubSharp.Tests
             }
         }
 
+        /*
         private void AssertNcx(NcxDocument expected, NcxDocument actual)
         {
             Assert.AreEqual(expected == null, actual == null, nameof(actual));
@@ -314,5 +315,6 @@ namespace EpubSharp.Tests
                 Assert.IsTrue(@new.Contains(old[i]), unitName);
             });
         }
+        */
     }
 }
