@@ -107,11 +107,11 @@ namespace EpubSharp
                 EpubTextContentFile html;
                 if (book.Content.Html.TryGetValue(contentPath, out html))
                 {
-                    chapter.HtmlContent = html.TextContent;
+                    chapter.ContentHtml = html.TextContent;
                 }
                 else if (book.Content.Images.ContainsKey(contentPath))
                 {
-                    chapter.HtmlContent = "";
+                    chapter.ContentHtml = "";
                 }
                 else
                 {
