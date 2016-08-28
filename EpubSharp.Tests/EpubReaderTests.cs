@@ -232,6 +232,17 @@ namespace EpubSharp.Tests
                     AssertPrimitiveCollection(expected.Metadata.Titles, actual.Metadata.Titles, "Titles", "Title");
                     AssertPrimitiveCollection(expected.Metadata.Types, actual.Metadata.Types, "Types", "Type");
                 }
+
+                Assert.AreEqual(expected.Guide == null, actual.Guide == null, nameof(actual.Guide));
+                if (expected.Guide != null && actual.Guide != null)
+                {
+                    AssertCollection(expected.Guide.References, actual.Guide.References, nameof(actual.Guide.References), (old, @new, i) =>
+                    {
+                        Assert.AreEqual(old[i].Title, @new[i].Title, "Reference.Title");
+                        Assert.AreEqual(old[i].Type, @new[i].Type, "Reference.Type");
+                        Assert.AreEqual(old[i].Href, @new[i].Href, "Reference.Href");
+                    });
+                }
             }
         }
 

@@ -30,6 +30,9 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Subject = MetadataNamespace + "subject";
             public static readonly XName Title = MetadataNamespace + "title";
             public static readonly XName Type = MetadataNamespace + "type";
+
+            public static readonly XName Guide = PackageNamespace + "guide";
+            public static readonly XName Reference = PackageNamespace + "reference";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -95,8 +98,9 @@ namespace EpubSharp.Format.Readers
                 Text = elem.Value
             };
 
-            var metadata = xml.Root.Element(PackageElements.Metadata);
             var epubVersion = GetAndValidateVersion((string) xml.Root.Attribute("version"));
+            var metadata = xml.Root.Element(PackageElements.Metadata);
+            var guide = xml.Root.Element(PackageElements.Guide);
 
             var package = new PackageDocument
             {
@@ -136,9 +140,18 @@ namespace EpubSharp.Format.Readers
                     Subjects = metadata?.Elements(PackageElements.Subject).AsStringList(),
                     Titles = metadata?.Elements(PackageElements.Title).AsStringList(),
                     Types = metadata?.Elements(PackageElements.Type).AsStringList()
+                },
+                Guide = guide == null ? null : new PackageGuide
+                {
+                    References = guide.Elements(PackageElements.Reference)?.AsObjectList(elem => new PackageGuideReference
+                    {
+                        Title = (string) elem.Attribute("title"),
+                        Type = (string) elem.Attribute("type"),
+                        Href = (string) elem.Attribute("href")
+                    })
                 }
             };
-            
+
             return package;
         }
 
