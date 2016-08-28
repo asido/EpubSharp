@@ -39,16 +39,13 @@ namespace EpubSharp
             {
                 var format = new EpubFormat();
                 format.Ocf = OcfReader.Read(archive.LoadXml("META-INF/container.xml"));
-                format.NewOcf = OcfReader.Read(archive.LoadXDocument("META-INF/container.xml"));
                 format.Package = PackageReader.Read(archive.LoadXml(format.Ocf.RootFile));
-                format.NewPackage = PackageReader.Read(archive.LoadXDocument(format.Ocf.RootFile));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
                 if (!string.IsNullOrWhiteSpace(format.Package.NcxPath))
                 {
                     var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(format.Ocf.RootFile), format.Package.NcxPath);
                     format.Ncx = NcxReader.Read(archive.LoadXml(absolutePath));
-                    format.NewNcx = NcxReader.Read(archive.LoadXDocument(absolutePath));
                 }
 
                 var book = new EpubBook { Format = format };

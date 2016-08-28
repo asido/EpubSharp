@@ -53,16 +53,7 @@ namespace EpubSharp
             return entry;
         }
 
-        public static XmlDocument LoadXml(this ZipArchive archive, string entryName)
-        {
-            var entry = archive.GetEntryIgnoringSlashDirection(entryName);
-            using (var stream = entry.Open())
-            {
-                return XmlExt.LoadDocument(stream);
-            }
-        }
-
-        public static XDocument LoadXDocument(this ZipArchive archive, string entryName)
+        public static XDocument LoadXml(this ZipArchive archive, string entryName)
         {
             var entry = archive.GetEntryIgnoringSlashDirection(entryName);
 
