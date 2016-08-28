@@ -12,7 +12,6 @@ namespace EpubSharp.Format.Readers
 
         private static class OcfElements
         {
-            public static readonly XName RootFiles = OcfNamespace + "rootfiles";
             public static readonly XName RootFile = OcfNamespace + "rootfile";
         }
 

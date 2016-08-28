@@ -101,24 +101,24 @@ namespace EpubSharp.Format.Readers
                 EpubVersion = epubVersion,
                 Metadata = new PackageMetadata
                 {
-                    Creators = metadata?.Elements(PackageElements.Creator).Select(readCreator).ToList().AsReadOnly(),
-                    Contributors = metadata?.Elements(PackageElements.Contributor).Select(readCreator).ToList().AsReadOnly(),
-                    Coverages = metadata?.Elements(PackageElements.Coverages).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Dates = metadata?.Elements(PackageElements.Date).Select(elem => new PackageMetadataDate
+                    Creators = metadata?.Elements(PackageElements.Creator).AsObjectList(readCreator),
+                    Contributors = metadata?.Elements(PackageElements.Contributor).AsObjectList(readCreator),
+                    Coverages = metadata?.Elements(PackageElements.Coverages).AsStringList(),
+                    Dates = metadata?.Elements(PackageElements.Date).AsObjectList(elem => new PackageMetadataDate
                     {
                         Text = elem.Value,
                         Event = (string)elem.Attribute(PackageNamespace + "event")
-                    }).ToList().AsReadOnly(),
-                    Descriptions = metadata?.Elements(PackageElements.Description).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Formats = metadata?.Elements(PackageElements.Format).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Identifiers = metadata?.Elements(PackageElements.Identifier).Select(elem => new PackageMetadataIdentifier
+                    }),
+                    Descriptions = metadata?.Elements(PackageElements.Description).AsStringList(),
+                    Formats = metadata?.Elements(PackageElements.Format).AsStringList(),
+                    Identifiers = metadata?.Elements(PackageElements.Identifier).AsObjectList(elem => new PackageMetadataIdentifier
                     {
                         Id = (string) elem.Attribute("id"),
                         Scheme = (string) elem.Attribute(PackageNamespace + "scheme"),
                         Text = elem.Value
-                    }).ToList().AsReadOnly(),
-                    Languages = metadata?.Elements(PackageElements.Language).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Metas = metadata?.Elements(PackageElements.Meta).Select(elem => new PackageMetadataMeta
+                    }),
+                    Languages = metadata?.Elements(PackageElements.Language).AsStringList(),
+                    Metas = metadata?.Elements(PackageElements.Meta).AsObjectList(elem => new PackageMetadataMeta
                     {
                         Id = (string) elem.Attribute("id"),
                         Name = (string) elem.Attribute("name"),
@@ -126,12 +126,12 @@ namespace EpubSharp.Format.Readers
                         Scheme = (string) elem.Attribute("scheme"),
                         Property = (string) elem.Attribute("property"),
                         Text = epubVersion == EpubVersion.Epub2 ? (string) elem.Attribute("content") : elem.Value
-                    }).ToList().AsReadOnly(),
-                    Publishers = metadata?.Elements(PackageElements.Publisher).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Relations = metadata?.Elements(PackageElements.Relation).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Rights = metadata?.Elements(PackageElements.Rights).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Sources = metadata?.Elements(PackageElements.Source).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Subjects = metadata?.Elements(PackageElements.Subject).Select(elem => elem.Value).ToList().AsReadOnly()
+                    }),
+                    Publishers = metadata?.Elements(PackageElements.Publisher).AsStringList(),
+                    Relations = metadata?.Elements(PackageElements.Relation).AsStringList(),
+                    Rights = metadata?.Elements(PackageElements.Rights).AsStringList(),
+                    Sources = metadata?.Elements(PackageElements.Source).AsStringList(),
+                    Subjects = metadata?.Elements(PackageElements.Subject).AsStringList()
                 }
             };
             

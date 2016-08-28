@@ -1,5 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace EpubSharp
 {
@@ -18,6 +22,16 @@ namespace EpubSharp
                 doc.Load(reader);
                 return doc;
             }
+        }
+
+        public static IReadOnlyCollection<string> AsStringList(this IEnumerable<XElement> self)
+        {
+            return self.Select(elem => elem.Value).ToList().AsReadOnly();
+        }
+
+        public static IReadOnlyCollection<T> AsObjectList<T>(this IEnumerable<XElement> self, Func<XElement, T> factory)
+        {
+            return self.Select(factory).ToList().AsReadOnly();
         }
     }
 }
