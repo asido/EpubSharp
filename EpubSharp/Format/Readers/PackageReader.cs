@@ -184,11 +184,6 @@ namespace EpubSharp.Format.Readers
                 }
             };
 
-            if (package.Metadata.Titles.Any(e => e == "Bogtyven"))
-            {
-                Console.WriteLine();
-            }
-
             return package;
         }
 
