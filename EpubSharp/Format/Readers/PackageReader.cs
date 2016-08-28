@@ -124,12 +124,7 @@ namespace EpubSharp.Format.Readers
                     }).ToList().AsReadOnly()
                 }
             };
-
-            if (package.Metadata.Creators.Any(e => e.Text == "Randall Munroe"))
-            {
-                Console.WriteLine();
-            }
-
+            
             return package;
         }
 
