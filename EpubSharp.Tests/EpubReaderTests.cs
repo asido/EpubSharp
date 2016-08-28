@@ -213,6 +213,13 @@ namespace EpubSharp.Tests
                     {
                         Assert.IsTrue(@new.Contains(old[i]), "Description");
                     });
+
+                    AssertCollection(expected.Metadata.Identifiers, actual.Metadata.Identifiers, nameof(actual.Metadata.Identifiers), (old, @new, i) =>
+                    {
+                        Assert.AreEqual(old[i].Id, @new[i].Id, "Identifier.Id");
+                        Assert.AreEqual(old[i].Scheme, @new[i].Scheme, "Identifier.Scheme");
+                        Assert.AreEqual(old[i].Text, @new[i].Text, "Identifier.Text");
+                    });
                 }
             }
         }

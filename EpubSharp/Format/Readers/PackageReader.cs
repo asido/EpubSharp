@@ -20,6 +20,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Date = MetadataNamespace + "date";
             public static readonly XName Description = MetadataNamespace + "description";
             public static readonly XName Format = MetadataNamespace + "format";
+            public static readonly XName Identifier = MetadataNamespace + "identifier";
         }
 
         public static PackageDocument Read(XmlDocument xml)
@@ -101,7 +102,13 @@ namespace EpubSharp.Format.Readers
                         Event = (string)elem.Attribute(PackageNamespace + "event")
                     }).ToList().AsReadOnly(),
                     Descriptions = metadata?.Elements(PackageElements.Description).Select(elem => elem.Value).ToList().AsReadOnly(),
-                    Formats = metadata?.Elements(PackageElements.Format).Select(elem => elem.Value).ToList().AsReadOnly()
+                    Formats = metadata?.Elements(PackageElements.Format).Select(elem => elem.Value).ToList().AsReadOnly(),
+                    Identifiers = metadata?.Elements(PackageElements.Identifier).Select(elem => new PackageMetadataIdentifier
+                    {
+                        Id = (string) elem.Attribute("id"),
+                        Scheme = (string) elem.Attribute(PackageNamespace + "scheme"),
+                        Text = elem.Value
+                    }).ToList().AsReadOnly()
                 }
             };
             return package;
@@ -362,6 +369,16 @@ namespace EpubSharp.Format.Readers
                         result.Id = attributeValue;
                         break;
                     case "opf:scheme":
+                    case "ns0:scheme":
+                    case "ns1:scheme":
+                    case "ns2:scheme":
+                    case "ns3:scheme":
+                    case "ns4:scheme":
+                    case "ns5:scheme":
+                    case "ns6:scheme":
+                    case "ns7:scheme":
+                    case "ns8:scheme":
+                    case "ns9:scheme":
                         result.Scheme = attributeValue;
                         break;
                 }
