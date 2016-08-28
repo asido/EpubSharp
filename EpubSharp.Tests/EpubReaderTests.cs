@@ -198,20 +198,10 @@ namespace EpubSharp.Tests
                     AssertCreators(expected.Metadata.Creators, actual.Metadata.Creators, nameof(actual.Metadata.Creators));
                     AssertCreators(expected.Metadata.Contributors, actual.Metadata.Contributors, nameof(actual.Metadata.Contributors));
 
-                    AssertCollection(expected.Metadata.Coverages, actual.Metadata.Coverages, nameof(actual.Metadata.Coverages), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Coverage");
-                    });
-
                     AssertCollection(expected.Metadata.Dates, actual.Metadata.Dates, nameof(actual.Metadata.Dates), (old, @new, i) =>
                     {
                         Assert.AreEqual(old[i].Text, @new[i].Text, "Date.Text");
                         Assert.AreEqual(old[i].Event, @new[i].Event, "Date.Event");
-                    });
-
-                    AssertCollection(expected.Metadata.Descriptions, actual.Metadata.Descriptions, nameof(actual.Metadata.Descriptions), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Description");
                     });
 
                     AssertCollection(expected.Metadata.Identifiers, actual.Metadata.Identifiers, nameof(actual.Metadata.Identifiers), (old, @new, i) =>
@@ -219,11 +209,6 @@ namespace EpubSharp.Tests
                         Assert.AreEqual(old[i].Id, @new[i].Id, "Identifier.Id");
                         Assert.AreEqual(old[i].Scheme, @new[i].Scheme, "Identifier.Scheme");
                         Assert.AreEqual(old[i].Text, @new[i].Text, "Identifier.Text");
-                    });
-
-                    AssertCollection(expected.Metadata.Languages, actual.Metadata.Languages, nameof(actual.Metadata.Languages), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Language");
                     });
 
                     AssertCollection(expected.Metadata.Metas, actual.Metadata.Metas, nameof(actual.Metadata.Metas), (old, @new, i) =>
@@ -236,35 +221,16 @@ namespace EpubSharp.Tests
                         Assert.AreEqual(old[i].Text, @new[i].Text, "Meta.Text");
                     });
 
-                    AssertCollection(expected.Metadata.Publishers, actual.Metadata.Publishers, nameof(actual.Metadata.Publishers), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Publisher");
-                    });
-
-                    AssertCollection(expected.Metadata.Relations, actual.Metadata.Relations, nameof(actual.Metadata.Relations), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Relation");
-                    });
-
-                    AssertCollection(expected.Metadata.Rights, actual.Metadata.Rights, nameof(actual.Metadata.Rights), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Right");
-                    });
-
-                    AssertCollection(expected.Metadata.Sources, actual.Metadata.Sources, nameof(actual.Metadata.Sources), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Source");
-                    });
-
-                    AssertCollection(expected.Metadata.Subjects, actual.Metadata.Subjects, nameof(actual.Metadata.Subjects), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Subject");
-                    });
-
-                    AssertCollection(expected.Metadata.Titles, actual.Metadata.Titles, nameof(actual.Metadata.Titles), (old, @new, i) =>
-                    {
-                        Assert.IsTrue(@new.Contains(old[i]), "Title");
-                    });
+                    AssertPrimitiveCollection(expected.Metadata.Coverages, actual.Metadata.Coverages, "Coverages", "Coverage");
+                    AssertPrimitiveCollection(expected.Metadata.Descriptions, actual.Metadata.Descriptions, "Descriptions", "Description");
+                    AssertPrimitiveCollection(expected.Metadata.Languages, actual.Metadata.Languages, "Languages", "Language");
+                    AssertPrimitiveCollection(expected.Metadata.Publishers, actual.Metadata.Publishers, "Publishers", "Publisher");
+                    AssertPrimitiveCollection(expected.Metadata.Relations, actual.Metadata.Relations, "Relations", "Relation");
+                    AssertPrimitiveCollection(expected.Metadata.Rights, actual.Metadata.Rights, "Rights", "Right");
+                    AssertPrimitiveCollection(expected.Metadata.Sources, actual.Metadata.Sources, "Sources", "Source");
+                    AssertPrimitiveCollection(expected.Metadata.Subjects, actual.Metadata.Subjects, "Subjects", "Subject");
+                    AssertPrimitiveCollection(expected.Metadata.Titles, actual.Metadata.Titles, "Titles", "Title");
+                    AssertPrimitiveCollection(expected.Metadata.Types, actual.Metadata.Types, "Types", "Type");
                 }
             }
         }
@@ -295,6 +261,14 @@ namespace EpubSharp.Tests
                     assert(old, @new, i);
                 }
             }
+        }
+
+        private void AssertPrimitiveCollection<T>(IEnumerable<T> expected, IEnumerable<T> actual, string collectionName, string unitName)
+        {
+            AssertCollection(expected, actual, collectionName, (old, @new, i) =>
+            {
+                Assert.IsTrue(@new.Contains(old[i]), unitName);
+            });
         }
     }
 }
