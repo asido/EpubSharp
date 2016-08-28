@@ -235,6 +235,11 @@ namespace EpubSharp.Tests
                         Assert.AreEqual(old[i].Scheme, @new[i].Scheme, "Meta.Scheme");
                         Assert.AreEqual(old[i].Text, @new[i].Text, "Meta.Text");
                     });
+
+                    AssertCollection(expected.Metadata.Publishers, actual.Metadata.Publishers, nameof(actual.Metadata.Publishers), (old, @new, i) =>
+                    {
+                        Assert.IsTrue(@new.Contains(old[i]), "Publisher");
+                    });
                 }
             }
         }
