@@ -31,7 +31,7 @@ namespace EpubSharp
             authors.AddRange(book.Authors);
 
             EpubByteContentFile cover;
-            if (book.Resources.Images.TryGetValue(book.Format.Package.CoverPath, out cover))
+            if (book.Resources.Images.TryGetValue(book.Format.Opf.CoverPath, out cover))
             {
                 coverFilename = Path.GetFileName(cover.FileName);
                 coverData = cover.Content;
@@ -89,7 +89,7 @@ namespace EpubSharp
             Write(archive, EpubReader.OcfPath, @"<?xml version=""1.0""?>
 <container version=""1.0"" xmlns=""urn:oasis:names:tc:opendocument:xmlns:container"">
   <rootfiles>
-    <rootfile full-path=""EPUB/package.opf"" media-type = ""application/oebps-package+xml"" />
+    <rootfile full-path=""EPUB/Opf.opf"" media-type = ""application/oebps-Opf+xml"" />
   </rootfiles>
 </container>");
         }

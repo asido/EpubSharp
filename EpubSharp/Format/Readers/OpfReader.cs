@@ -4,14 +4,14 @@ using System.Xml.Linq;
 
 namespace EpubSharp.Format.Readers
 {
-    internal static class PackageReader
+    internal static class OpfReader
     {
-        private static readonly XNamespace PackageNamespace = "http://www.idpf.org/2007/opf";
+        private static readonly XNamespace OpfNamespace = "http://www.idpf.org/2007/opf";
         private static readonly XNamespace MetadataNamespace = "http://purl.org/dc/elements/1.1/";
 
-        private static class PackageElements
+        private static class OpfElements
         {
-            public static readonly XName Metadata = PackageNamespace + "metadata";
+            public static readonly XName Metadata = OpfNamespace + "metadata";
             public static readonly XName Contributor = MetadataNamespace + "contributor";
             public static readonly XName Coverages = MetadataNamespace + "coverages";
             public static readonly XName Creator = MetadataNamespace + "creator";
@@ -20,7 +20,7 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Format = MetadataNamespace + "format";
             public static readonly XName Identifier = MetadataNamespace + "identifier";
             public static readonly XName Language = MetadataNamespace + "language";
-            public static readonly XName Meta = PackageNamespace + "meta";
+            public static readonly XName Meta = OpfNamespace + "meta";
             public static readonly XName Publisher = MetadataNamespace + "publisher";
             public static readonly XName Relation = MetadataNamespace + "relation";
             public static readonly XName Rights = MetadataNamespace + "rights";
@@ -29,57 +29,57 @@ namespace EpubSharp.Format.Readers
             public static readonly XName Title = MetadataNamespace + "title";
             public static readonly XName Type = MetadataNamespace + "type";
 
-            public static readonly XName Guide = PackageNamespace + "guide";
-            public static readonly XName Reference = PackageNamespace + "reference";
+            public static readonly XName Guide = OpfNamespace + "guide";
+            public static readonly XName Reference = OpfNamespace + "reference";
 
-            public static readonly XName Manifest = PackageNamespace + "manifest";
-            public static readonly XName Item = PackageNamespace + "item";
+            public static readonly XName Manifest = OpfNamespace + "manifest";
+            public static readonly XName Item = OpfNamespace + "item";
 
-            public static readonly XName Spine = PackageNamespace + "spine";
-            public static readonly XName ItemRef = PackageNamespace + "itemref";
+            public static readonly XName Spine = OpfNamespace + "spine";
+            public static readonly XName ItemRef = OpfNamespace + "itemref";
         }
 
-        public static PackageDocument Read(XDocument xml)
+        public static OpfDocument Read(XDocument xml)
         {
             if (xml == null) throw new ArgumentNullException(nameof(xml));
             if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
 
-            Func<XElement, PackageMetadataCreator> readCreator = elem => new PackageMetadataCreator
+            Func<XElement, OpfMetadataCreator> readCreator = elem => new OpfMetadataCreator
             {
-                Role = (string) elem.Attribute(PackageNamespace + "role"),
-                FileAs = (string) elem.Attribute(PackageNamespace + "file-as"),
-                AlternateScript = (string) elem.Attribute(PackageNamespace + "alternate-script"),
+                Role = (string) elem.Attribute(OpfNamespace + "role"),
+                FileAs = (string) elem.Attribute(OpfNamespace + "file-as"),
+                AlternateScript = (string) elem.Attribute(OpfNamespace + "alternate-script"),
                 Text = elem.Value
             };
 
             var epubVersion = GetAndValidateVersion((string) xml.Root.Attribute("version"));
-            var metadata = xml.Root.Element(PackageElements.Metadata);
-            var guide = xml.Root.Element(PackageElements.Guide);
-            var spine = xml.Root.Element(PackageElements.Spine);
+            var metadata = xml.Root.Element(OpfElements.Metadata);
+            var guide = xml.Root.Element(OpfElements.Guide);
+            var spine = xml.Root.Element(OpfElements.Spine);
 
-            var package = new PackageDocument
+            var package = new OpfDocument
             {
                 EpubVersion = epubVersion,
-                Metadata = new PackageMetadata
+                Metadata = new OpfMetadata
                 {
-                    Creators = metadata?.Elements(PackageElements.Creator).AsObjectList(readCreator),
-                    Contributors = metadata?.Elements(PackageElements.Contributor).AsObjectList(readCreator),
-                    Coverages = metadata?.Elements(PackageElements.Coverages).AsStringList(),
-                    Dates = metadata?.Elements(PackageElements.Date).AsObjectList(elem => new PackageMetadataDate
+                    Creators = metadata?.Elements(OpfElements.Creator).AsObjectList(readCreator),
+                    Contributors = metadata?.Elements(OpfElements.Contributor).AsObjectList(readCreator),
+                    Coverages = metadata?.Elements(OpfElements.Coverages).AsStringList(),
+                    Dates = metadata?.Elements(OpfElements.Date).AsObjectList(elem => new OpfMetadataDate
                     {
                         Text = elem.Value,
-                        Event = (string)elem.Attribute(PackageNamespace + "event")
+                        Event = (string)elem.Attribute(OpfNamespace + "event")
                     }),
-                    Descriptions = metadata?.Elements(PackageElements.Description).AsStringList(),
-                    Formats = metadata?.Elements(PackageElements.Format).AsStringList(),
-                    Identifiers = metadata?.Elements(PackageElements.Identifier).AsObjectList(elem => new PackageMetadataIdentifier
+                    Descriptions = metadata?.Elements(OpfElements.Description).AsStringList(),
+                    Formats = metadata?.Elements(OpfElements.Format).AsStringList(),
+                    Identifiers = metadata?.Elements(OpfElements.Identifier).AsObjectList(elem => new OpfMetadataIdentifier
                     {
                         Id = (string) elem.Attribute("id"),
-                        Scheme = (string) elem.Attribute(PackageNamespace + "scheme"),
+                        Scheme = (string) elem.Attribute(OpfNamespace + "scheme"),
                         Text = elem.Value
                     }),
-                    Languages = metadata?.Elements(PackageElements.Language).AsStringList(),
-                    Metas = metadata?.Elements(PackageElements.Meta).AsObjectList(elem => new PackageMetadataMeta
+                    Languages = metadata?.Elements(OpfElements.Language).AsStringList(),
+                    Metas = metadata?.Elements(OpfElements.Meta).AsObjectList(elem => new OpfMetadataMeta
                     {
                         Id = (string) elem.Attribute("id"),
                         Name = (string) elem.Attribute("name"),
@@ -88,26 +88,26 @@ namespace EpubSharp.Format.Readers
                         Property = (string) elem.Attribute("property"),
                         Text = epubVersion == EpubVersion.Epub2 ? (string) elem.Attribute("content") : elem.Value
                     }),
-                    Publishers = metadata?.Elements(PackageElements.Publisher).AsStringList(),
-                    Relations = metadata?.Elements(PackageElements.Relation).AsStringList(),
-                    Rights = metadata?.Elements(PackageElements.Rights).AsStringList(),
-                    Sources = metadata?.Elements(PackageElements.Source).AsStringList(),
-                    Subjects = metadata?.Elements(PackageElements.Subject).AsStringList(),
-                    Titles = metadata?.Elements(PackageElements.Title).AsStringList(),
-                    Types = metadata?.Elements(PackageElements.Type).AsStringList()
+                    Publishers = metadata?.Elements(OpfElements.Publisher).AsStringList(),
+                    Relations = metadata?.Elements(OpfElements.Relation).AsStringList(),
+                    Rights = metadata?.Elements(OpfElements.Rights).AsStringList(),
+                    Sources = metadata?.Elements(OpfElements.Source).AsStringList(),
+                    Subjects = metadata?.Elements(OpfElements.Subject).AsStringList(),
+                    Titles = metadata?.Elements(OpfElements.Title).AsStringList(),
+                    Types = metadata?.Elements(OpfElements.Type).AsStringList()
                 },
-                Guide = guide == null ? null : new PackageGuide
+                Guide = guide == null ? null : new OpfGuide
                 {
-                    References = guide.Elements(PackageElements.Reference)?.AsObjectList(elem => new PackageGuideReference
+                    References = guide.Elements(OpfElements.Reference)?.AsObjectList(elem => new OpfGuideReference
                     {
                         Title = (string) elem.Attribute("title"),
                         Type = (string) elem.Attribute("type"),
                         Href = (string) elem.Attribute("href")
                     })
                 },
-                Manifest = new PackageManifest
+                Manifest = new OpfManifest
                 {
-                    Items = xml.Root.Element(PackageElements.Manifest)?.Elements(PackageElements.Item).AsObjectList(elem => new PackageManifestItem
+                    Items = xml.Root.Element(OpfElements.Manifest)?.Elements(OpfElements.Item).AsObjectList(elem => new OpfManifestItem
                     {
                         Fallback = (string) elem.Attribute("fallback"),
                         FallbackStyle = (string) elem.Attribute("fallback-style"),
@@ -119,9 +119,9 @@ namespace EpubSharp.Format.Readers
                         RequiredNamespace = (string) elem.Attribute("required-namespace")
                     })
                 },
-                Spine = new PackageSpine
+                Spine = new OpfSpine
                 {
-                    ItemRefs = spine?.Elements(PackageElements.ItemRef).AsObjectList(elem => new PackageSpineItemRef
+                    ItemRefs = spine?.Elements(OpfElements.ItemRef).AsObjectList(elem => new OpfSpineItemRef
                     {
                         IdRef = (string) elem.Attribute("idref"),
                         Linear = (string) elem.Attribute("linear") != "no",
@@ -155,11 +155,11 @@ namespace EpubSharp.Format.Readers
             throw new Exception($"Unsupported EPUB version: {version}.");
         }
 
-        private static string FindCoverPath(PackageDocument package)
+        private static string FindCoverPath(OpfDocument opf)
         {
             string coverId = null;
 
-            var coverMetaItem = package.Metadata.Metas
+            var coverMetaItem = opf.Metadata.Metas
                 .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
             if (coverMetaItem != null)
             {
@@ -167,7 +167,7 @@ namespace EpubSharp.Format.Readers
             }
             else
             {
-                var item = package.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
+                var item = opf.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
                 if (item != null)
                 {
                     coverId = item.Href;
@@ -179,16 +179,16 @@ namespace EpubSharp.Format.Readers
                 return null;
             }
 
-            var coverItem = package.Manifest.Items.FirstOrDefault(item => item.Id == coverId);
+            var coverItem = opf.Manifest.Items.FirstOrDefault(item => item.Id == coverId);
             return coverItem?.Href;
         }
 
-        private static string FindNcxPath(PackageDocument package)
+        private static string FindNcxPath(OpfDocument opf)
         {
-            var ncxItem = package.Manifest.Items.FirstOrDefault(e => e.MediaType == "application/x-dtbncx+xml");
+            var ncxItem = opf.Manifest.Items.FirstOrDefault(e => e.MediaType == "application/x-dtbncx+xml");
             if (ncxItem != null)
             {
-                package.NcxPath = ncxItem.Href;
+                opf.NcxPath = ncxItem.Href;
             }
             else
             {
@@ -196,9 +196,9 @@ namespace EpubSharp.Format.Readers
                 // according to http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm#Section2.4.1.2,
                 // "The item that describes the NCX must be referenced by the spine toc attribute."
 
-                if (!string.IsNullOrWhiteSpace(package.Spine.Toc))
+                if (!string.IsNullOrWhiteSpace(opf.Spine.Toc))
                 {
-                    var tocItem = package.Manifest.Items.FirstOrDefault(e => e.Id == package.Spine.Toc);
+                    var tocItem = opf.Manifest.Items.FirstOrDefault(e => e.Id == opf.Spine.Toc);
                     if (tocItem != null)
                     {
                         return tocItem.Href;
@@ -209,9 +209,9 @@ namespace EpubSharp.Format.Readers
             return null;
         }
 
-        private static string FindNavPath(PackageDocument package)
+        private static string FindNavPath(OpfDocument opf)
         {
-            var navItem = package.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
+            var navItem = opf.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
             return navItem?.Href;
         }
     }

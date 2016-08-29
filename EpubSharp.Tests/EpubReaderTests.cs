@@ -153,7 +153,7 @@ namespace EpubSharp.Tests
                 {
                     EpubReader.Read(path);
                     //AssertOcf(book.Format.Ocf, book.Format.NewOcf);
-                    //AssertPackage(book.Format.Package, book.Format.NewPackage);
+                    //AssertOpf(book.Format.Opf, book.Format.NewOpf);
                     //AssertNcx(book.Format.Ncx, book.Format.NewNcx);
                 }
                 catch (Exception ex)
@@ -246,7 +246,7 @@ namespace EpubSharp.Tests
             Assert.AreEqual(expected.RootFile, actual.RootFile);
         }
 
-        private void AssertPackage(PackageDocument expected, PackageDocument actual)
+        private void AssertOpf(OpfDocument expected, OpfDocument actual)
         {
             Assert.AreEqual(expected == null, actual == null, nameof(actual));
             if (expected != null && actual != null)
@@ -340,7 +340,7 @@ namespace EpubSharp.Tests
             }
         }
 
-        private void AssertCreators(IEnumerable<PackageMetadataCreator> expected, IEnumerable<PackageMetadataCreator> actual, string name)
+        private void AssertCreators(IEnumerable<OpfMetadataCreator> expected, IEnumerable<OpfMetadataCreator> actual, string name)
         {
             AssertCollection(expected, actual, name, (old, @new, i) =>
             {

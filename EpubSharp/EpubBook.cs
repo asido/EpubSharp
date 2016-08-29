@@ -16,8 +16,8 @@ namespace EpubSharp
         /// </summary>
         public EpubFormat Format { get; internal set; }
 
-        public string Title => Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
-        public List<string> Authors => Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
+        public string Title => Format.Opf.Metadata.Titles.FirstOrDefault() ?? string.Empty;
+        public List<string> Authors => Format.Opf.Metadata.Creators.Select(creator => creator.Text).ToList();
         public string Author => string.Join(AuthorsSeparator, Authors);
         public EpubResources Resources { get; internal set; }
 

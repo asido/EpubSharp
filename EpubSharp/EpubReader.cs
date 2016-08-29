@@ -46,12 +46,12 @@ namespace EpubSharp
             {
                 var format = new EpubFormat();
                 format.Ocf = OcfReader.Read(archive.LoadXml(OcfPath));
-                format.Package = PackageReader.Read(archive.LoadXml(format.Ocf.RootFile));
+                format.Opf = OpfReader.Read(archive.LoadXml(format.Ocf.RootFile));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
-                if (!string.IsNullOrWhiteSpace(format.Package.NcxPath))
+                if (!string.IsNullOrWhiteSpace(format.Opf.NcxPath))
                 {
-                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(format.Ocf.RootFile), format.Package.NcxPath);
+                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(format.Ocf.RootFile), format.Opf.NcxPath);
                     format.Ncx = NcxReader.Read(archive.LoadXml(absolutePath));
                 }
 
@@ -71,7 +71,7 @@ namespace EpubSharp
             return new Lazy<Image>(() =>
             {
                 EpubByteContentFile coverImageContentFile;
-                if (!book.Resources.Images.TryGetValue(book.Format.Package.CoverPath, out coverImageContentFile))
+                if (!book.Resources.Images.TryGetValue(book.Format.Opf.CoverPath, out coverImageContentFile))
                 {
                     return null;
                 }
@@ -145,7 +145,7 @@ namespace EpubSharp
             // Saved items for creating reading order from spine.
             var idToHtmlItems = new Dictionary<string, EpubTextContentFile>();
 
-            foreach (var item in book.Format.Package.Manifest.Items)
+            foreach (var item in book.Format.Opf.Manifest.Items)
             {
                 var path = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), item.Href);
                 var entry = epubArchive.GetEntryIgnoringSlashDirection(path);
@@ -244,7 +244,7 @@ namespace EpubSharp
                 }
             }
 
-            foreach (var item in book.Format.Package.Spine.ItemRefs)
+            foreach (var item in book.Format.Opf.Spine.ItemRefs)
             {
                 EpubTextContentFile html;
                 if (idToHtmlItems.TryGetValue(item.IdRef, out html))

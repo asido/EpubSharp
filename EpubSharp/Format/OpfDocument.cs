@@ -8,13 +8,13 @@ namespace EpubSharp.Format
         Epub3
     }
     
-    public class PackageDocument
+    public class OpfDocument
     {
         public EpubVersion EpubVersion { get; internal set; }
-        public PackageMetadata Metadata { get; internal set; }
-        public PackageManifest Manifest { get; internal set; }
-        public PackageSpine Spine { get; internal set; }
-        public PackageGuide Guide { get; internal set; }
+        public OpfMetadata Metadata { get; internal set; }
+        public OpfManifest Manifest { get; internal set; }
+        public OpfSpine Spine { get; internal set; }
+        public OpfGuide Guide { get; internal set; }
 
         // Below are helper properties, which aren't part of the format.
         public string NavPath { get; internal set; }
@@ -22,27 +22,27 @@ namespace EpubSharp.Format
         public string CoverPath { get; internal set; }
     }
 
-    public class PackageMetadata
+    public class OpfMetadata
     {
         public IReadOnlyCollection<string> Titles { get; internal set; }
         public IReadOnlyCollection<string> Subjects { get; internal set; }
         public IReadOnlyCollection<string> Descriptions { get; internal set; }
         public IReadOnlyCollection<string> Publishers { get; internal set; }
-        public IReadOnlyCollection<PackageMetadataCreator> Creators { get; internal set; }
-        public IReadOnlyCollection<PackageMetadataCreator> Contributors { get; internal set; }
-        public IReadOnlyCollection<PackageMetadataDate> Dates { get; internal set; }
+        public IReadOnlyCollection<OpfMetadataCreator> Creators { get; internal set; }
+        public IReadOnlyCollection<OpfMetadataCreator> Contributors { get; internal set; }
+        public IReadOnlyCollection<OpfMetadataDate> Dates { get; internal set; }
         public IReadOnlyCollection<string> Types { get; internal set; }
         public IReadOnlyCollection<string> Formats { get; internal set; }
-        public IReadOnlyCollection<PackageMetadataIdentifier> Identifiers { get; internal set; }
+        public IReadOnlyCollection<OpfMetadataIdentifier> Identifiers { get; internal set; }
         public IReadOnlyCollection<string> Sources { get; internal set; }
         public IReadOnlyCollection<string> Languages { get; internal set; }
         public IReadOnlyCollection<string> Relations { get; internal set; }
         public IReadOnlyCollection<string> Coverages { get; internal set; }
         public IReadOnlyCollection<string> Rights { get; internal set; }
-        public IReadOnlyCollection<PackageMetadataMeta> Metas { get; internal set; }
+        public IReadOnlyCollection<OpfMetadataMeta> Metas { get; internal set; }
     }
 
-    public class PackageMetadataDate
+    public class OpfMetadataDate
     {
         public string Text { get; internal set; }
 
@@ -52,7 +52,7 @@ namespace EpubSharp.Format
         public string Event { get; internal set; }
     }
 
-    public class PackageMetadataCreator
+    public class OpfMetadataCreator
     {
         public string Text { get; internal set; }
         public string Role { get; internal set; }
@@ -60,14 +60,14 @@ namespace EpubSharp.Format
         public string AlternateScript { get; internal set; }
     }
 
-    public class PackageMetadataIdentifier
+    public class OpfMetadataIdentifier
     {
         public string Id { get; internal set; }
         public string Scheme { get; internal set; }
         public string Text { get; internal set; }
     }
 
-    public class PackageMetadataMeta
+    public class OpfMetadataMeta
     {
         public string Name { get; internal set; }
         public string Id { get; internal set; }
@@ -77,12 +77,12 @@ namespace EpubSharp.Format
         public string Text { get; internal set; }
     }
 
-    public class PackageManifest
+    public class OpfManifest
     {
-        public IReadOnlyCollection<PackageManifestItem> Items { get; internal set; }
+        public IReadOnlyCollection<OpfManifestItem> Items { get; internal set; }
     }
 
-    public class PackageManifestItem
+    public class OpfManifestItem
     {
         public string Id { get; internal set; }
         public string Href { get; internal set; }
@@ -99,13 +99,13 @@ namespace EpubSharp.Format
         }
     }
 
-    public class PackageSpine
+    public class OpfSpine
     {
         public string Toc { get; internal set; }
-        public IReadOnlyCollection<PackageSpineItemRef> ItemRefs { get; internal set; }
+        public IReadOnlyCollection<OpfSpineItemRef> ItemRefs { get; internal set; }
     }
 
-    public class PackageSpineItemRef
+    public class OpfSpineItemRef
     {
         public string IdRef { get; internal set; }
         public bool Linear { get; internal set; }
@@ -118,12 +118,12 @@ namespace EpubSharp.Format
         }
     }
 
-    public class PackageGuide
+    public class OpfGuide
     {
-        public IReadOnlyCollection<PackageGuideReference> References { get; internal set; }
+        public IReadOnlyCollection<OpfGuideReference> References { get; internal set; }
     }
 
-    public class PackageGuideReference
+    public class OpfGuideReference
     {
         public string Type { get; internal set; }
         public string Title { get; internal set; }
