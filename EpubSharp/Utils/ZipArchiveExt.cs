@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 
 namespace EpubSharp
@@ -51,6 +52,23 @@ namespace EpubSharp
 
             return entry;
         }
+        
+        public static byte[] LoadBytes(this ZipArchive archive, string entryName)
+        {
+            var entry = archive.GetEntryIgnoringSlashDirection(entryName);
+            using (var stream = entry.Open())
+            {
+                var data = stream.ReadToEnd();
+                return data;
+            }
+        }
+
+        public static string LoadText(this ZipArchive archive, string entryName)
+        {
+            var data = archive.LoadBytes(entryName);
+            var str = Encoding.UTF8.GetString(data);
+            return str;
+        }
 
         public static XDocument LoadXml(this ZipArchive archive, string entryName)
         {
@@ -58,7 +76,8 @@ namespace EpubSharp
 
             using (var stream = entry.Open())
             {
-                return XDocument.Load(stream);
+                var xml = XDocument.Load(stream);
+                return xml;
             }
         }
     }

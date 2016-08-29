@@ -52,12 +52,17 @@ namespace EpubSharp
     
     public class EpubResources
     {
+        public EpubTextContentFile Ocf { get; internal set; }
+        public EpubTextContentFile Opf { get; internal set; }
+
         public Dictionary<string, EpubTextContentFile> Html { get; internal set; }
+        public List<EpubTextContentFile> HtmlInReadingOrder { get; internal set; }
+
         public Dictionary<string, EpubTextContentFile> Css { get; internal set; }
         public Dictionary<string, EpubByteContentFile> Images { get; internal set; }
         public Dictionary<string, EpubByteContentFile> Fonts { get; internal set; }
+
         public Dictionary<string, EpubContentFile> AllFiles { get; internal set; }
-        public List<EpubTextContentFile> HtmlInReadingOrder { get; internal set; }
     }
 
     public enum EpubContentType

@@ -11,6 +11,8 @@ namespace EpubSharp
 {
     public static class EpubReader
     {
+        private const string OcfPath = "META-INF/container.xml";
+
         private static readonly IReadOnlyDictionary<string, EpubContentType> MimeTypeToContentType = new Dictionary<string, EpubContentType>
         {
             { "application/xhtml+xml", EpubContentType.Xhtml11 },
@@ -28,6 +30,10 @@ namespace EpubSharp
             { "font/opentype", EpubContentType.FontOpentype },
             { "application/vnd.ms-opentype", EpubContentType.FontOpentype }
         };
+        private static readonly IReadOnlyDictionary<EpubContentType, string> ContentTypeToMimeType = MimeTypeToContentType
+            .Where(pair => pair.Key != "application/vnd.ms-opentype") // Because it's defined twice.
+            .ToDictionary(pair => pair.Value, pair => pair.Key);
+
 
         public static EpubBook Read(string filePath)
         {
@@ -39,7 +45,7 @@ namespace EpubSharp
             using (var archive = ZipFile.Open(filePath, ZipArchiveMode.Read, System.Text.Encoding.UTF8))
             {
                 var format = new EpubFormat();
-                format.Ocf = OcfReader.Read(archive.LoadXml("META-INF/container.xml"));
+                format.Ocf = OcfReader.Read(archive.LoadXml(OcfPath));
                 format.Package = PackageReader.Read(archive.LoadXml(format.Ocf.RootFile));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
@@ -129,6 +135,20 @@ namespace EpubSharp
         {
             var result = new EpubResources
             {
+                Ocf = new EpubTextContentFile
+                {
+                    FileName = OcfPath,
+                    ContentType = EpubContentType.Xml,
+                    MimeType = ContentTypeToMimeType[EpubContentType.Xml],
+                    Content = epubArchive.LoadBytes(OcfPath)
+                },
+                Opf = new EpubTextContentFile
+                {
+                    FileName = book.Format.Ocf.RootFile,
+                    ContentType = EpubContentType.Xml,
+                    MimeType = ContentTypeToMimeType[EpubContentType.Xml],
+                    Content = epubArchive.LoadBytes(book.Format.Ocf.RootFile)
+                },
                 Html = new Dictionary<string, EpubTextContentFile>(),
                 Css = new Dictionary<string, EpubTextContentFile>(),
                 Images = new Dictionary<string, EpubByteContentFile>(),
