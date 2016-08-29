@@ -9,6 +9,8 @@ namespace EpubSharp
 {
     public class EpubBook
     {
+        internal const string AuthorsSeparator = ", ";
+
         /// <summary>
         /// Raw epub format structures. This is populated only when the instance is retrieved using EpubReader.Read()
         /// </summary>
@@ -16,7 +18,7 @@ namespace EpubSharp
 
         public string Title => Format.Package.Metadata.Titles.FirstOrDefault() ?? string.Empty;
         public List<string> Authors => Format.Package.Metadata.Creators.Select(creator => creator.Text).ToList();
-        public string Author => string.Join(", ", Authors);
+        public string Author => string.Join(AuthorsSeparator, Authors);
         public EpubResources Resources { get; internal set; }
 
         internal Lazy<Image> LazyCoverImage = null;

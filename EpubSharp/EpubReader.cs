@@ -11,7 +11,7 @@ namespace EpubSharp
 {
     public static class EpubReader
     {
-        private const string OcfPath = "META-INF/container.xml";
+        internal const string OcfPath = "META-INF/container.xml";
 
         private static readonly IReadOnlyDictionary<string, EpubContentType> MimeTypeToContentType = new Dictionary<string, EpubContentType>
         {

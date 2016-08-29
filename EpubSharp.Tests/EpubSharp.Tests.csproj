@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="EpubReaderTests.cs" />
+    <Compile Include="EpubWriterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
