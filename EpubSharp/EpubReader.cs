@@ -58,7 +58,7 @@ namespace EpubSharp
                 var book = new EpubBook { Format = format };
                 book.Resources = LoadResources(archive, book);
                 book.LazyCoverImage = LazyLoadCoverImage(book);
-                book.Chapters = LoadChapters(book, archive);
+                book.TableOfContents = LoadChapters(book, archive);
                 return book;
             }
         }
@@ -102,27 +102,12 @@ namespace EpubSharp
                 var contentSourceAnchorCharIndex = navigationPoint.ContentSrc.IndexOf('#');
                 if (contentSourceAnchorCharIndex == -1)
                 {
-                    chapter.ContentFileName = navigationPoint.ContentSrc;
+                    chapter.FileName = navigationPoint.ContentSrc;
                 }
                 else
                 {
-                    chapter.ContentFileName = navigationPoint.ContentSrc.Substring(0, contentSourceAnchorCharIndex);
+                    chapter.FileName = navigationPoint.ContentSrc.Substring(0, contentSourceAnchorCharIndex);
                     chapter.Anchor = navigationPoint.ContentSrc.Substring(contentSourceAnchorCharIndex + 1);
-                }
-
-                var contentPath = PathExt.Combine(PathExt.GetDirectoryPath(book.Format.Package.NcxPath), chapter.ContentFileName);
-                EpubTextContentFile html;
-                if (book.Resources.Html.TryGetValue(contentPath, out html))
-                {
-                    chapter.ContentHtml = html.TextContent;
-                }
-                else if (book.Resources.Images.ContainsKey(contentPath))
-                {
-                    chapter.ContentHtml = "";
-                }
-                else
-                {
-                    throw new EpubException($"Incorrect EPUB manifest: item with href = '{contentPath}' is missing");
                 }
 
                 chapter.SubChapters = LoadChaptersFromNcx(book, navigationPoint.NavigationPoints, epubArchive);

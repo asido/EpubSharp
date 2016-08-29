@@ -22,7 +22,7 @@ namespace EpubSharp
         internal Lazy<Image> LazyCoverImage = null;
         public Image CoverImage => LazyCoverImage?.Value;
 
-        public List<EpubChapter> Chapters { get; internal set; }
+        public List<EpubChapter> TableOfContents { get; internal set; }
 
         public string ToPlainText()
         {
@@ -39,8 +39,7 @@ namespace EpubSharp
     public class EpubChapter
     {
         public string Title { get; set; }
-        public string ContentFileName { get; set; }
-        public string ContentHtml { get; set; }
+        public string FileName { get; set; }
         public string Anchor { get; set; }
         public List<EpubChapter> SubChapters { get; set; }
 
