@@ -11,8 +11,6 @@ namespace EpubSharp
 {
     public static class EpubReader
     {
-        internal const string OcfPath = "META-INF/container.xml";
-
         private static readonly IReadOnlyDictionary<string, EpubContentType> MimeTypeToContentType = new Dictionary<string, EpubContentType>
         {
             { "application/xhtml+xml", EpubContentType.Xhtml11 },
@@ -45,7 +43,7 @@ namespace EpubSharp
             using (var archive = ZipFile.Open(filePath, ZipArchiveMode.Read, System.Text.Encoding.UTF8))
             {
                 var format = new EpubFormat();
-                format.Ocf = OcfReader.Read(archive.LoadXml(OcfPath));
+                format.Ocf = OcfReader.Read(archive.LoadXml(Constants.OcfPath));
                 format.Opf = OpfReader.Read(archive.LoadXml(format.Ocf.RootFile));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
@@ -122,10 +120,10 @@ namespace EpubSharp
             {
                 Ocf = new EpubTextContentFile
                 {
-                    FileName = OcfPath,
+                    FileName = Constants.OcfPath,
                     ContentType = EpubContentType.Xml,
                     MimeType = ContentTypeToMimeType[EpubContentType.Xml],
-                    Content = epubArchive.LoadBytes(OcfPath)
+                    Content = epubArchive.LoadBytes(Constants.OcfPath)
                 },
                 Opf = new EpubTextContentFile
                 {

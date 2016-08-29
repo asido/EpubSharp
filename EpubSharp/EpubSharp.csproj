@@ -47,6 +47,9 @@
     <Compile Include="EpubException.cs" />
     <Compile Include="EpubReader.cs" />
     <Compile Include="EpubWriter.cs" />
+    <Compile Include="Format\Constants.cs" />
+    <Compile Include="Format\Writers\MimeTypeWriter.cs" />
+    <Compile Include="Format\Writers\OcfWriter.cs" />
     <Compile Include="Utils\HtmlProcessor.cs" />
     <Compile Include="Utils\StreamExt.cs" />
     <Compile Include="Utils\ZipArchiveExt.cs" />

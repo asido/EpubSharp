@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,15 @@ namespace EpubSharp
 {
     internal static class ZipArchiveExt
     {
+        public static void CreateEntry(this ZipArchive archive, string file, string content)
+        {
+            var entry = archive.CreateEntry(file);
+            using (var stream = new StreamWriter(entry.Open()))
+            {
+                stream.Write(content);
+            }
+        }
+
         /// <summary>
         /// ZIP's are slash-side sensitive and ZIP's created on Windows and Linux can contain their own variation.
         /// </summary>

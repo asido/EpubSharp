@@ -5,23 +5,21 @@ namespace EpubSharp.Format.Readers
 {
     internal static class NcxReader
     {
-        private static readonly XNamespace NcxNamespace = "http://www.daisy.org/z3986/2005/ncx/";
-
         private static class NcxElements
         {
-            public static readonly XName Head = NcxNamespace + "head";
-            public static readonly XName Meta = NcxNamespace + "meta";
-            public static readonly XName DocTitle = NcxNamespace + "docTitle";
-            public static readonly XName DocAuthor = NcxNamespace + "docAuthor";
-            public static readonly XName Text = NcxNamespace + "text";
-            public static readonly XName NavMap = NcxNamespace + "navMap";
-            public static readonly XName NavPoint = NcxNamespace + "navPoint";
-            public static readonly XName NavList = NcxNamespace + "navList";
-            public static readonly XName PageList = NcxNamespace + "pageList";
-            public static readonly XName PageTarget = NcxNamespace + "pageTarget";
-            public static readonly XName NavLabel = NcxNamespace + "navLabel";
-            public static readonly XName NavTarget = NcxNamespace + "navTarget";
-            public static readonly XName Content = NcxNamespace + "content";
+            public static readonly XName Head = Constants.NcxNamespace + "head";
+            public static readonly XName Meta = Constants.NcxNamespace + "meta";
+            public static readonly XName DocTitle = Constants.NcxNamespace + "docTitle";
+            public static readonly XName DocAuthor = Constants.NcxNamespace + "docAuthor";
+            public static readonly XName Text = Constants.NcxNamespace + "text";
+            public static readonly XName NavMap = Constants.NcxNamespace + "navMap";
+            public static readonly XName NavPoint = Constants.NcxNamespace + "navPoint";
+            public static readonly XName NavList = Constants.NcxNamespace + "navList";
+            public static readonly XName PageList = Constants.NcxNamespace + "pageList";
+            public static readonly XName PageTarget = Constants.NcxNamespace + "pageTarget";
+            public static readonly XName NavLabel = Constants.NcxNamespace + "navLabel";
+            public static readonly XName NavTarget = Constants.NcxNamespace + "navTarget";
+            public static readonly XName Content = Constants.NcxNamespace + "content";
         }
 
         public static NcxDocument Read(XDocument xml)

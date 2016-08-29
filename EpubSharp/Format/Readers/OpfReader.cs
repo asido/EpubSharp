@@ -6,37 +6,34 @@ namespace EpubSharp.Format.Readers
 {
     internal static class OpfReader
     {
-        private static readonly XNamespace OpfNamespace = "http://www.idpf.org/2007/opf";
-        private static readonly XNamespace MetadataNamespace = "http://purl.org/dc/elements/1.1/";
-
         private static class OpfElements
         {
-            public static readonly XName Metadata = OpfNamespace + "metadata";
-            public static readonly XName Contributor = MetadataNamespace + "contributor";
-            public static readonly XName Coverages = MetadataNamespace + "coverages";
-            public static readonly XName Creator = MetadataNamespace + "creator";
-            public static readonly XName Date = MetadataNamespace + "date";
-            public static readonly XName Description = MetadataNamespace + "description";
-            public static readonly XName Format = MetadataNamespace + "format";
-            public static readonly XName Identifier = MetadataNamespace + "identifier";
-            public static readonly XName Language = MetadataNamespace + "language";
-            public static readonly XName Meta = OpfNamespace + "meta";
-            public static readonly XName Publisher = MetadataNamespace + "publisher";
-            public static readonly XName Relation = MetadataNamespace + "relation";
-            public static readonly XName Rights = MetadataNamespace + "rights";
-            public static readonly XName Source = MetadataNamespace + "source";
-            public static readonly XName Subject = MetadataNamespace + "subject";
-            public static readonly XName Title = MetadataNamespace + "title";
-            public static readonly XName Type = MetadataNamespace + "type";
+            public static readonly XName Metadata = Constants.OpfNamespace + "metadata";
+            public static readonly XName Contributor = Constants.OpfMetadataNamespace + "contributor";
+            public static readonly XName Coverages = Constants.OpfMetadataNamespace + "coverages";
+            public static readonly XName Creator = Constants.OpfMetadataNamespace + "creator";
+            public static readonly XName Date = Constants.OpfMetadataNamespace + "date";
+            public static readonly XName Description = Constants.OpfMetadataNamespace + "description";
+            public static readonly XName Format = Constants.OpfMetadataNamespace + "format";
+            public static readonly XName Identifier = Constants.OpfMetadataNamespace + "identifier";
+            public static readonly XName Language = Constants.OpfMetadataNamespace + "language";
+            public static readonly XName Meta = Constants.OpfNamespace + "meta";
+            public static readonly XName Publisher = Constants.OpfMetadataNamespace + "publisher";
+            public static readonly XName Relation = Constants.OpfMetadataNamespace + "relation";
+            public static readonly XName Rights = Constants.OpfMetadataNamespace + "rights";
+            public static readonly XName Source = Constants.OpfMetadataNamespace + "source";
+            public static readonly XName Subject = Constants.OpfMetadataNamespace + "subject";
+            public static readonly XName Title = Constants.OpfMetadataNamespace + "title";
+            public static readonly XName Type = Constants.OpfMetadataNamespace + "type";
 
-            public static readonly XName Guide = OpfNamespace + "guide";
-            public static readonly XName Reference = OpfNamespace + "reference";
+            public static readonly XName Guide = Constants.OpfNamespace + "guide";
+            public static readonly XName Reference = Constants.OpfNamespace + "reference";
 
-            public static readonly XName Manifest = OpfNamespace + "manifest";
-            public static readonly XName Item = OpfNamespace + "item";
+            public static readonly XName Manifest = Constants.OpfNamespace + "manifest";
+            public static readonly XName Item = Constants.OpfNamespace + "item";
 
-            public static readonly XName Spine = OpfNamespace + "spine";
-            public static readonly XName ItemRef = OpfNamespace + "itemref";
+            public static readonly XName Spine = Constants.OpfNamespace + "spine";
+            public static readonly XName ItemRef = Constants.OpfNamespace + "itemref";
         }
 
         public static OpfDocument Read(XDocument xml)
@@ -46,9 +43,9 @@ namespace EpubSharp.Format.Readers
 
             Func<XElement, OpfMetadataCreator> readCreator = elem => new OpfMetadataCreator
             {
-                Role = (string) elem.Attribute(OpfNamespace + "role"),
-                FileAs = (string) elem.Attribute(OpfNamespace + "file-as"),
-                AlternateScript = (string) elem.Attribute(OpfNamespace + "alternate-script"),
+                Role = (string) elem.Attribute(Constants.OpfNamespace + "role"),
+                FileAs = (string) elem.Attribute(Constants.OpfNamespace + "file-as"),
+                AlternateScript = (string) elem.Attribute(Constants.OpfNamespace + "alternate-script"),
                 Text = elem.Value
             };
 
@@ -68,14 +65,14 @@ namespace EpubSharp.Format.Readers
                     Dates = metadata?.Elements(OpfElements.Date).AsObjectList(elem => new OpfMetadataDate
                     {
                         Text = elem.Value,
-                        Event = (string)elem.Attribute(OpfNamespace + "event")
+                        Event = (string)elem.Attribute(Constants.OpfNamespace + "event")
                     }),
                     Descriptions = metadata?.Elements(OpfElements.Description).AsStringList(),
                     Formats = metadata?.Elements(OpfElements.Format).AsStringList(),
                     Identifiers = metadata?.Elements(OpfElements.Identifier).AsObjectList(elem => new OpfMetadataIdentifier
                     {
                         Id = (string) elem.Attribute("id"),
-                        Scheme = (string) elem.Attribute(OpfNamespace + "scheme"),
+                        Scheme = (string) elem.Attribute(Constants.OpfNamespace + "scheme"),
                         Text = elem.Value
                     }),
                     Languages = metadata?.Elements(OpfElements.Language).AsStringList(),

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using EpubSharp.Format.Writers;
 
 namespace EpubSharp
 {
@@ -74,33 +70,9 @@ namespace EpubSharp
         public void Save(Stream stream)
         {
             var archive = new ZipArchive(stream, ZipArchiveMode.Create);
-            WriteMimeType(archive);
-            WriteOcf(archive);
+            MimeTypeWriter.Write(archive);
+            OcfWriter.Write(archive);
             archive.Dispose();
-        }
-
-        private void WriteMimeType(ZipArchive archive)
-        {
-            Write(archive, "mimetype", "application/epub+zip");
-        }
-
-        private void WriteOcf(ZipArchive archive)
-        {
-            Write(archive, EpubReader.OcfPath, @"<?xml version=""1.0""?>
-<container version=""1.0"" xmlns=""urn:oasis:names:tc:opendocument:xmlns:container"">
-  <rootfiles>
-    <rootfile full-path=""EPUB/Opf.opf"" media-type = ""application/oebps-Opf+xml"" />
-  </rootfiles>
-</container>");
-        }
-
-        private void Write(ZipArchive archive, string file, string content)
-        {
-            var entry = archive.CreateEntry(file);
-            using (var stream = new StreamWriter(entry.Open()))
-            {
-                stream.Write(content);
-            }
         }
     }
 }
