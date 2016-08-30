@@ -45,6 +45,11 @@ namespace EpubSharp.Format
     
     public class OpfDocument
     {
+        internal static class Attributes
+        {
+            public static readonly XName Version = "version";
+        }
+
         public EpubVersion EpubVersion { get; internal set; } = new EpubVersion();
         public OpfMetadata Metadata { get; internal set; } = new OpfMetadata();
         public OpfManifest Manifest { get; internal set; } = new OpfManifest();
@@ -136,6 +141,11 @@ namespace EpubSharp.Format
 
     public class OpfMetadataDate
     {
+        internal static class Attributes
+        {
+            public static readonly XName Event = Constants.OpfNamespace + "event";
+        }
+
         public string Text { get; internal set; }
 
         /// <summary>
@@ -146,6 +156,13 @@ namespace EpubSharp.Format
 
     public class OpfMetadataCreator
     {
+        internal static class Attributes
+        {
+            public static readonly XName Role = Constants.OpfNamespace + "role";
+            public static readonly XName FileAs = Constants.OpfNamespace + "file-as";
+            public static readonly XName AlternateScript = Constants.OpfNamespace + "alternate-script";
+        }
+
         public string Text { get; internal set; }
         public string Role { get; internal set; }
         public string FileAs { get; internal set; }
@@ -154,6 +171,12 @@ namespace EpubSharp.Format
 
     public class OpfMetadataIdentifier
     {
+        internal static class Attributes
+        {
+            public static readonly XName Id = "id";
+            public static readonly XName Scheme = "scheme";
+        }
+
         public string Id { get; internal set; }
         public string Scheme { get; internal set; }
         public string Text { get; internal set; }
@@ -161,6 +184,16 @@ namespace EpubSharp.Format
 
     public class OpfMetadataMeta
     {
+        internal static class Attributes
+        {
+            public static readonly XName Id = "id";
+            public static readonly XName Name = "name";
+            public static readonly XName Refines = "refines";
+            public static readonly XName Scheme = "scheme";
+            public static readonly XName Property = "property";
+            public static readonly XName Content = "content";
+        }
+
         public string Name { get; internal set; }
         public string Id { get; internal set; }
         public string Refines { get; internal set; }
@@ -176,6 +209,18 @@ namespace EpubSharp.Format
 
     public class OpfManifestItem
     {
+        internal static class Attributes
+        {
+            public static readonly XName Fallback = "fallback";
+            public static readonly XName FallbackStyle = "fallback-style";
+            public static readonly XName Href = "href";
+            public static readonly XName Id = "id";
+            public static readonly XName MediaType = "media-type";
+            public static readonly XName Properties = "properties";
+            public static readonly XName RequiredModules = "required-modules";
+            public static readonly XName RequiredNamespace = "required-namespace";
+        }
+
         public string Id { get; internal set; }
         public string Href { get; internal set; }
         public ICollection<string> Properties { get; internal set; } = new List<string>();
@@ -199,6 +244,15 @@ namespace EpubSharp.Format
 
     public class OpfSpineItemRef
     {
+        internal static class Attributes
+        {
+            public static readonly XName IdRef = "idref";
+            public static readonly XName Linear = "linear";
+            public static readonly XName Id = "id";
+            public static readonly XName Properties = "properties";
+            public static readonly XName Toc = "toc";
+        }
+
         public string IdRef { get; internal set; }
         public bool Linear { get; internal set; }
         public string Id { get; internal set; }
@@ -217,6 +271,13 @@ namespace EpubSharp.Format
 
     public class OpfGuideReference
     {
+        internal static class Attributes
+        {
+            public static readonly XName Title = "id";
+            public static readonly XName Type = "name";
+            public static readonly XName Href = "refines";
+        }
+
         public string Type { get; internal set; }
         public string Title { get; internal set; }
         public string Href { get; internal set; }
