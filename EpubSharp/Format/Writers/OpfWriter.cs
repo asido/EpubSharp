@@ -42,22 +42,24 @@ namespace EpubSharp.Format.Writers
             root.Add(metadata);
 
             var manifest = new XElement(Constants.OpfNamespace + "manifest");
-            if (opf.CoverPath != null)
+            var coverPath = opf.FindCoverPath();
+            if (coverPath != null)
             {
-                var cover = opf.Manifest.Items.FirstOrDefault(e => e.Href == opf.CoverPath);
+                var cover = opf.Manifest.Items.FirstOrDefault(e => e.Href == coverPath);
                 if (cover == null)
                 {
-                    throw new EpubWriteException($"Cover path is set to '{opf.CoverPath}', but couldn't find any manifest item with such href.");
+                    throw new EpubWriteException($"Cover path is set to '{coverPath}', but couldn't find any manifest item with such href.");
                 }
                 manifest.Add(new XElement(Constants.OpfNamespace + "item", new XAttribute("id", "cover-image"), new XAttribute("href", cover.Href), new XAttribute("media-type", cover.MediaType), new XAttribute("properties", "cover-image")));
             }
             if (opf.Spine.Toc != null)
             {
-                if (opf.NcxPath == null)
+                var ncxPath = opf.FindNcxPath();
+                if (ncxPath == null)
                 {
                     throw new EpubWriteException("Spine TOC is set, but NCX path is not.");
                 }
-                manifest.Add(new XElement(Constants.OpfNamespace + "item", new XAttribute("id", "ncx"), new XAttribute("media-type", ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx]), new XAttribute("href", opf.NcxPath)));
+                manifest.Add(new XElement(Constants.OpfNamespace + "item", new XAttribute("id", "ncx"), new XAttribute("media-type", ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx]), new XAttribute("href", ncxPath)));
             }
             foreach (var item in opf.Manifest.Items)
             {
@@ -121,7 +123,6 @@ namespace EpubSharp.Format.Writers
                 element.Add(new XAttribute("linear", itemref.Linear ? "yes" : "no"));
                 spine.Add(element);
             }
-            spine.Add(new XElement(Constants.OpfNamespace + "itemref", new XAttribute("idref", "BookCover")));
             root.Add(spine);
 
             return root.ToString();

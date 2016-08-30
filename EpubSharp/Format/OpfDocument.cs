@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EpubSharp.Format
 {
@@ -16,10 +18,67 @@ namespace EpubSharp.Format
         public OpfSpine Spine { get; internal set; } = new OpfSpine();
         public OpfGuide Guide { get; internal set; } = new OpfGuide();
 
-        // Below are helper properties, which aren't part of the format.
-        public string NavPath { get; internal set; }
-        public string NcxPath { get; internal set; }
-        public string CoverPath { get; internal set; }
+        public string FindCoverPath()
+        {
+            string coverId = null;
+
+            var coverMetaItem = Metadata.Metas
+                .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
+            if (coverMetaItem != null)
+            {
+                coverId = coverMetaItem.Text;
+            }
+            else
+            {
+                var item = Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
+                if (item != null)
+                {
+                    coverId = item.Href;
+                }
+            }
+
+            if (coverId == null)
+            {
+                return null;
+            }
+
+            var coverItem = Manifest.Items.FirstOrDefault(item => item.Id == coverId);
+            return coverItem?.Href;
+        }
+
+        public string FindNcxPath()
+        {
+            string path = null;
+
+            var ncxItem = Manifest.Items.FirstOrDefault(e => e.MediaType == "application/x-dtbncx+xml");
+            if (ncxItem != null)
+            {
+                path = ncxItem.Href;
+            }
+            else
+            {
+                // If we can't find the toc by media-type then try to look for id of the item in the spine attributes as
+                // according to http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm#Section2.4.1.2,
+                // "The item that describes the NCX must be referenced by the spine toc attribute."
+
+                if (!string.IsNullOrWhiteSpace(Spine.Toc))
+                {
+                    var tocItem = Manifest.Items.FirstOrDefault(e => e.Id == Spine.Toc);
+                    if (tocItem != null)
+                    {
+                        path = tocItem.Href;
+                    }
+                }
+            }
+
+            return path;
+        }
+
+        public string FindNavPath()
+        {
+            var navItem = Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
+            return navItem?.Href;
+        }
     }
 
     public class OpfMetadata

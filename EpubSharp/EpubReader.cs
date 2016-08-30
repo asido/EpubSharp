@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Readers;
 
@@ -24,9 +25,10 @@ namespace EpubSharp
                 format.Opf = OpfReader.Read(archive.LoadXml(format.Ocf.RootFile));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
-                if (!string.IsNullOrWhiteSpace(format.Opf.NcxPath))
+                var ncxPath = format.Opf.FindNcxPath();
+                if (ncxPath != null)
                 {
-                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(format.Ocf.RootFile), format.Opf.NcxPath);
+                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(format.Ocf.RootFile), ncxPath);
                     format.Ncx = NcxReader.Read(archive.LoadXml(absolutePath));
                 }
 
@@ -37,7 +39,7 @@ namespace EpubSharp
                 return book;
             }
         }
-
+        
         private static Lazy<Image> LazyLoadCoverImage(EpubBook book)
         {
             if (book == null) throw new ArgumentNullException(nameof(book));
@@ -46,7 +48,14 @@ namespace EpubSharp
             return new Lazy<Image>(() =>
             {
                 EpubByteContentFile coverImageContentFile;
-                if (!book.Resources.Images.TryGetValue(book.Format.Opf.CoverPath, out coverImageContentFile))
+
+                var coverPath = book.Format.Opf.FindCoverPath();
+                if (coverPath == null)
+                {
+                    return null;
+                }
+
+                if (!book.Resources.Images.TryGetValue(coverPath, out coverImageContentFile))
                 {
                     return null;
                 }

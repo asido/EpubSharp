@@ -128,11 +128,7 @@ namespace EpubSharp.Format.Readers
                     Toc = spine?.Attribute("toc")?.Value
                 }
             };
-
-            package.NavPath = FindNavPath(package);
-            package.NcxPath = FindNcxPath(package);
-            package.CoverPath = FindCoverPath(package);
-
+            
             return package;
         }
 
@@ -150,66 +146,6 @@ namespace EpubSharp.Format.Readers
             }
 
             throw new Exception($"Unsupported EPUB version: {version}.");
-        }
-
-        private static string FindCoverPath(OpfDocument opf)
-        {
-            string coverId = null;
-
-            var coverMetaItem = opf.Metadata.Metas
-                .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
-            if (coverMetaItem != null)
-            {
-                coverId = coverMetaItem.Text;
-            }
-            else
-            {
-                var item = opf.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
-                if (item != null)
-                {
-                    coverId = item.Href;
-                }
-            }
-
-            if (coverId == null)
-            {
-                return null;
-            }
-
-            var coverItem = opf.Manifest.Items.FirstOrDefault(item => item.Id == coverId);
-            return coverItem?.Href;
-        }
-
-        private static string FindNcxPath(OpfDocument opf)
-        {
-            var ncxItem = opf.Manifest.Items.FirstOrDefault(e => e.MediaType == "application/x-dtbncx+xml");
-            if (ncxItem != null)
-            {
-                opf.NcxPath = ncxItem.Href;
-            }
-            else
-            {
-                // If we can't find the toc by media-type then try to look for id of the item in the spine attributes as
-                // according to http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm#Section2.4.1.2,
-                // "The item that describes the NCX must be referenced by the spine toc attribute."
-
-                if (!string.IsNullOrWhiteSpace(opf.Spine.Toc))
-                {
-                    var tocItem = opf.Manifest.Items.FirstOrDefault(e => e.Id == opf.Spine.Toc);
-                    if (tocItem != null)
-                    {
-                        return tocItem.Href;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private static string FindNavPath(OpfDocument opf)
-        {
-            var navItem = opf.Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
-            return navItem?.Href;
         }
     }
 }
