@@ -134,7 +134,9 @@ namespace EpubSharp.Format.Writers
             }
             root.Add(spine);
 
-            return root.ToString();
+            var doc = new XDocument(root);
+            var xml = doc.Declaration.ToString() + doc;
+            return xml;
         }
     }
 }
