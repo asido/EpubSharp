@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using EpubSharp.Format;
 using EpubSharp.Format.Writers;
 
 namespace EpubSharp
@@ -13,6 +14,8 @@ namespace EpubSharp
 
     public class EpubWriter
     {
+        private const string OpfPath = "EPUB/package.opf";
+
         private readonly List<string> authors = new List<string>();
 
         private string coverFilename;
@@ -70,8 +73,8 @@ namespace EpubSharp
         public void Save(Stream stream)
         {
             var archive = new ZipArchive(stream, ZipArchiveMode.Create);
-            MimeTypeWriter.Write(archive);
-            OcfWriter.Write(archive);
+            archive.CreateEntry("mimetype", MimeTypeWriter.Format());
+            archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(OpfPath));
             archive.Dispose();
         }
     }

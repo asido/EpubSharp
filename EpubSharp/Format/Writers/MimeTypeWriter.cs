@@ -1,13 +1,10 @@
-﻿using System;
-using System.IO.Compression;
-
-namespace EpubSharp.Format.Writers
+﻿namespace EpubSharp.Format.Writers
 {
     internal class MimeTypeWriter
     {
-        public static void Write(ZipArchive archive)
+        public static string Format()
         {
-            archive.CreateEntry("mimetype", "application/epub+zip");
+            return "application/epub+zip";
         }
     }
 }
