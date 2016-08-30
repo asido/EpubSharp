@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Readers;
 
@@ -11,28 +10,6 @@ namespace EpubSharp
 {
     public static class EpubReader
     {
-        private static readonly IReadOnlyDictionary<string, EpubContentType> MimeTypeToContentType = new Dictionary<string, EpubContentType>
-        {
-            { "application/xhtml+xml", EpubContentType.Xhtml11 },
-            { "application/x-dtbook+xml", EpubContentType.Dtbook },
-            { "application/x-dtbncx+xml", EpubContentType.DtbookNcx },
-            { "text/x-oeb1-document", EpubContentType.Oeb1Document },
-            { "application/xml", EpubContentType.Xml },
-            { "text/css", EpubContentType.Css },
-            { "text/x-oeb1-css", EpubContentType.Oeb1Css },
-            { "image/gif", EpubContentType.ImageGif },
-            { "image/jpeg", EpubContentType.ImageJpeg },
-            { "image/png", EpubContentType.ImagePng },
-            { "image/svg+xml", EpubContentType.ImageSvg },
-            { "font/truetype", EpubContentType.FontTruetype },
-            { "font/opentype", EpubContentType.FontOpentype },
-            { "application/vnd.ms-opentype", EpubContentType.FontOpentype }
-        };
-        private static readonly IReadOnlyDictionary<EpubContentType, string> ContentTypeToMimeType = MimeTypeToContentType
-            .Where(pair => pair.Key != "application/vnd.ms-opentype") // Because it's defined twice.
-            .ToDictionary(pair => pair.Value, pair => pair.Key);
-
-
         public static EpubBook Read(string filePath)
         {
             if (!File.Exists(filePath))
@@ -85,13 +62,13 @@ namespace EpubSharp
         {
             if (book.Format.Ncx != null)
             {
-                return LoadChaptersFromNcx(book, book.Format.Ncx.NavigationMap, epubArchive);
+                return LoadChaptersFromNcx(book.Format.Ncx.NavigationMap, epubArchive);
             }
             
             return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChaptersFromNcx(EpubBook book, IReadOnlyCollection<NcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChaptersFromNcx(IEnumerable<NcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
@@ -108,7 +85,7 @@ namespace EpubSharp
                     chapter.Anchor = navigationPoint.ContentSrc.Substring(contentSourceAnchorCharIndex + 1);
                 }
 
-                chapter.SubChapters = LoadChaptersFromNcx(book, navigationPoint.NavigationPoints, epubArchive);
+                chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavigationPoints, epubArchive);
                 result.Add(chapter);
             }
             return result;
@@ -122,14 +99,14 @@ namespace EpubSharp
                 {
                     FileName = Constants.OcfPath,
                     ContentType = EpubContentType.Xml,
-                    MimeType = ContentTypeToMimeType[EpubContentType.Xml],
+                    MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
                     Content = epubArchive.LoadBytes(Constants.OcfPath)
                 },
                 Opf = new EpubTextContentFile
                 {
                     FileName = book.Format.Ocf.RootFile,
                     ContentType = EpubContentType.Xml,
-                    MimeType = ContentTypeToMimeType[EpubContentType.Xml],
+                    MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
                     Content = epubArchive.LoadBytes(book.Format.Ocf.RootFile)
                 },
                 Html = new Dictionary<string, EpubTextContentFile>(),
@@ -161,7 +138,7 @@ namespace EpubSharp
                 var mimeType = item.MediaType;
 
                 EpubContentType contentType;
-                contentType = MimeTypeToContentType.TryGetValue(mimeType, out contentType)
+                contentType = ContentType.MimeTypeToContentType.TryGetValue(mimeType, out contentType)
                     ? contentType
                     : EpubContentType.Other;
 

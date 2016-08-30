@@ -65,25 +65,7 @@ namespace EpubSharp
 
         public Dictionary<string, EpubContentFile> AllFiles { get; internal set; }
     }
-
-    public enum EpubContentType
-    {
-        Xhtml11 = 1,
-        Dtbook,
-        DtbookNcx,
-        Oeb1Document,
-        Xml,
-        Css,
-        Oeb1Css,
-        ImageGif,
-        ImageJpeg,
-        ImagePng,
-        ImageSvg,
-        FontTruetype,
-        FontOpentype,
-        Other
-    }
-
+    
     public abstract class EpubContentFile
     {
         public string FileName { get; set; }

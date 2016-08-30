@@ -11,4 +11,9 @@ namespace EpubSharp
     {
         public EpubParseException(string message) : base($"EPUB parsing error: {message}") { }
     }
+
+    public class EpubWriteException : EpubException
+    {
+        public EpubWriteException(string message) : base($"EPUB write error: {message}") { }
+    }
 }

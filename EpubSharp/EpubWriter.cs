@@ -16,42 +16,41 @@ namespace EpubSharp
     {
         private const string OpfPath = "EPUB/package.opf";
 
-        private readonly List<string> authors = new List<string>();
+        private readonly OpfDocument opf = new OpfDocument
+        {
+            // We could probably switch to v3 once we can format nav.xhtml
+            EpubVersion = EpubVersion.Epub2
+        };
 
-        private string coverFilename;
-        private byte[] coverData;
+        private byte[] coverData; // TODO: Replace this eventually with EpubResources object.
 
         public EpubWriter() { }
 
         public EpubWriter(EpubBook book)
         {
             if (book == null) throw new ArgumentNullException(nameof(book));
+            if (book.Format?.Opf == null) throw new ArgumentException("book opf instance == null", nameof(book));
 
-            authors.AddRange(book.Authors);
-
-            EpubByteContentFile cover;
-            if (book.Resources.Images.TryGetValue(book.Format.Opf.CoverPath, out cover))
-            {
-                coverFilename = Path.GetFileName(cover.FileName);
-                coverData = cover.Content;
-            }
+            opf = book.Format.Opf;
         }
 
         public void SetCover(byte[] image, ImageFormat format)
         {
             if (image == null) throw new ArgumentNullException(nameof(image));
 
+            var coverItem = new OpfManifestItem { Id = "cover-image" };
             switch (format)
             {
                 case ImageFormat.Jpeg:
-                    coverFilename = "cover.jpg";
+                    coverItem.Href = "cover.jpg";
                     break;
                 case ImageFormat.Png:
-                    coverFilename = "cover.png";
+                    coverItem.Href = "cover.png";
                     break;
                 default:
                     throw new ArgumentException($"Unknown format: {format}", nameof(format));
             }
+            opf.Manifest.Items.Add(coverItem);
 
             coverData = image;
         }
@@ -59,7 +58,7 @@ namespace EpubSharp
         public void AddAuthor(string author)
         {
             if (author == null) throw new ArgumentNullException(nameof(author));
-            authors.Add(author);
+            opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
         }
 
         public void Save(string filename)
@@ -75,6 +74,7 @@ namespace EpubSharp
             var archive = new ZipArchive(stream, ZipArchiveMode.Create);
             archive.CreateEntry("mimetype", MimeTypeWriter.Format());
             archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(OpfPath));
+            archive.CreateEntry(OpfPath, OpfWriter.Format(opf));
             archive.Dispose();
         }
     }

@@ -7,11 +7,11 @@ namespace EpubSharp.Format
     /// </summary>
     public class NcxDocument
     {
-        public IReadOnlyCollection<NcxMetadata> Metadata { get; internal set; }
+        public ICollection<NcxMetadata> Metadata { get; internal set; } = new List<NcxMetadata>();
         public string DocTitle { get; internal set; }
         public string DocAuthor { get; internal set; }
-        public IReadOnlyCollection<NcxNavigationPoint> NavigationMap { get; internal set; }
-        public IReadOnlyCollection<NcxPageTarget> PageList { get; internal set; }
+        public ICollection<NcxNavigationPoint> NavigationMap { get; internal set; } = new List<NcxNavigationPoint>();
+        public ICollection<NcxPageTarget> PageList { get; internal set; } = new List<NcxPageTarget>();
         public NcxNavigationList NavigationList { get; internal set; }
     }
 
@@ -29,7 +29,7 @@ namespace EpubSharp.Format
         public int? PlayOrder { get; internal set; }
         public string LabelText { get; internal set; }
         public string ContentSrc { get; internal set; }
-        public IReadOnlyCollection<NcxNavigationPoint> NavigationPoints { get; internal set; }
+        public ICollection<NcxNavigationPoint> NavigationPoints { get; internal set; } = new List<NcxNavigationPoint>();
 
         public override string ToString()
         {
@@ -60,7 +60,7 @@ namespace EpubSharp.Format
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public string Label { get; internal set; }
-        public IReadOnlyCollection<NcxNavigationTarget> NavigationTargets { get; internal set; }
+        public ICollection<NcxNavigationTarget> NavigationTargets { get; internal set; } = new List<NcxNavigationTarget>();
     }
 
     public class NcxNavigationTarget

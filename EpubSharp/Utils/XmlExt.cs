@@ -24,14 +24,14 @@ namespace EpubSharp
             }
         }
 
-        public static IReadOnlyCollection<string> AsStringList(this IEnumerable<XElement> self)
+        public static ICollection<string> AsStringList(this IEnumerable<XElement> self)
         {
-            return self.Select(elem => elem.Value).ToList().AsReadOnly();
+            return self.Select(elem => elem.Value).ToList();
         }
 
-        public static IReadOnlyCollection<T> AsObjectList<T>(this IEnumerable<XElement> self, Func<XElement, T> factory)
+        public static ICollection<T> AsObjectList<T>(this IEnumerable<XElement> self, Func<XElement, T> factory)
         {
-            return self.Select(factory).ToList().AsReadOnly();
+            return self.Select(factory).ToList();
         }
     }
 }
