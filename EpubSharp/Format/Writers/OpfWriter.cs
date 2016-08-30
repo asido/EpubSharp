@@ -15,7 +15,19 @@ namespace EpubSharp.Format.Writers
             root.Add(new XAttribute("xmlns", Constants.OpfNamespace));
             root.Add(new XAttribute(XNamespace.Xmlns + "dc", Constants.OpfMetadataNamespace));
 
-            root.Add(new XAttribute("version", "2.0"));
+            string versionString = null;
+            switch (opf.EpubVersion)
+            {
+                case EpubVersion.Epub2:
+                    versionString = "2.0";
+                    break;
+                case EpubVersion.Epub3:
+                    versionString = "3.0";
+                    break;
+                default:
+                    throw new EpubWriteException($"Unknown version: {opf.EpubVersion}");
+            }
+            root.Add(new XAttribute("version", versionString));
 
             var metadata = new XElement(OpfElements.Metadata);
             foreach (var lang in opf.Metadata.Languages)
