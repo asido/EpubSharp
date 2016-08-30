@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Writers
@@ -27,7 +24,7 @@ namespace EpubSharp.Format.Writers
                 default:
                     throw new EpubWriteException($"Unknown version: {opf.EpubVersion}");
             }
-            root.Add(new XAttribute("version", versionString));
+            root.Add(new XAttribute(OpfDocument.Attributes.Version, versionString));
 
             var metadata = new XElement(OpfElements.Metadata);
             foreach (var lang in opf.Metadata.Languages)
@@ -62,7 +59,7 @@ namespace EpubSharp.Format.Writers
                 {
                     throw new EpubWriteException($"Cover path is set to '{coverPath}', but couldn't find any manifest item with such href.");
                 }
-                manifest.Add(new XElement(OpfElements.Item, new XAttribute("id", "cover-image"), new XAttribute("href", cover.Href), new XAttribute("media-type", cover.MediaType), new XAttribute("properties", "cover-image")));
+                manifest.Add(new XElement(OpfElements.Item, new XAttribute(OpfManifestItem.Attributes.Id, "cover-image"), new XAttribute(OpfManifestItem.Attributes.Href, cover.Href), new XAttribute(OpfManifestItem.Attributes.MediaType, cover.MediaType), new XAttribute(OpfManifestItem.Attributes.Properties, "cover-image")));
             }
             if (opf.Spine.Toc != null)
             {
@@ -71,42 +68,42 @@ namespace EpubSharp.Format.Writers
                 {
                     throw new EpubWriteException("Spine TOC is set, but NCX path is not.");
                 }
-                manifest.Add(new XElement(OpfElements.Item, new XAttribute("id", "ncx"), new XAttribute("media-type", ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx]), new XAttribute("href", ncxPath)));
+                manifest.Add(new XElement(OpfElements.Item, new XAttribute(OpfManifestItem.Attributes.Id, "ncx"), new XAttribute(OpfManifestItem.Attributes.MediaType, ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx]), new XAttribute(OpfManifestItem.Attributes.Href, ncxPath)));
             }
             foreach (var item in opf.Manifest.Items)
             {
                 var element = new XElement(OpfElements.Item);
                 if (item.Fallback != null)
                 {
-                    element.Add(new XAttribute("fallback", item.Fallback));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.Fallback, item.Fallback));
                 }
                 if (item.FallbackStyle != null)
                 {
-                    element.Add(new XAttribute("fallback-style", item.FallbackStyle));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.FallbackStyle, item.FallbackStyle));
                 }
                 if (item.Href != null)
                 {
-                    element.Add(new XAttribute("href", item.Href));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.Href, item.Href));
                 }
                 if (item.Id != null)
                 {
-                    element.Add(new XAttribute("id", item.Id));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.Id, item.Id));
                 }
                 if (item.MediaType != null)
                 {
-                    element.Add(new XAttribute("media-type", item.MediaType));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.MediaType, item.MediaType));
                 }
                 if (item.Properties != null)
                 {
-                    element.Add(new XAttribute("properties", string.Join(" ", item.Properties)));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.Properties, string.Join(" ", item.Properties)));
                 }
                 if (item.RequiredModules != null)
                 {
-                    element.Add(new XAttribute("required-modules", item.RequiredModules));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.RequiredModules, item.RequiredModules));
                 }
                 if (item.RequiredNamespace != null)
                 {
-                    element.Add(new XAttribute("required-namespace", item.RequiredNamespace));
+                    element.Add(new XAttribute(OpfManifestItem.Attributes.RequiredNamespace, item.RequiredNamespace));
                 }
                 manifest.Add(element);
             }
@@ -115,24 +112,24 @@ namespace EpubSharp.Format.Writers
             var spine = new XElement(OpfElements.Spine);
             if (opf.Spine.Toc != null)
             {
-                spine.Add(new XAttribute("toc", opf.Spine.Toc));
+                spine.Add(new XAttribute(OpfSpine.Attributes.Toc, opf.Spine.Toc));
             }
             foreach (var itemref in opf.Spine.ItemRefs)
             {
                 var element = new XElement(OpfElements.ItemRef);
                 if (itemref.Id != null)
                 {
-                    element.Add(new XAttribute("id", itemref.Id));
+                    element.Add(new XAttribute(OpfSpineItemRef.Attributes.Id, itemref.Id));
                 }
                 if (itemref.IdRef != null)
                 {
-                    element.Add(new XAttribute("idref", itemref.IdRef));
+                    element.Add(new XAttribute(OpfSpineItemRef.Attributes.IdRef, itemref.IdRef));
                 }
                 if (itemref.Properties != null && itemref.Properties.Length > 0)
                 {
-                    element.Add(new XAttribute("properties", string.Join(" ", itemref.Properties)));
+                    element.Add(new XAttribute(OpfSpineItemRef.Attributes.Properties, string.Join(" ", itemref.Properties)));
                 }
-                element.Add(new XAttribute("linear", itemref.Linear ? "yes" : "no"));
+                element.Add(new XAttribute(OpfSpineItemRef.Attributes.Linear, itemref.Linear ? "yes" : "no"));
                 spine.Add(element);
             }
             root.Add(spine);
