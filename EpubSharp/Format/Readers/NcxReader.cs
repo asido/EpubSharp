@@ -5,23 +5,6 @@ namespace EpubSharp.Format.Readers
 {
     internal static class NcxReader
     {
-        private static class NcxElements
-        {
-            public static readonly XName Head = Constants.NcxNamespace + "head";
-            public static readonly XName Meta = Constants.NcxNamespace + "meta";
-            public static readonly XName DocTitle = Constants.NcxNamespace + "docTitle";
-            public static readonly XName DocAuthor = Constants.NcxNamespace + "docAuthor";
-            public static readonly XName Text = Constants.NcxNamespace + "text";
-            public static readonly XName NavMap = Constants.NcxNamespace + "navMap";
-            public static readonly XName NavPoint = Constants.NcxNamespace + "navPoint";
-            public static readonly XName NavList = Constants.NcxNamespace + "navList";
-            public static readonly XName PageList = Constants.NcxNamespace + "pageList";
-            public static readonly XName PageTarget = Constants.NcxNamespace + "pageTarget";
-            public static readonly XName NavLabel = Constants.NcxNamespace + "navLabel";
-            public static readonly XName NavTarget = Constants.NcxNamespace + "navTarget";
-            public static readonly XName Content = Constants.NcxNamespace + "content";
-        }
-
         public static NcxDocument Read(XDocument xml)
         {
             if (xml == null) throw new ArgumentNullException(nameof(xml));

@@ -49,6 +49,7 @@
     <Compile Include="EpubWriter.cs" />
     <Compile Include="Format\Constants.cs" />
     <Compile Include="Format\ContentType.cs" />
+    <Compile Include="Format\OcfElements.cs" />
     <Compile Include="Format\Writers\MimeTypeWriter.cs" />
     <Compile Include="Format\Writers\OcfWriter.cs" />
     <Compile Include="Format\Writers\OpfWriter.cs" />

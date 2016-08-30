@@ -6,11 +6,6 @@ namespace EpubSharp.Format.Readers
 {
     internal static class OcfReader
     {
-        private static class OcfElements
-        {
-            public static readonly XName RootFile = Constants.OcfNamespace + "rootfile";
-        }
-
         public static OcfDocument Read(XDocument xml)
         {
             if (xml == null) throw new ArgumentNullException(nameof(xml));
