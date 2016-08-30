@@ -95,7 +95,7 @@ namespace EpubSharp.Format.Readers
                         Id = (string) elem.Attribute(OpfSpineItemRef.Attributes.Id),
                         Properties = ((string) elem.Attribute(OpfSpineItemRef.Attributes.Properties))?.Split(' ')
                     }),
-                    Toc = spine?.Attribute(OpfSpineItemRef.Attributes.Toc)?.Value
+                    Toc = spine?.Attribute(OpfSpine.Attributes.Toc)?.Value
                 }
             };
             

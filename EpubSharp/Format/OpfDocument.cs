@@ -238,6 +238,11 @@ namespace EpubSharp.Format
 
     public class OpfSpine
     {
+        internal static class Attributes
+        {
+            public static readonly XName Toc = "toc";
+        }
+
         public string Toc { get; internal set; }
         public ICollection<OpfSpineItemRef> ItemRefs { get; internal set; } = new List<OpfSpineItemRef>();
     }
@@ -250,7 +255,6 @@ namespace EpubSharp.Format
             public static readonly XName Linear = "linear";
             public static readonly XName Id = "id";
             public static readonly XName Properties = "properties";
-            public static readonly XName Toc = "toc";
         }
 
         public string IdRef { get; internal set; }
