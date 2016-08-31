@@ -34,6 +34,7 @@ namespace EpubSharp
 
                 var book = new EpubBook { Format = format };
                 book.Resources = LoadResources(archive, book);
+                book.SpecialResources = LoadSpecialResources(archive, book);
                 book.LazyCoverImage = LazyLoadCoverImage(book);
                 book.TableOfContents = LoadChapters(book, archive);
                 return book;
@@ -104,30 +105,12 @@ namespace EpubSharp
         {
             var result = new EpubResources
             {
-                Ocf = new EpubTextContentFile
-                {
-                    FileName = Constants.OcfPath,
-                    ContentType = EpubContentType.Xml,
-                    MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
-                    Content = epubArchive.LoadBytes(Constants.OcfPath)
-                },
-                Opf = new EpubTextContentFile
-                {
-                    FileName = book.Format.Ocf.RootFile,
-                    ContentType = EpubContentType.Xml,
-                    MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
-                    Content = epubArchive.LoadBytes(book.Format.Ocf.RootFile)
-                },
                 Html = new Dictionary<string, EpubTextContentFile>(),
                 Css = new Dictionary<string, EpubTextContentFile>(),
                 Images = new Dictionary<string, EpubByteContentFile>(),
                 Fonts = new Dictionary<string, EpubByteContentFile>(),
-                AllFiles = new Dictionary<string, EpubContentFile>(),
-                HtmlInReadingOrder = new List<EpubTextContentFile>()
+                AllFiles = new Dictionary<string, EpubContentFile>()
             };
-
-            // Saved items for creating reading order from spine.
-            var idToHtmlItems = new Dictionary<string, EpubTextContentFile>();
 
             foreach (var item in book.Format.Opf.Manifest.Items)
             {
@@ -176,7 +159,6 @@ namespace EpubSharp
                         switch (contentType)
                         {
                             case EpubContentType.Xhtml11:
-                                idToHtmlItems.Add(item.Id, file);
                                 result.Html.Add(fileName, file);
                                 break;
                             case EpubContentType.Css:
@@ -227,11 +209,45 @@ namespace EpubSharp
                     }
                 }
             }
+            
+            return result;
+        }
+
+        private static EpubSpecialResources LoadSpecialResources(ZipArchive epubArchive, EpubBook book)
+        {
+            var result = new EpubSpecialResources
+            {
+                Ocf = new EpubTextContentFile
+                {
+                    FileName = Constants.OcfPath,
+                    ContentType = EpubContentType.Xml,
+                    MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
+                    Content = epubArchive.LoadBytes(Constants.OcfPath)
+                },
+                Opf = new EpubTextContentFile
+                {
+                    FileName = book.Format.Ocf.RootFile,
+                    ContentType = EpubContentType.Xml,
+                    MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
+                    Content = epubArchive.LoadBytes(book.Format.Ocf.RootFile)
+                },
+                HtmlInReadingOrder = new List<EpubTextContentFile>()
+            };
+
+            var htmlFiles = book.Format.Opf.Manifest.Items
+                .Where(item => ContentType.MimeTypeToContentType.ContainsKey(item.MediaType) && ContentType.MimeTypeToContentType[item.MediaType] == EpubContentType.Xhtml11)
+                .ToDictionary(item => item.Id, item => item.Href);
 
             foreach (var item in book.Format.Opf.Spine.ItemRefs)
             {
+                string href;
+                if (!htmlFiles.TryGetValue(item.IdRef, out href))
+                {
+                    continue;
+                }
+
                 EpubTextContentFile html;
-                if (idToHtmlItems.TryGetValue(item.IdRef, out html))
+                if (book.Resources.Html.TryGetValue(href, out html))
                 {
                     result.HtmlInReadingOrder.Add(html);
                 }

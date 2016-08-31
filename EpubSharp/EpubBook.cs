@@ -20,6 +20,7 @@ namespace EpubSharp
         public List<string> Authors => Format.Opf.Metadata.Creators.Select(creator => creator.Text).ToList();
         public string Author => string.Join(AuthorsSeparator, Authors);
         public EpubResources Resources { get; internal set; }
+        public EpubSpecialResources SpecialResources { get; internal set; }
 
         internal Lazy<Image> LazyCoverImage = null;
         public Image CoverImage => LazyCoverImage?.Value;
@@ -29,7 +30,7 @@ namespace EpubSharp
         public string ToPlainText()
         {
             var builder = new StringBuilder();
-            foreach (var html in Resources.HtmlInReadingOrder)
+            foreach (var html in SpecialResources.HtmlInReadingOrder)
             {
                 builder.Append(HtmlProcessor.GetContentAsPlainText(html.TextContent));
                 builder.Append('\n');
@@ -53,19 +54,20 @@ namespace EpubSharp
     
     public class EpubResources
     {
-        public EpubTextContentFile Ocf { get; internal set; }
-        public EpubTextContentFile Opf { get; internal set; }
-
         public Dictionary<string, EpubTextContentFile> Html { get; internal set; }
-        public List<EpubTextContentFile> HtmlInReadingOrder { get; internal set; }
-
         public Dictionary<string, EpubTextContentFile> Css { get; internal set; }
         public Dictionary<string, EpubByteContentFile> Images { get; internal set; }
         public Dictionary<string, EpubByteContentFile> Fonts { get; internal set; }
-
         public Dictionary<string, EpubContentFile> AllFiles { get; internal set; }
     }
-    
+
+    public class EpubSpecialResources
+    {
+        public EpubTextContentFile Ocf { get; internal set; }
+        public EpubTextContentFile Opf { get; internal set; }
+        public List<EpubTextContentFile> HtmlInReadingOrder { get; internal set; }
+    }
+
     public abstract class EpubContentFile
     {
         public string FileName { get; set; }
