@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -102,7 +101,7 @@ namespace EpubSharp
 
         public void Write(Stream stream)
         {
-            using (var archive = new ZipArchive(stream, ZipArchiveMode.Create))
+            using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
             {
                 archive.CreateEntry("mimetype", MimeTypeWriter.Format());
                 archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(OpfPath));

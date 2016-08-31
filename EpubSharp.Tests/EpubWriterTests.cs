@@ -15,7 +15,7 @@ namespace EpubSharp.Tests
         {
             var book = EpubReader.Read(@"../../Samples/epub-assorted/Inversions - Iain M. Banks.epub");
             var writer = new EpubWriter(book);
-            writer.Save("saved.epub");
+            writer.Write("saved.epub");
         }
     }
 }

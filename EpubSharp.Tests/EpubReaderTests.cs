@@ -15,19 +15,22 @@ namespace EpubSharp.Tests
         [TestMethod]
         public void OpenEpub30Test()
         {
-            ZipAndMoveAndTestEpubOpen(@"../../Samples/epub30");
+            var archives = Utils.ZipAndCopyEpubs(@"../../Samples/epub30");
+            OpenEpubTest(archives);
         }
 
         [TestMethod]
         public void OpenEpub31Test()
         {
-            ZipAndMoveAndTestEpubOpen(@"../../Samples/epub31");
+            var archives = Utils.ZipAndCopyEpubs(@"../../Samples/epub31");
+            OpenEpubTest(archives);
         }
 
         [TestMethod]
         public void OpenEpubAssortedTest()
         {
-            MoveAndTestEpubOpen(@"../../Samples/epub-assorted");
+            var archives = Utils.CopyEpubs(@"../../Samples/epub-assorted");
+            OpenEpubTest(archives);
         }
 
         [TestMethod]
@@ -87,60 +90,6 @@ namespace EpubSharp.Tests
             Assert.AreEqual(1, Regex.Matches(trimmed, "How This Book Is Organized").Count);
             Assert.AreEqual(2, Regex.Matches(trimmed, "Appendix: Resources").Count);
             Assert.AreEqual(2, Regex.Matches(trimmed, "Case Study: Pwn2Own 2010").Count);
-        }
-
-        private void ZipAndMoveAndTestEpubOpen(string samplePath)
-        {
-            if (samplePath == null) throw new ArgumentNullException(nameof(samplePath));
-
-            var destination = Path.Combine("Samples", Path.GetFileName(samplePath));
-            if (!Directory.Exists(destination))
-            {
-                Directory.CreateDirectory(destination);
-            }
-
-            var samples = Directory.GetDirectories(samplePath, "*", SearchOption.TopDirectoryOnly).ToList();
-            var archives = new List<string>();
-
-            foreach (var source in samples)
-            {
-                var archiveName = Path.GetFileName(source) + ".zip";
-                var archivePath = Path.Combine(destination, archiveName);
-                if (!File.Exists(archivePath))
-                {
-                    ZipFile.CreateFromDirectory(source, archivePath);
-                }
-                archives.Add(archivePath);
-            }
-
-            OpenEpubTest(archives);
-        }
-
-        private void MoveAndTestEpubOpen(string samplePath)
-        {
-            if (samplePath == null) throw new ArgumentNullException(nameof(samplePath));
-
-            var destination = Path.Combine("Samples", Path.GetFileName(samplePath));
-            if (!Directory.Exists(destination))
-            {
-                Directory.CreateDirectory(destination);
-            }
-
-            var samples = Directory.GetFiles(samplePath, "*.epub");
-            var archives = new List<string>();
-
-            foreach (var source in samples)
-            {
-                var archiveName = Path.GetFileName(source);
-                var archivePath = Path.Combine(destination, archiveName);
-                if (!File.Exists(archivePath))
-                {
-                    File.Copy(source, archivePath);
-                }
-                archives.Add(archivePath);
-            }
-
-            OpenEpubTest(archives);
         }
 
         private void OpenEpubTest(ICollection<string> files)
