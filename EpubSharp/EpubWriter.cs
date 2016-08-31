@@ -36,6 +36,24 @@ namespace EpubSharp
             resources = book.Resources;
         }
 
+        public static void Write(EpubBook book, string filename)
+        {
+            if (book == null) throw new ArgumentNullException(nameof(book));
+            if (string.IsNullOrWhiteSpace(filename)) throw new ArgumentNullException(nameof(filename));
+
+            var writer = new EpubWriter(book);
+            writer.Write(filename);
+        }
+
+        public static void Write(EpubBook book, Stream stream)
+        {
+            if (book == null) throw new ArgumentNullException(nameof(book));
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            var writer = new EpubWriter(book);
+            writer.Write(stream);
+        }
+
         public void SetCover(byte[] image, ImageFormat format)
         {
             if (image == null) throw new ArgumentNullException(nameof(image));
