@@ -20,15 +20,21 @@ namespace EpubSharp
 
             using (var archive = ZipFile.Open(filePath, ZipArchiveMode.Read, System.Text.Encoding.UTF8))
             {
-                var format = new EpubFormat();
-                format.Ocf = OcfReader.Read(archive.LoadXml(Constants.OcfPath));
-                format.Opf = OpfReader.Read(archive.LoadXml(format.Ocf.RootFile));
+                var format = new EpubFormat { Ocf = OcfReader.Read(archive.LoadXml(Constants.OcfPath)) };
+
+                var rootFilePath = format.Ocf.RootFilePath;
+                if (rootFilePath == null)
+                {
+                    throw new EpubParseException("Epub OCF doesn't specify a root file.");
+                }
+
+                format.Opf = OpfReader.Read(archive.LoadXml(rootFilePath));
 
                 // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
                 var ncxPath = format.Opf.FindNcxPath();
                 if (ncxPath != null)
                 {
-                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(format.Ocf.RootFile), ncxPath);
+                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(rootFilePath), ncxPath);
                     format.Ncx = NcxReader.Read(archive.LoadXml(absolutePath));
                 }
 
@@ -113,7 +119,7 @@ namespace EpubSharp
 
             foreach (var item in book.Format.Opf.Manifest.Items)
             {
-                var path = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFile), item.Href);
+                var path = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFilePath), item.Href);
                 var entry = epubArchive.GetEntryIgnoringSlashDirection(path);
 
                 if (entry == null)
@@ -223,10 +229,10 @@ namespace EpubSharp
                 },
                 Opf = new EpubTextContentFile
                 {
-                    FileName = book.Format.Ocf.RootFile,
+                    FileName = book.Format.Ocf.RootFilePath,
                     ContentType = EpubContentType.Xml,
                     MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
-                    Content = epubArchive.LoadBytes(book.Format.Ocf.RootFile)
+                    Content = epubArchive.LoadBytes(book.Format.Ocf.RootFilePath)
                 },
                 HtmlInReadingOrder = new List<EpubTextContentFile>()
             };

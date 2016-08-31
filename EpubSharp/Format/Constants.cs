@@ -12,5 +12,6 @@ namespace EpubSharp.Format
         public static readonly XNamespace OpfMetadataNamespace = "http://purl.org/dc/elements/1.1/";
 
         public const string OcfPath = "META-INF/container.xml";
+        public const string OcfMediaType = "application/oebps-package+xml";
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Readers
@@ -11,13 +10,16 @@ namespace EpubSharp.Format.Readers
             if (xml == null) throw new ArgumentNullException(nameof(xml));
             if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
 
-            var element = xml.Root.Descendants(OcfElements.RootFile).FirstOrDefault();
-            var rootFile = element?.Attribute("full-path")?.Value;
-            if (string.IsNullOrWhiteSpace(rootFile))
+            var rootFiles = xml.Root?.Element(OcfElements.RootFiles)?.Elements(OcfElements.RootFile);
+            var ocf = new OcfDocument
             {
-                throw new EpubParseException("Malformed OCF.");
-            }
-            return new OcfDocument { RootFile = rootFile };
+                RootFiles = rootFiles.AsObjectList(elem => new OcfRootFile
+                {
+                    FullPath = (string) elem.Attribute(OcfRootFile.Attributes.FullPath),
+                    MediaType = (string) elem.Attribute(OcfRootFile.Attributes.MediaType)
+                })
+            };
+            return ocf;
         }
     }
 }

@@ -6,9 +6,4 @@
         public OpfDocument Opf { get; internal set; }
         public NcxDocument Ncx { get; internal set; }
     }
-
-    public class OcfDocument
-    {
-        public string RootFile { get; internal set; }
-    }
 }
