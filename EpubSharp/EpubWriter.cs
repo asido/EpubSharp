@@ -74,36 +74,36 @@ namespace EpubSharp
             opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
         }
 
-        public void Save(string filename)
+        public void Write(string filename)
         {
             using (var file = File.Create(filename))
             {
-                Save(file);
+                Write(file);
             }
         }
 
-        public void Save(Stream stream)
+        public void Write(Stream stream)
         {
-            var archive = new ZipArchive(stream, ZipArchiveMode.Create);
-            archive.CreateEntry("mimetype", MimeTypeWriter.Format());
-            archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(OpfPath));
-            archive.CreateEntry(OpfPath, OpfWriter.Format(opf));
+            using (var archive = new ZipArchive(stream, ZipArchiveMode.Create))
+            {
+                archive.CreateEntry("mimetype", MimeTypeWriter.Format());
+                archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(OpfPath));
+                archive.CreateEntry(OpfPath, OpfWriter.Format(opf));
 
-            var allFiles = new[]
-            {
-                resources.Html.Select(dict => dict.Value).Cast<EpubContentFile>(),
-                resources.Css.Select(dict => dict.Value),
-                resources.Images.Select(dict => dict.Value),
-                resources.Fonts.Select(dict => dict.Value)
-            }.SelectMany(collection => collection as EpubContentFile[] ?? collection.ToArray());
-            var relativePath = PathExt.GetDirectoryPath(OpfPath);
-            foreach (var file in allFiles)
-            {
-                var absolutePath = PathExt.Combine(relativePath, file.FileName);
-                archive.CreateEntry(absolutePath, file.Content);
+                var allFiles = new[]
+                {
+                    resources.Html.Select(dict => dict.Value).Cast<EpubContentFile>(),
+                    resources.Css.Select(dict => dict.Value),
+                    resources.Images.Select(dict => dict.Value),
+                    resources.Fonts.Select(dict => dict.Value)
+                }.SelectMany(collection => collection as EpubContentFile[] ?? collection.ToArray());
+                var relativePath = PathExt.GetDirectoryPath(OpfPath);
+                foreach (var file in allFiles)
+                {
+                    var absolutePath = PathExt.Combine(relativePath, file.FileName);
+                    archive.CreateEntry(absolutePath, file.Content);
+                }
             }
-
-            archive.Dispose();
         }
     }
 }
