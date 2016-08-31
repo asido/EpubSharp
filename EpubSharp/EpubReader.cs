@@ -108,8 +108,7 @@ namespace EpubSharp
                 Html = new Dictionary<string, EpubTextContentFile>(),
                 Css = new Dictionary<string, EpubTextContentFile>(),
                 Images = new Dictionary<string, EpubByteContentFile>(),
-                Fonts = new Dictionary<string, EpubByteContentFile>(),
-                AllFiles = new Dictionary<string, EpubContentFile>()
+                Fonts = new Dictionary<string, EpubByteContentFile>()
             };
 
             foreach (var item in book.Format.Opf.Manifest.Items)
@@ -165,7 +164,6 @@ namespace EpubSharp
                                 result.Css.Add(fileName, file);
                                 break;
                         }
-                        result.AllFiles.Add(fileName, file);
                         break;
                     }
                     default:
@@ -204,7 +202,6 @@ namespace EpubSharp
                                 result.Fonts.Add(fileName, file);
                                 break;
                         }
-                        result.AllFiles.Add(fileName, file);
                         break;
                     }
                 }

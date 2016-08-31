@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Writers;
 
@@ -22,7 +23,7 @@ namespace EpubSharp
             EpubVersion = EpubVersion.Epub2
         };
 
-        private byte[] coverData; // TODO: Replace this eventually with EpubResources object.
+        private readonly EpubResources resources = new EpubResources();
 
         public EpubWriter() { }
 
@@ -32,6 +33,7 @@ namespace EpubSharp
             if (book.Format?.Opf == null) throw new ArgumentException("book opf instance == null", nameof(book));
 
             opf = book.Format.Opf;
+            resources = book.Resources;
         }
 
         public void SetCover(byte[] image, ImageFormat format)
@@ -39,20 +41,31 @@ namespace EpubSharp
             if (image == null) throw new ArgumentNullException(nameof(image));
 
             var coverItem = new OpfManifestItem { Id = "cover-image" };
+            var coverResource = new EpubByteContentFile { Content = image };
+
+            string filename;
+
             switch (format)
             {
                 case ImageFormat.Jpeg:
-                    coverItem.Href = "cover.jpg";
+                    filename = "cover.jpg";
+                    coverResource.ContentType = EpubContentType.ImageJpeg;
                     break;
                 case ImageFormat.Png:
-                    coverItem.Href = "cover.png";
+                    filename = "cover.png";
+                    coverResource.ContentType = EpubContentType.ImagePng;
                     break;
                 default:
                     throw new ArgumentException($"Unknown format: {format}", nameof(format));
             }
-            opf.Manifest.Items.Add(coverItem);
 
-            coverData = image;
+            coverResource.FileName = filename;
+            coverResource.MimeType = ContentType.ContentTypeToMimeType[coverResource.ContentType];
+            resources.Images.Add(coverResource.FileName, coverResource);
+
+            coverItem.Href = filename;
+            coverItem.MediaType = coverResource.MimeType;
+            opf.Manifest.Items.Add(coverItem);
         }
 
         public void AddAuthor(string author)
@@ -75,6 +88,21 @@ namespace EpubSharp
             archive.CreateEntry("mimetype", MimeTypeWriter.Format());
             archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(OpfPath));
             archive.CreateEntry(OpfPath, OpfWriter.Format(opf));
+
+            var allFiles = new[]
+            {
+                resources.Html.Select(dict => dict.Value).Cast<EpubContentFile>(),
+                resources.Css.Select(dict => dict.Value),
+                resources.Images.Select(dict => dict.Value),
+                resources.Fonts.Select(dict => dict.Value)
+            }.SelectMany(collection => collection as EpubContentFile[] ?? collection.ToArray());
+            var relativePath = PathExt.GetDirectoryPath(OpfPath);
+            foreach (var file in allFiles)
+            {
+                var absolutePath = PathExt.Combine(relativePath, file.FileName);
+                archive.CreateEntry(absolutePath, file.Content);
+            }
+
             archive.Dispose();
         }
     }

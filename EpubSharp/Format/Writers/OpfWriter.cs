@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Writers
@@ -93,7 +94,7 @@ namespace EpubSharp.Format.Writers
                 {
                     element.Add(new XAttribute(OpfManifestItem.Attributes.MediaType, item.MediaType));
                 }
-                if (item.Properties != null)
+                if (item.Properties.Any())
                 {
                     element.Add(new XAttribute(OpfManifestItem.Attributes.Properties, string.Join(" ", item.Properties)));
                 }
@@ -129,13 +130,15 @@ namespace EpubSharp.Format.Writers
                 {
                     element.Add(new XAttribute(OpfSpineItemRef.Attributes.Properties, string.Join(" ", itemref.Properties)));
                 }
-                element.Add(new XAttribute(OpfSpineItemRef.Attributes.Linear, itemref.Linear ? "yes" : "no"));
+                if (!itemref.Linear) // Defualt is true
+                {
+                    element.Add(new XAttribute(OpfSpineItemRef.Attributes.Linear, "no"));
+                }
                 spine.Add(element);
             }
             root.Add(spine);
 
-            var doc = new XDocument(root);
-            var xml = doc.Declaration.ToString() + doc;
+            var xml = Constants.XmlDeclaration + "\n" + root;
             return xml;
         }
     }

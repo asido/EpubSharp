@@ -12,10 +12,16 @@ namespace EpubSharp
     {
         public static void CreateEntry(this ZipArchive archive, string file, string content)
         {
+            var data = Encoding.UTF8.GetBytes(content);
+            archive.CreateEntry(file, data);
+        }
+
+        public static void CreateEntry(this ZipArchive archive, string file, byte[] data)
+        {
             var entry = archive.CreateEntry(file);
-            using (var stream = new StreamWriter(entry.Open()))
+            using (var stream = entry.Open())
             {
-                stream.Write(content);
+                stream.Write(data, 0, data.Length);
             }
         }
 
