@@ -13,7 +13,7 @@ namespace EpubSharp.Tests
         [TestMethod]
         public void SaveTest()
         {
-            var book = EpubReader.Read(@"../../Samples/epub-assorted/iOS Hackers Handbook.epub");
+            var book = EpubReader.Read(@"../../Samples/epub-assorted/Inversions - Iain M. Banks.epub");
             var writer = new EpubWriter(book);
             writer.Save("saved.epub");
         }
