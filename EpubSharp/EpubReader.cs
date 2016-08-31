@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using EpubSharp.Format;
 using EpubSharp.Format.Readers;
 
@@ -13,12 +14,21 @@ namespace EpubSharp
     {
         public static EpubBook Read(string filePath)
         {
+            if (filePath == null) throw new ArgumentNullException(nameof(filePath));
+
             if (!File.Exists(filePath))
             {
                 throw new FileNotFoundException("Specified epub file not found.", filePath);
             }
 
-            using (var archive = ZipFile.Open(filePath, ZipArchiveMode.Read, System.Text.Encoding.UTF8))
+            return Read(File.Open(filePath, FileMode.Open, FileAccess.Read), false);
+        }
+
+        public static EpubBook Read(Stream stream, bool leaveOpen)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen, Encoding.UTF8))
             {
                 var format = new EpubFormat { Ocf = OcfReader.Read(archive.LoadXml(Constants.OcfPath)) };
 
@@ -46,7 +56,7 @@ namespace EpubSharp
                 return book;
             }
         }
-        
+
         private static Lazy<Image> LazyLoadCoverImage(EpubBook book)
         {
             if (book == null) throw new ArgumentNullException(nameof(book));
