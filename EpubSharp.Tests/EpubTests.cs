@@ -36,15 +36,58 @@ namespace EpubSharp.Tests
         {
             foreach (var archive in archives)
             {
-                var origEpub = EpubReader.Read(archive);
+                var originalEpub = EpubReader.Read(archive);
 
                 var stream = new MemoryStream();
-                EpubWriter.Write(origEpub, stream);
+                EpubWriter.Write(originalEpub, stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 var savedEpub = EpubReader.Read(stream, false);
 
-                // TODO: Do asserts to compare the original and the saved epubs.
+                AssertEpub(originalEpub, savedEpub);
             }
+        }
+
+        private void AssertEpub(EpubBook expected, EpubBook actual)
+        {
+            Assert.IsNotNull(expected);
+            Assert.IsNotNull(actual);
+
+            Assert.AreEqual(expected.Title, actual.Title);
+
+            Assert.AreEqual(expected.Author, actual.Author);
+            AssertPrimitiveCollection(expected.Authors, actual.Authors, nameof(actual.Authors), "Author");
+
+            Assert.AreEqual(expected.CoverImage == null, actual.CoverImage == null, nameof(actual.CoverImage));
+            if (expected.CoverImage != null && actual.CoverImage != null)
+            {
+                Assert.AreEqual(expected.CoverImage.Height, actual.CoverImage.Height, "CoverImage.Height");
+                Assert.AreEqual(expected.CoverImage.Width, actual.CoverImage.Width, "CoverImage.Width");
+            }
+        }
+
+        private void AssertCollection<T>(IEnumerable<T> expected, IEnumerable<T> actual, string name, Action<List<T>, List<T>, int> assert)
+        {
+            Assert.AreEqual(expected == null, actual == null, name);
+            if (expected != null && actual != null)
+            {
+                var old = expected.ToList();
+                var @new = actual.ToList();
+
+                Assert.AreEqual(old.Count, @new.Count, $"{name}.Count");
+
+                for (var i = 0; i < @new.Count; ++i)
+                {
+                    assert(old, @new, i);
+                }
+            }
+        }
+
+        private void AssertPrimitiveCollection<T>(IEnumerable<T> expected, IEnumerable<T> actual, string collectionName, string unitName)
+        {
+            AssertCollection(expected, actual, collectionName, (old, @new, i) =>
+            {
+                Assert.IsTrue(@new.Contains(old[i]), unitName);
+            });
         }
     }
 }
