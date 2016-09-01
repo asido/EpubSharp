@@ -61,6 +61,31 @@ namespace EpubSharp.Format.Writers
             {
                 metadata.Add(new XElement(OpfElements.Subject, subject));
             }
+            foreach (var meta in opf.Metadata.Metas)
+            {
+                var element = new XElement(OpfElements.Meta, meta.Text);
+                if (!string.IsNullOrWhiteSpace(meta.Id))
+                {
+                    element.Add(new XAttribute(OpfMetadataMeta.Attributes.Id, meta.Id));
+                }
+                if (!string.IsNullOrWhiteSpace(meta.Name))
+                {
+                    element.Add(new XAttribute(OpfMetadataMeta.Attributes.Name, meta.Name));
+                }
+                if (!string.IsNullOrWhiteSpace(meta.Property))
+                {
+                    element.Add(new XAttribute(OpfMetadataMeta.Attributes.Name, meta.Name));
+                }
+                if (!string.IsNullOrWhiteSpace(meta.Refines))
+                {
+                    element.Add(new XAttribute(OpfMetadataMeta.Attributes.Refines, meta.Refines));
+                }
+                if (!string.IsNullOrWhiteSpace(meta.Scheme))
+                {
+                    element.Add(new XAttribute(OpfMetadataMeta.Attributes.Scheme, meta.Scheme));
+                }
+                metadata.Add(element);
+            }
             metadata.Add(new XElement(OpfElements.Date, DateTimeOffset.UtcNow));
             root.Add(metadata);
 
