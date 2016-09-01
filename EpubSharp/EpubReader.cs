@@ -88,13 +88,13 @@ namespace EpubSharp
         {
             if (book.Format.Ncx != null)
             {
-                return LoadChaptersFromNcx(book.Format.Ncx.NavigationMap, epubArchive);
+                return LoadChaptersFromNcx(book.Format.Ncx.NavMap.NavPoints, epubArchive);
             }
             
             return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChaptersFromNcx(IEnumerable<NcxNavigationPoint> navigationPoints, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChaptersFromNcx(IEnumerable<NcxNavPoint> navigationPoints, ZipArchive epubArchive)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)

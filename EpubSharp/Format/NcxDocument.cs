@@ -5,6 +5,7 @@ namespace EpubSharp.Format
 {
     internal static class NcxElements
     {
+        public static readonly XName Ncx = Constants.NcxNamespace + "ncx";
         public static readonly XName Head = Constants.NcxNamespace + "head";
         public static readonly XName Meta = Constants.NcxNamespace + "meta";
         public static readonly XName DocTitle = Constants.NcxNamespace + "docTitle";
@@ -28,7 +29,7 @@ namespace EpubSharp.Format
         public ICollection<NcxMetadata> Metadata { get; internal set; } = new List<NcxMetadata>();
         public string DocTitle { get; internal set; }
         public string DocAuthor { get; internal set; }
-        public ICollection<NcxNavigationPoint> NavigationMap { get; internal set; } = new List<NcxNavigationPoint>();
+        public NcxNapMap NavMap { get; internal set; }
         public ICollection<NcxPageTarget> PageList { get; internal set; } = new List<NcxPageTarget>();
         public NcxNavigationList NavigationList { get; internal set; }
     }
@@ -40,14 +41,19 @@ namespace EpubSharp.Format
         public string Scheme { get; internal set; }
     }
 
-    public class NcxNavigationPoint
+    public class NcxNapMap
+    {
+        public ICollection<NcxNavPoint> NavPoints { get; internal set; } = new List<NcxNavPoint>();
+    }
+
+    public class NcxNavPoint
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public int? PlayOrder { get; internal set; }
         public string LabelText { get; internal set; }
         public string ContentSrc { get; internal set; }
-        public ICollection<NcxNavigationPoint> NavigationPoints { get; internal set; } = new List<NcxNavigationPoint>();
+        public ICollection<NcxNavPoint> NavigationPoints { get; internal set; } = new List<NcxNavPoint>();
 
         public override string ToString()
         {

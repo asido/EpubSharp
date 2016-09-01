@@ -21,7 +21,7 @@ namespace EpubSharp.Format.Readers
                 }),
                 DocTitle = xml.Root.Element(NcxElements.DocTitle)?.Element(NcxElements.Text)?.Value,
                 DocAuthor = xml.Root.Element(NcxElements.DocAuthor)?.Element(NcxElements.Text)?.Value,
-                NavigationMap = xml.Root.Element(NcxElements.NavMap)?.Elements(NcxElements.NavPoint).AsObjectList(ReadNavigationPoint),
+                NavMap = new NcxNapMap { NavPoints = xml.Root.Element(NcxElements.NavMap)?.Elements(NcxElements.NavPoint).AsObjectList(ReadNavigationPoint) },
                 PageList = xml.Root.Element(NcxElements.PageList)?.Elements(NcxElements.PageTarget).AsObjectList(elem => new NcxPageTarget
                 {
                     Id = (string)elem.Attribute("id"),
@@ -50,12 +50,12 @@ namespace EpubSharp.Format.Readers
             return ncx;
         }
 
-        private static NcxNavigationPoint ReadNavigationPoint(XElement element)
+        private static NcxNavPoint ReadNavigationPoint(XElement element)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
             if (element.Name != NcxElements.NavPoint) throw new ArgumentException("The element is not <navPoint>", nameof(element));
 
-            return new NcxNavigationPoint
+            return new NcxNavPoint
             {
                 Id = (string)element.Attribute("id"),
                 Class = (string)element.Attribute("class"),
