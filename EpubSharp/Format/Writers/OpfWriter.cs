@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Writers
@@ -25,7 +26,7 @@ namespace EpubSharp.Format.Writers
             }
             root.Add(new XAttribute(OpfDocument.Attributes.Version, versionString));
 
-            root.Add(WriteMetadata(opf.Metadata));
+            root.Add(WriteMetadata(opf.Metadata, opf.EpubVersion));
             root.Add(WriteManifest(opf.Manifest));
             root.Add(WriteSpine(opf.Spine));
 
@@ -33,7 +34,7 @@ namespace EpubSharp.Format.Writers
             return xml;
         }
 
-        private static XElement WriteMetadata(OpfMetadata metadata)
+        private static XElement WriteMetadata(OpfMetadata metadata, EpubVersion version)
         {
             var root = new XElement(OpfElements.Metadata);
 
@@ -93,7 +94,20 @@ namespace EpubSharp.Format.Writers
             }
             foreach (var meta in metadata.Metas)
             {
-                var element = new XElement(OpfElements.Meta, meta.Text);
+                var element = new XElement(OpfElements.Meta);
+
+                switch (version)
+                {
+                    case EpubVersion.Epub2:
+                        element.Add(new XAttribute(OpfMetadataMeta.Attributes.Content, meta.Text));
+                        break;
+                    case EpubVersion.Epub3:
+                        element.Add(meta.Text);
+                        break;
+                    default:
+                        throw new NotImplementedException($"Epub version not support: {version} ({nameof(OpfWriter)})");
+                }
+
                 if (!string.IsNullOrWhiteSpace(meta.Id))
                 {
                     element.Add(new XAttribute(OpfMetadataMeta.Attributes.Id, meta.Id));
