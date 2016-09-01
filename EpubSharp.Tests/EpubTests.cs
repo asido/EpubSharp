@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using EpubSharp.Format;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EpubSharp.Tests
@@ -78,6 +79,10 @@ namespace EpubSharp.Tests
             });
 
             AssertCollection(expected.TableOfContents, actual.TableOfContents, nameof(actual.TableOfContents), AssertChapter);
+
+            AssertOcf(expected.Format.Ocf, actual.Format.Ocf);
+            AssertOpf(expected.Format.Opf, actual.Format.Opf);
+            AssertNcx(expected.Format.Ncx, actual.Format.Ncx);
         }
 
         private void AssertCollectionWithIndex<T>(IEnumerable<T> expected, IEnumerable<T> actual, string name, Action<List<T>, List<T>, int> assert)
@@ -150,6 +155,197 @@ namespace EpubSharp.Tests
             {
                 AssertChapter(expected.SubChapters[i], actual.SubChapters[i]);
             }
+        }
+
+        private void AssertOcf(OcfDocument expected, OcfDocument actual)
+        {
+            // There are some epubs with multiple root files.
+            // i.e. 1 normal and 1 for braille.
+            // We don't have multiple root file support, therefore Take(1) for now.
+            // Currently it is also assumed that the first root file is the main root file.
+            // This is a dangerous assumption.
+            AssertCollection(expected.RootFiles.Take(1), actual.RootFiles, nameof(actual.RootFiles), (a, b) =>
+            {
+                Assert.AreEqual(a.FullPath, b.FullPath, nameof(b.FullPath));
+                Assert.AreEqual(a.MediaType, b.MediaType, nameof(b.MediaType));
+            });
+            Assert.AreEqual(expected.RootFilePath, actual.RootFilePath);
+        }
+
+        private void AssertOpf(OpfDocument expected, OpfDocument actual)
+        {
+            Assert.AreEqual(expected == null, actual == null, nameof(actual));
+            if (expected != null && actual != null)
+            {
+                Assert.AreEqual(expected.EpubVersion, actual.EpubVersion, nameof(actual.EpubVersion));
+
+                Assert.AreEqual(expected.Metadata == null, actual.Metadata == null, nameof(actual.Metadata));
+                if (expected.Metadata != null && actual.Metadata != null)
+                {
+                    AssertCreators(expected.Metadata.Creators, actual.Metadata.Creators, nameof(actual.Metadata.Creators));
+                    AssertCreators(expected.Metadata.Contributors, actual.Metadata.Contributors, nameof(actual.Metadata.Contributors));
+
+                    AssertCollection(expected.Metadata.Dates, actual.Metadata.Dates, nameof(actual.Metadata.Dates), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Text, b.Text, "Date.Text");
+                        Assert.AreEqual(a.Event, b.Event, "Date.Event");
+                    });
+
+                    AssertCollection(expected.Metadata.Identifiers, actual.Metadata.Identifiers, nameof(actual.Metadata.Identifiers), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Id, b.Id, "Identifier.Id");
+                        Assert.AreEqual(a.Scheme, b.Scheme, "Identifier.Scheme");
+                        Assert.AreEqual(a.Text, b.Text, "Identifier.Text");
+                    });
+
+                    AssertCollection(expected.Metadata.Metas, actual.Metadata.Metas, nameof(actual.Metadata.Metas), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Id, b.Id, "Meta.Id");
+                        Assert.AreEqual(a.Name, b.Name, "Meta.Name");
+                        Assert.AreEqual(a.Property, b.Property, "Meta.Property");
+                        Assert.AreEqual(a.Refines, b.Refines, "Meta.Refines");
+                        Assert.AreEqual(a.Scheme, b.Scheme, "Meta.Scheme");
+                        Assert.AreEqual(a.Text, b.Text, "Meta.Text");
+                    });
+
+                    AssertPrimitiveCollection(expected.Metadata.Coverages, actual.Metadata.Coverages, "Coverages", "Coverage");
+                    AssertPrimitiveCollection(expected.Metadata.Descriptions, actual.Metadata.Descriptions, "Descriptions", "Description");
+                    AssertPrimitiveCollection(expected.Metadata.Languages, actual.Metadata.Languages, "Languages", "Language");
+                    AssertPrimitiveCollection(expected.Metadata.Publishers, actual.Metadata.Publishers, "Publishers", "Publisher");
+                    AssertPrimitiveCollection(expected.Metadata.Relations, actual.Metadata.Relations, "Relations", "Relation");
+                    AssertPrimitiveCollection(expected.Metadata.Rights, actual.Metadata.Rights, "Rights", "Right");
+                    AssertPrimitiveCollection(expected.Metadata.Sources, actual.Metadata.Sources, "Sources", "Source");
+                    AssertPrimitiveCollection(expected.Metadata.Subjects, actual.Metadata.Subjects, "Subjects", "Subject");
+                    AssertPrimitiveCollection(expected.Metadata.Titles, actual.Metadata.Titles, "Titles", "Title");
+                    AssertPrimitiveCollection(expected.Metadata.Types, actual.Metadata.Types, "Types", "Type");
+                }
+
+                Assert.AreEqual(expected.Guide == null, actual.Guide == null, nameof(actual.Guide));
+                if (expected.Guide != null && actual.Guide != null)
+                {
+                    AssertCollection(expected.Guide.References, actual.Guide.References, nameof(actual.Guide.References), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Title, b.Title, "Reference.Title");
+                        Assert.AreEqual(a.Type, b.Type, "Reference.Type");
+                        Assert.AreEqual(a.Href, b.Href, "Reference.Href");
+                    });
+                }
+
+                Assert.AreEqual(expected.Manifest == null, actual.Manifest == null, nameof(actual.Manifest));
+                if (expected.Manifest != null && actual.Manifest != null)
+                {
+                    AssertCollection(expected.Manifest.Items, actual.Manifest.Items, nameof(actual.Manifest.Items), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Fallback, b.Fallback, "Item.Fallback");
+                        Assert.AreEqual(a.FallbackStyle, b.FallbackStyle, "Item.FallbackStyle");
+                        Assert.AreEqual(a.Href, b.Href, "Item.Href");
+                        Assert.AreEqual(a.Id, b.Id, "Item.Id");
+                        Assert.AreEqual(a.MediaType, b.MediaType, "Item.MediaType");
+                        Assert.AreEqual(a.RequiredModules, b.RequiredModules, "Item.RequiredModules");
+                        Assert.AreEqual(a.RequiredNamespace, b.RequiredNamespace, "Item.RequiredNamespace");
+                        AssertPrimitiveCollection(a.Properties, b.Properties, "Item.Properties", "Item.Property");
+                    });
+                }
+
+                Assert.AreEqual(expected.Spine == null, actual.Spine == null, nameof(actual.Spine));
+                if (expected.Spine != null && actual.Spine != null)
+                {
+                    Assert.AreEqual(expected.Spine.Toc, actual.Spine.Toc, nameof(actual.Spine.Toc));
+                    AssertCollection(expected.Spine.ItemRefs, actual.Spine.ItemRefs, nameof(actual.Spine.ItemRefs), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Id, b.Id, "ItemRef.Id");
+                        Assert.AreEqual(a.IdRef, b.IdRef, "ItemRef.IdRef");
+                        Assert.AreEqual(a.Linear, b.Linear, "ItemRef.Linear");
+                        AssertPrimitiveCollection(a.Properties, b.Properties, "ItemRef.Properties", "ItemRef.Property");
+                    });
+                }
+
+                Assert.AreEqual(expected.FindCoverPath(), actual.FindCoverPath(), nameof(actual.FindCoverPath));
+                Assert.AreEqual(expected.FindNavPath(), actual.FindNavPath(), nameof(actual.FindNavPath));
+                Assert.AreEqual(expected.FindNcxPath(), actual.FindNcxPath(), nameof(actual.FindNcxPath));
+            }
+        }
+
+        private void AssertCreators(IEnumerable<OpfMetadataCreator> expected, IEnumerable<OpfMetadataCreator> actual, string name)
+        {
+            AssertCollection(expected, actual, name, (a, b) =>
+            {
+                Assert.AreEqual(a.AlternateScript, b.AlternateScript, $"{name}.AlternateScript");
+                Assert.AreEqual(a.FileAs, b.FileAs, $"{name}.FileAs");
+                Assert.AreEqual(a.Role, b.Role, $"{name}.Role");
+                Assert.AreEqual(a.Text, b.Text, $"{name}.Text");
+            });
+        }
+
+        private void AssertNcx(NcxDocument expected, NcxDocument actual)
+        {
+            Assert.AreEqual(expected == null, actual == null, nameof(actual));
+            if (expected != null && actual != null)
+            {
+                Assert.AreEqual(expected.DocAuthor, actual.DocAuthor, nameof(actual.DocAuthor));
+                Assert.AreEqual(expected.DocTitle, actual.DocTitle, nameof(actual.DocTitle));
+
+                AssertCollection(expected.Metadata, actual.Metadata, nameof(actual.Metadata), (a, b) =>
+                {
+                    Assert.AreEqual(a.Name, b.Name, "Metadata.Name");
+                    Assert.AreEqual(a.Content, b.Content, "Metadata.Content");
+                    Assert.AreEqual(a.Scheme, b.Scheme, "Metadata.Scheme");
+                });
+
+                Assert.AreEqual(expected.NavigationList == null, actual.NavigationList == null, "NavigationList");
+                if (expected.NavigationList != null && actual.NavigationList != null)
+                {
+                    Assert.AreEqual(expected.NavigationList.Id, actual.NavigationList.Id, "NavigationList.Id");
+                    Assert.AreEqual(expected.NavigationList.Class, actual.NavigationList.Class, "NavigationList.Class");
+                    Assert.AreEqual(expected.NavigationList.Label, actual.NavigationList.Label, "NavigationList.Label");
+
+                    AssertCollection(expected.NavigationList.NavTargets, actual.NavigationList.NavTargets, nameof(actual.NavigationList.NavTargets), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Id, b.Id, "NavigationTarget.Id");
+                        Assert.AreEqual(a.Class, b.Class, "NavigationTarget.Class");
+                        Assert.AreEqual(a.Label, b.Label, "NavigationTarget.Label");
+                        Assert.AreEqual(a.PlayOrder, b.PlayOrder, "NavigationTarget.PlayOrder");
+                        Assert.AreEqual(a.ContentSource, b.ContentSource, "NavigationTarget.ContentSrc");
+                    });
+                }
+
+                AssertCollection(expected.NavMap.NavPoints, actual.NavMap.NavPoints, nameof(actual.NavMap), (a, b) =>
+                {
+                    Assert.AreEqual(a.Id, b.Id, "NavigationMap.Id");
+                    Assert.AreEqual(a.PlayOrder, b.PlayOrder, "NavigationMap.PlayOrder");
+                    Assert.AreEqual(a.NavLabelText, b.NavLabelText, "NavigationMap.NavLabelText");
+                    Assert.AreEqual(a.Class, b.Class, "NavigationMap.Class");
+                    Assert.AreEqual(a.ContentSrc, b.ContentSrc, "NavigationMap.ContentSorce");
+                    AssertNavigationPoints(a.NavPoints, b.NavPoints);
+                });
+
+                AssertCollection(expected.PageList, actual.PageList, nameof(actual.PageList), (a, b) =>
+                {
+                    Assert.AreEqual(a.Id, b.Id, "PageList.Id");
+                    Assert.AreEqual(a.Class, b.Class, "PageList.Class");
+                    Assert.AreEqual(a.ContentSource, b.ContentSource, "PageList.ContentSrc");
+                    Assert.AreEqual(a.Label, b.Label, "PageList.Label");
+                    Assert.AreEqual(a.Type, b.Type, "PageList.Type");
+                    Assert.AreEqual(a.Value, b.Value, "PageList.Value");
+                });
+            }
+        }
+
+        private void AssertNavigationPoints(IEnumerable<NcxNavPoint> expected, IEnumerable<NcxNavPoint> actual)
+        {
+            AssertCollection(expected, actual, "NavigationPoint", (a, b) =>
+            {
+                Assert.AreEqual(a.Id, b.Id, "NavigationPoint.Id");
+                Assert.AreEqual(a.Class, b.Class, "NavigationPoint.Class");
+                Assert.AreEqual(a.ContentSrc, b.ContentSrc, "NavigationPoint.ContentSrc");
+                Assert.AreEqual(a.NavLabelText, b.NavLabelText, "NavigationPoint.NavLabelText");
+                Assert.AreEqual(a.PlayOrder, b.PlayOrder, "NavigationPoint.PlayOrder");
+                Assert.AreEqual(a.NavPoints == null, b.NavPoints == null, "NavigationPoint.NavPoints");
+                if (a.NavPoints != null && b.NavPoints != null)
+                {
+                    AssertNavigationPoints(a.NavPoints, b.NavPoints);
+                }
+            });
         }
     }
 }
