@@ -38,7 +38,20 @@ namespace EpubSharp.Format.Writers
             }
             foreach (var creator in opf.Metadata.Creators)
             {
-                metadata.Add(new XElement(OpfElements.Creator, creator));
+                var element = new XElement(OpfElements.Creator, creator.Text);
+                if (!string.IsNullOrWhiteSpace(creator.AlternateScript))
+                {
+                    element.Add(new XAttribute(OpfMetadataCreator.Attributes.AlternateScript, creator.AlternateScript));
+                }
+                if (!string.IsNullOrWhiteSpace(creator.FileAs))
+                {
+                    element.Add(new XAttribute(OpfMetadataCreator.Attributes.FileAs, creator.FileAs));
+                }
+                if (!string.IsNullOrWhiteSpace(creator.Role))
+                {
+                    element.Add(new XAttribute(OpfMetadataCreator.Attributes.Role, creator.Role));
+                }
+                metadata.Add(element);
             }
             foreach (var publisher in opf.Metadata.Publishers)
             {
