@@ -58,6 +58,7 @@ namespace EpubSharp
         public Dictionary<string, EpubTextContentFile> Css { get; internal set; } = new Dictionary<string, EpubTextContentFile>();
         public Dictionary<string, EpubByteContentFile> Images { get; internal set; } = new Dictionary<string, EpubByteContentFile>();
         public Dictionary<string, EpubByteContentFile> Fonts { get; internal set; } = new Dictionary<string, EpubByteContentFile>();
+        public Dictionary<string, EpubContentFile> Other { get; internal set; } = new Dictionary<string, EpubContentFile>();
     }
 
     public class EpubSpecialResources

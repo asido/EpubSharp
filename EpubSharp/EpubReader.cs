@@ -99,7 +99,7 @@ namespace EpubSharp
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
             {
-                var chapter = new EpubChapter { Title = navigationPoint.LabelText };
+                var chapter = new EpubChapter { Title = navigationPoint.NavLabelText };
                 var contentSourceAnchorCharIndex = navigationPoint.ContentSrc.IndexOf('#');
                 if (contentSourceAnchorCharIndex == -1)
                 {
@@ -111,7 +111,7 @@ namespace EpubSharp
                     chapter.Anchor = navigationPoint.ContentSrc.Substring(contentSourceAnchorCharIndex + 1);
                 }
 
-                chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavigationPoints, epubArchive);
+                chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavPoints, epubArchive);
                 result.Add(chapter);
             }
             return result;
@@ -179,7 +179,10 @@ namespace EpubSharp
                             case EpubContentType.Css:
                                 result.Css.Add(fileName, file);
                                 break;
-                        }
+                            default:
+                                result.Other.Add(fileName, file);
+                                break;
+                            }
                         break;
                     }
                     default:
@@ -216,6 +219,9 @@ namespace EpubSharp
                             case EpubContentType.FontTruetype:
                             case EpubContentType.FontOpentype:
                                 result.Fonts.Add(fileName, file);
+                                break;
+                            default:
+                                result.Other.Add(fileName, file);
                                 break;
                         }
                         break;
