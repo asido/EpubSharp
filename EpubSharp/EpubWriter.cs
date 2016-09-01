@@ -14,13 +14,16 @@ namespace EpubSharp
 
     public class EpubWriter
     {
-        private const string OpfPath = "EPUB/package.opf";
+        private readonly string opfPath = "EPUB/package.opf";
+        private readonly string ncxPath = "EPUB/toc.ncx";
 
         private readonly OpfDocument opf = new OpfDocument
         {
             // We could probably switch to v3 once we can format nav.xhtml
             EpubVersion = EpubVersion.Epub2
         };
+
+        private readonly NcxDocument ncx = new NcxDocument();
 
         private readonly EpubResources resources = new EpubResources();
 
@@ -32,7 +35,16 @@ namespace EpubSharp
             if (book.Format?.Opf == null) throw new ArgumentException("book opf instance == null", nameof(book));
 
             opf = book.Format.Opf;
+            ncx = book.Format.Ncx;
+
             resources = book.Resources;
+
+            opfPath = book.Format.Ocf.RootFilePath;
+            ncxPath = book.Format.Opf.FindNcxPath();
+            if (ncxPath != null)
+            {
+                ncxPath = PathExt.Combine(PathExt.GetDirectoryPath(opfPath), ncxPath);
+            }
         }
 
         public static void Write(EpubBook book, string filename)
@@ -57,9 +69,7 @@ namespace EpubSharp
         {
             if (image == null) throw new ArgumentNullException(nameof(image));
 
-            var coverItem = new OpfManifestItem { Id = "cover-image" };
             var coverResource = new EpubByteContentFile { Content = image };
-
             string filename;
 
             switch (format)
@@ -80,9 +90,12 @@ namespace EpubSharp
             coverResource.MimeType = ContentType.ContentTypeToMimeType[coverResource.ContentType];
             resources.Images.Add(coverResource.FileName, coverResource);
 
-            coverItem.Href = filename;
-            coverItem.MediaType = coverResource.MimeType;
-            opf.Manifest.Items.Add(coverItem);
+            opf.Manifest.Items.Add(new OpfManifestItem
+            {
+                Id = "cover-image",
+                Href = filename,
+                MediaType = coverResource.MimeType
+            });
         }
 
         public void AddAuthor(string author)
@@ -104,17 +117,23 @@ namespace EpubSharp
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
             {
                 archive.CreateEntry("mimetype", MimeTypeWriter.Format());
-                archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(OpfPath));
-                archive.CreateEntry(OpfPath, OpfWriter.Format(opf));
+                archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(opfPath));
+                archive.CreateEntry(opfPath, OpfWriter.Format(opf));
+
+                if (ncx != null)
+                {
+                    archive.CreateEntry(ncxPath, NcxWriter.Format(ncx));
+                }
 
                 var allFiles = new[]
                 {
                     resources.Html.Select(dict => dict.Value).Cast<EpubContentFile>(),
                     resources.Css.Select(dict => dict.Value),
                     resources.Images.Select(dict => dict.Value),
-                    resources.Fonts.Select(dict => dict.Value)
+                    resources.Fonts.Select(dict => dict.Value),
+                    resources.Other.Select(dict => dict.Value)
                 }.SelectMany(collection => collection as EpubContentFile[] ?? collection.ToArray());
-                var relativePath = PathExt.GetDirectoryPath(OpfPath);
+                var relativePath = PathExt.GetDirectoryPath(opfPath);
                 foreach (var file in allFiles)
                 {
                     var absolutePath = PathExt.Combine(relativePath, file.FileName);
@@ -122,5 +141,18 @@ namespace EpubSharp
                 }
             }
         }
+
+        // Old code to add toc.ncx
+        /*
+            if (opf.Spine.Toc != null)
+            {
+                var ncxPath = opf.FindNcxPath();
+                if (ncxPath == null)
+                {
+                    throw new EpubWriteException("Spine TOC is set, but NCX path is not.");
+                }
+                manifest.Add(new XElement(OpfElements.Item, new XAttribute(OpfManifestItem.Attributes.Id, "ncx"), new XAttribute(OpfManifestItem.Attributes.MediaType, ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx]), new XAttribute(OpfManifestItem.Attributes.Href, ncxPath)));
+            }
+         */
     }
 }

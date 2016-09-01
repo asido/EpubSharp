@@ -13,7 +13,7 @@ namespace EpubSharp.Format.Writers
             root.Add(new XAttribute("xmlns", Constants.OpfNamespace));
             root.Add(new XAttribute(XNamespace.Xmlns + "dc", Constants.OpfMetadataNamespace));
 
-            string versionString = null;
+            string versionString;
             switch (opf.EpubVersion)
             {
                 case EpubVersion.Epub2:
@@ -52,25 +52,6 @@ namespace EpubSharp.Format.Writers
             root.Add(metadata);
 
             var manifest = new XElement(OpfElements.Manifest);
-            var coverPath = opf.FindCoverPath();
-            if (coverPath != null)
-            {
-                var cover = opf.Manifest.Items.FirstOrDefault(e => e.Href == coverPath);
-                if (cover == null)
-                {
-                    throw new EpubWriteException($"Cover path is set to '{coverPath}', but couldn't find any manifest item with such href.");
-                }
-                manifest.Add(new XElement(OpfElements.Item, new XAttribute(OpfManifestItem.Attributes.Id, "cover-image"), new XAttribute(OpfManifestItem.Attributes.Href, cover.Href), new XAttribute(OpfManifestItem.Attributes.MediaType, cover.MediaType), new XAttribute(OpfManifestItem.Attributes.Properties, "cover-image")));
-            }
-            if (opf.Spine.Toc != null)
-            {
-                var ncxPath = opf.FindNcxPath();
-                if (ncxPath == null)
-                {
-                    throw new EpubWriteException("Spine TOC is set, but NCX path is not.");
-                }
-                manifest.Add(new XElement(OpfElements.Item, new XAttribute(OpfManifestItem.Attributes.Id, "ncx"), new XAttribute(OpfManifestItem.Attributes.MediaType, ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx]), new XAttribute(OpfManifestItem.Attributes.Href, ncxPath)));
-            }
             foreach (var item in opf.Manifest.Items)
             {
                 var element = new XElement(OpfElements.Item);
