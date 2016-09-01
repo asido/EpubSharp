@@ -74,7 +74,7 @@ namespace EpubSharp.Format.Writers
                 }
                 if (!string.IsNullOrWhiteSpace(meta.Property))
                 {
-                    element.Add(new XAttribute(OpfMetadataMeta.Attributes.Name, meta.Name));
+                    element.Add(new XAttribute(OpfMetadataMeta.Attributes.Property, meta.Property));
                 }
                 if (!string.IsNullOrWhiteSpace(meta.Refines))
                 {
