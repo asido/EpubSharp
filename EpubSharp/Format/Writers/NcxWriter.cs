@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Writers
@@ -21,7 +23,16 @@ namespace EpubSharp.Format.Writers
             }
 
             var navMap = new XElement(NcxElements.NavMap);
-            foreach (var navPoint in ncx.NavMap.NavPoints)
+            WriteNavPoints(navMap, ncx.NavMap.NavPoints);
+            root.Add(navMap);
+
+            var xml = Constants.XmlDeclaration + "\n" + root;
+            return xml;
+        }
+
+        private static void WriteNavPoints(XElement root, IEnumerable<NcxNavPoint> navPoints)
+        {
+            foreach (var navPoint in navPoints)
             {
                 var element = new XElement(NcxElements.NavPoint, new XAttribute(NcxNavPoint.Attributes.Id, navPoint.Id));
                 if (!string.IsNullOrWhiteSpace(navPoint.Class))
@@ -34,12 +45,13 @@ namespace EpubSharp.Format.Writers
                 }
                 element.Add(new XElement(NcxElements.NavLabel, new XElement(NcxElements.Text, navPoint.NavLabelText)));
                 element.Add(new XElement(NcxElements.Content, new XAttribute(NcxNavPoint.Attributes.ContentSrc, navPoint.ContentSrc)));
-                navMap.Add(element);
-            }
-            root.Add(navMap);
+                root.Add(element);
 
-            var xml = Constants.XmlDeclaration + "\n" + root;
-            return xml;
+                if (navPoint.NavPoints.Any())
+                {
+                    WriteNavPoints(element, navPoint.NavPoints);
+                }
+            }
         }
     }
 }
