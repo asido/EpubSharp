@@ -21,7 +21,7 @@ namespace EpubSharp.Format.Readers
                 }),
                 DocTitle = xml.Root.Element(NcxElements.DocTitle)?.Element(NcxElements.Text)?.Value,
                 DocAuthor = xml.Root.Element(NcxElements.DocAuthor)?.Element(NcxElements.Text)?.Value,
-                NavMap = new NcxNapMap { NavPoints = xml.Root.Element(NcxElements.NavMap)?.Elements(NcxElements.NavPoint).AsObjectList(ReadNavigationPoint) },
+                NavMap = new NcxNapMap { NavPoints = xml.Root.Element(NcxElements.NavMap)?.Elements(NcxElements.NavPoint).AsObjectList(ReadNavPoint) },
                 PageList = xml.Root.Element(NcxElements.PageList)?.Elements(NcxElements.PageTarget).AsObjectList(elem => new NcxPageTarget
                 {
                     Id = (string)elem.Attribute("id"),
@@ -36,7 +36,7 @@ namespace EpubSharp.Format.Readers
                     Id = (string)navList.Attribute("id"),
                     Class = (string)navList.Attribute("class"),
                     Label = navList.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
-                    NavigationTargets = navList.Elements(NcxElements.NavTarget).AsObjectList(elem => new NcxNavigationTarget
+                    NavTargets = navList.Elements(NcxElements.NavTarget).AsObjectList(elem => new NcxNavigationTarget
                     {
                         Id = (string)elem.Attribute("id"),
                         Class = (string)elem.Attribute("class"),
@@ -50,19 +50,19 @@ namespace EpubSharp.Format.Readers
             return ncx;
         }
 
-        private static NcxNavPoint ReadNavigationPoint(XElement element)
+        private static NcxNavPoint ReadNavPoint(XElement element)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
             if (element.Name != NcxElements.NavPoint) throw new ArgumentException("The element is not <navPoint>", nameof(element));
 
             return new NcxNavPoint
             {
-                Id = (string)element.Attribute("id"),
-                Class = (string)element.Attribute("class"),
-                LabelText = element.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
-                ContentSrc = (string)element.Element(NcxElements.Content)?.Attribute("src"),
-                PlayOrder = (int?)element.Attribute("playOrder"),
-                NavigationPoints = element.Elements(NcxElements.NavPoint).AsObjectList(ReadNavigationPoint)
+                Id = (string)element.Attribute(NcxNavPoint.Attributes.Id),
+                Class = (string)element.Attribute(NcxNavPoint.Attributes.Class),
+                NavLabelText = element.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
+                ContentSrc = (string)element.Element(NcxElements.Content)?.Attribute(NcxNavPoint.Attributes.ContentSrc),
+                PlayOrder = (int?)element.Attribute(NcxNavPoint.Attributes.PlayOrder),
+                NavPoints = element.Elements(NcxElements.NavPoint).AsObjectList(ReadNavPoint)
             };
         }
     }

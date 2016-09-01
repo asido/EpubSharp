@@ -48,12 +48,22 @@ namespace EpubSharp.Format
 
     public class NcxNavPoint
     {
+        internal static class Attributes
+        {
+            public static readonly XName Id = "id";
+            public static readonly XName Class = "class";
+            public static readonly XName PlayOrder = "playOrder";
+            public static readonly XName ContentSrc = "src";
+        }
+
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public int? PlayOrder { get; internal set; }
-        public string LabelText { get; internal set; }
+        // NavLabelText and ContentSrc are flattened elements for convenience.
+        // In case <navLabel> or <content/> need to carry more data, then they should have a dedicated model created.
+        public string NavLabelText { get; internal set; }
         public string ContentSrc { get; internal set; }
-        public ICollection<NcxNavPoint> NavigationPoints { get; internal set; } = new List<NcxNavPoint>();
+        public ICollection<NcxNavPoint> NavPoints { get; internal set; } = new List<NcxNavPoint>();
 
         public override string ToString()
         {
@@ -84,7 +94,7 @@ namespace EpubSharp.Format
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public string Label { get; internal set; }
-        public ICollection<NcxNavigationTarget> NavigationTargets { get; internal set; } = new List<NcxNavigationTarget>();
+        public ICollection<NcxNavigationTarget> NavTargets { get; internal set; } = new List<NcxNavigationTarget>();
     }
 
     public class NcxNavigationTarget
