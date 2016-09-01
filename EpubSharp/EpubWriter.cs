@@ -27,7 +27,10 @@ namespace EpubSharp
 
         private readonly EpubResources resources = new EpubResources();
 
-        public EpubWriter() { }
+        public EpubWriter()
+        {
+            opf.Metadata.Dates.Add(new OpfMetadataDate { Text = DateTimeOffset.UtcNow.ToString() });
+        }
 
         public EpubWriter(EpubBook book)
         {

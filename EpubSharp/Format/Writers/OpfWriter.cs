@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Writers
@@ -27,16 +25,48 @@ namespace EpubSharp.Format.Writers
             }
             root.Add(new XAttribute(OpfDocument.Attributes.Version, versionString));
 
-            var metadata = new XElement(OpfElements.Metadata);
-            foreach (var lang in opf.Metadata.Languages)
+            root.Add(WriteMetadata(opf.Metadata));
+            root.Add(WriteManifest(opf.Manifest));
+            root.Add(WriteSpine(opf.Spine));
+
+            var xml = Constants.XmlDeclaration + "\n" + root;
+            return xml;
+        }
+
+        private static XElement WriteMetadata(OpfMetadata metadata)
+        {
+            var root = new XElement(OpfElements.Metadata);
+
+            foreach (var contributor in metadata.Contributors)
             {
-                metadata.Add(new XElement(OpfElements.Language, lang));
+                var element = new XElement(OpfElements.Contributor, contributor.Text);
+                if (!string.IsNullOrWhiteSpace(contributor.AlternateScript))
+                {
+                    element.Add(new XAttribute(OpfMetadataCreator.Attributes.AlternateScript, contributor.AlternateScript));
+                }
+                if (!string.IsNullOrWhiteSpace(contributor.FileAs))
+                {
+                    element.Add(new XAttribute(OpfMetadataCreator.Attributes.FileAs, contributor.FileAs));
+                }
+                if (!string.IsNullOrWhiteSpace(contributor.Role))
+                {
+                    element.Add(new XAttribute(OpfMetadataCreator.Attributes.Role, contributor.Role));
+                }
+                root.Add(element);
             }
-            foreach (var title in opf.Metadata.Titles)
+            foreach (var description in metadata.Descriptions)
             {
-                metadata.Add(new XElement(OpfElements.Title, title));
+                root.Add(new XElement(OpfElements.Description, description));
             }
-            foreach (var creator in opf.Metadata.Creators)
+            foreach (var lang in metadata.Languages)
+            {
+                root.Add(new XElement(OpfElements.Language, lang));
+            }
+            foreach (var title in metadata.Titles)
+            {
+                root.Add(new XElement(OpfElements.Title, title));
+            }
+            foreach (var creator in metadata.Creators)
             {
                 var element = new XElement(OpfElements.Creator, creator.Text);
                 if (!string.IsNullOrWhiteSpace(creator.AlternateScript))
@@ -51,17 +81,17 @@ namespace EpubSharp.Format.Writers
                 {
                     element.Add(new XAttribute(OpfMetadataCreator.Attributes.Role, creator.Role));
                 }
-                metadata.Add(element);
+                root.Add(element);
             }
-            foreach (var publisher in opf.Metadata.Publishers)
+            foreach (var publisher in metadata.Publishers)
             {
-                metadata.Add(new XElement(OpfElements.Publisher, publisher));
+                root.Add(new XElement(OpfElements.Publisher, publisher));
             }
-            foreach (var subject in opf.Metadata.Subjects)
+            foreach (var subject in metadata.Subjects)
             {
-                metadata.Add(new XElement(OpfElements.Subject, subject));
+                root.Add(new XElement(OpfElements.Subject, subject));
             }
-            foreach (var meta in opf.Metadata.Metas)
+            foreach (var meta in metadata.Metas)
             {
                 var element = new XElement(OpfElements.Meta, meta.Text);
                 if (!string.IsNullOrWhiteSpace(meta.Id))
@@ -84,15 +114,66 @@ namespace EpubSharp.Format.Writers
                 {
                     element.Add(new XAttribute(OpfMetadataMeta.Attributes.Scheme, meta.Scheme));
                 }
-                metadata.Add(element);
+                root.Add(element);
             }
-            metadata.Add(new XElement(OpfElements.Date, DateTimeOffset.UtcNow));
-            root.Add(metadata);
+            foreach (var coverage in metadata.Coverages)
+            {
+                root.Add(new XElement(OpfElements.Coverages, coverage));
+            }
+            foreach (var date in metadata.Dates)
+            {
+                var element = new XElement(OpfElements.Date, date.Text);
+                if (!string.IsNullOrWhiteSpace(date.Event))
+                {
+                    element.Add(new XAttribute(OpfMetadataDate.Attributes.Event, date.Event));
+                }
+                root.Add(element);
+            }
+            foreach (var format in metadata.Formats)
+            {
+                root.Add(new XElement(OpfElements.Format, format));
+            }
+            foreach (var identifier in metadata.Identifiers)
+            {
+                var element = new XElement(OpfElements.Meta, identifier.Text);
+                if (!string.IsNullOrWhiteSpace(identifier.Id))
+                {
+                    element.Add(new XAttribute(OpfMetadataIdentifier.Attributes.Id, identifier.Id));
+                }
+                if (!string.IsNullOrWhiteSpace(identifier.Scheme))
+                {
+                    element.Add(new XAttribute(OpfMetadataIdentifier.Attributes.Scheme, identifier.Scheme));
+                }
+                root.Add(element);
+            }
+            foreach (var relation in metadata.Relations)
+            {
+                root.Add(new XElement(OpfElements.Relation, relation));
+            }
+            foreach (var right in metadata.Rights)
+            {
+                root.Add(new XElement(OpfElements.Rights, right));
+            }
+            foreach (var source in metadata.Sources)
+            {
+                root.Add(new XElement(OpfElements.Source, source));
+            }
+            foreach (var type in metadata.Types)
+            {
+                root.Add(new XElement(OpfElements.Type, type));
+            }
 
-            var manifest = new XElement(OpfElements.Manifest);
-            foreach (var item in opf.Manifest.Items)
+            return root;
+        }
+
+        private static XElement WriteManifest(OpfManifest manifest)
+        {
+            var root = new XElement(OpfElements.Manifest);
+
+            foreach (var item in manifest.Items)
             {
                 var element = new XElement(OpfElements.Item);
+
                 if (item.Fallback != null)
                 {
                     element.Add(new XAttribute(OpfManifestItem.Attributes.Fallback, item.Fallback));
@@ -125,16 +206,23 @@ namespace EpubSharp.Format.Writers
                 {
                     element.Add(new XAttribute(OpfManifestItem.Attributes.RequiredNamespace, item.RequiredNamespace));
                 }
-                manifest.Add(element);
-            }
-            root.Add(manifest);
 
-            var spine = new XElement(OpfElements.Spine);
-            if (opf.Spine.Toc != null)
-            {
-                spine.Add(new XAttribute(OpfSpine.Attributes.Toc, opf.Spine.Toc));
+                root.Add(element);
             }
-            foreach (var itemref in opf.Spine.ItemRefs)
+
+            return root;
+        }
+
+        private static XElement WriteSpine(OpfSpine spine)
+        {
+            var root = new XElement(OpfElements.Spine);
+
+            if (spine.Toc != null)
+            {
+                root.Add(new XAttribute(OpfSpine.Attributes.Toc, spine.Toc));
+            }
+
+            foreach (var itemref in spine.ItemRefs)
             {
                 var element = new XElement(OpfElements.ItemRef);
                 if (itemref.Id != null)
@@ -153,12 +241,10 @@ namespace EpubSharp.Format.Writers
                 {
                     element.Add(new XAttribute(OpfSpineItemRef.Attributes.Linear, "no"));
                 }
-                spine.Add(element);
+                root.Add(element);
             }
-            root.Add(spine);
 
-            var xml = Constants.XmlDeclaration + "\n" + root;
-            return xml;
+            return root;
         }
     }
 }
