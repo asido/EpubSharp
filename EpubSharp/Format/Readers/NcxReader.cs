@@ -10,27 +10,34 @@ namespace EpubSharp.Format.Readers
             if (xml == null) throw new ArgumentNullException(nameof(xml));
             if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
 
+            var pageList = xml.Root.Element(NcxElements.PageList);
+            var navInfo = pageList?.Element(NcxElements.NavInfo);
             var navList = xml.Root.Element(NcxElements.NavList);
+
             var ncx = new NcxDocument
             {
                 Meta = xml.Root.Element(NcxElements.Head)?.Elements(NcxElements.Meta).AsObjectList(elem => new NcxMeta
                 {
-                    Name = (string)elem.Attribute("name"),
-                    Content = (string)elem.Attribute("content"),
-                    Scheme = (string)elem.Attribute("scheme")
+                    Name = (string)elem.Attribute(NcxMeta.Attributes.Name),
+                    Content = (string)elem.Attribute(NcxMeta.Attributes.Content),
+                    Scheme = (string)elem.Attribute(NcxMeta.Attributes.Scheme)
                 }),
                 DocTitle = xml.Root.Element(NcxElements.DocTitle)?.Element(NcxElements.Text)?.Value,
                 DocAuthor = xml.Root.Element(NcxElements.DocAuthor)?.Element(NcxElements.Text)?.Value,
                 NavMap = new NcxNapMap { NavPoints = xml.Root.Element(NcxElements.NavMap)?.Elements(NcxElements.NavPoint).AsObjectList(ReadNavPoint) },
-                PageList = xml.Root.Element(NcxElements.PageList)?.Elements(NcxElements.PageTarget).AsObjectList(elem => new NcxPageTarget
+                PageList = pageList == null ? null : new NcxPageList
                 {
-                    Id = (string)elem.Attribute("id"),
-                    Class = (string)elem.Attribute("class"),
-                    Value = (int?)elem.Attribute("value"),
-                    Type = (NcxPageTargetType?)(elem.Attribute("type") == null ? null : Enum.Parse(typeof(NcxPageTargetType), (string)elem.Attribute("type"), true)),
-                    Label = elem.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
-                    ContentSource = (string)elem.Element(NcxElements.Content)?.Attribute("src")
-                }),
+                    NavInfo = navInfo == null ? null : new NcxNavInfo { Text = navInfo.Element(NcxElements.Text)?.Value },
+                    PageTargets = pageList.Elements(NcxElements.PageTarget).AsObjectList(elem => new NcxPageTarget
+                    {
+                        Id = (string)elem.Attribute(NcxPageTarget.Attributes.Id),
+                        Class = (string)elem.Attribute(NcxPageTarget.Attributes.Class),
+                        Value = (int?)elem.Attribute(NcxPageTarget.Attributes.Value),
+                        Type = (NcxPageTargetType?)(elem.Attribute(NcxPageTarget.Attributes.Type) == null ? null : Enum.Parse(typeof(NcxPageTargetType), (string)elem.Attribute("type"), true)),
+                        NavLabelText = elem.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
+                        ContentSrc = (string)elem.Element(NcxElements.Content)?.Attribute(NcxPageTarget.Attributes.ContentSrc)
+                    })
+                },
                 NavigationList = navList == null ? null : new NcxNavigationList
                 {
                     Id = (string)navList.Attribute("id"),

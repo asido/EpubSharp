@@ -15,6 +15,7 @@ namespace EpubSharp.Format
         public static readonly XName NavPoint = Constants.NcxNamespace + "navPoint";
         public static readonly XName NavList = Constants.NcxNamespace + "navList";
         public static readonly XName PageList = Constants.NcxNamespace + "pageList";
+        public static readonly XName NavInfo = Constants.NcxNamespace + "navInfo";
         public static readonly XName PageTarget = Constants.NcxNamespace + "pageTarget";
         public static readonly XName NavLabel = Constants.NcxNamespace + "navLabel";
         public static readonly XName NavTarget = Constants.NcxNamespace + "navTarget";
@@ -30,7 +31,7 @@ namespace EpubSharp.Format
         public string DocTitle { get; internal set; }
         public string DocAuthor { get; internal set; }
         public NcxNapMap NavMap { get; internal set; }
-        public ICollection<NcxPageTarget> PageList { get; internal set; } = new List<NcxPageTarget>();
+        public NcxPageList PageList { get; internal set; }
         public NcxNavigationList NavigationList { get; internal set; }
     }
 
@@ -86,14 +87,35 @@ namespace EpubSharp.Format
         Body
     }
 
+    public class NcxPageList
+    {
+        public NcxNavInfo NavInfo { get; internal set; }
+
+        public ICollection<NcxPageTarget> PageTargets { get; internal set; } = new List<NcxPageTarget>();
+    }
+
+    public class NcxNavInfo
+    {
+        public string Text { get; internal set; }
+    }
+
     public class NcxPageTarget
     {
+        internal static class Attributes
+        {
+            public static readonly XName Id = "id";
+            public static readonly XName Class = "class";
+            public static readonly XName Type = "type";
+            public static readonly XName Value = "value";
+            public static readonly XName ContentSrc = "src";
+        }
+
         public string Id { get; internal set; }
         public int? Value { get; internal set; }
         public string Class { get; internal set; }
         public NcxPageTargetType? Type { get; internal set; }
-        public string Label { get; internal set; }
-        public string ContentSource { get; internal set; }
+        public string NavLabelText { get; internal set; }
+        public string ContentSrc { get; internal set; }
     }
 
     public class NcxNavigationList

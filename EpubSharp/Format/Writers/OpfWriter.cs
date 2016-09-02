@@ -30,6 +30,11 @@ namespace EpubSharp.Format.Writers
             root.Add(WriteManifest(opf.Manifest));
             root.Add(WriteSpine(opf.Spine));
 
+            if (opf.Guide != null)
+            {
+                root.Add(WriteGuide(opf.Guide));
+            }
+
             var xml = Constants.XmlDeclaration + "\n" + root;
             return xml;
         }
@@ -254,6 +259,31 @@ namespace EpubSharp.Format.Writers
                 if (!itemref.Linear) // Defualt is true
                 {
                     element.Add(new XAttribute(OpfSpineItemRef.Attributes.Linear, "no"));
+                }
+                root.Add(element);
+            }
+
+            return root;
+        }
+
+        private static XElement WriteGuide(OpfGuide guide)
+        {
+            var root = new XElement(OpfElements.Guide);
+
+            foreach (var reference in guide.References)
+            {
+                var element = new XElement(OpfElements.Reference);
+                if (!string.IsNullOrWhiteSpace(reference.Href))
+                {
+                    element.Add(new XAttribute(OpfGuideReference.Attributes.Href, reference.Href));
+                }
+                if (!string.IsNullOrWhiteSpace(reference.Title))
+                {
+                    element.Add(new XAttribute(OpfGuideReference.Attributes.Title, reference.Title));
+                }
+                if (!string.IsNullOrWhiteSpace(reference.Type))
+                {
+                    element.Add(new XAttribute(OpfGuideReference.Attributes.Type, reference.Type));
                 }
                 root.Add(element);
             }

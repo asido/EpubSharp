@@ -319,15 +319,19 @@ namespace EpubSharp.Tests
                     AssertNavigationPoints(a.NavPoints, b.NavPoints);
                 });
 
-                AssertCollection(expected.PageList, actual.PageList, nameof(actual.PageList), (a, b) =>
+                Assert.AreEqual(expected.PageList == null, actual.PageList == null, nameof(actual.PageList));
+                if (expected.PageList != null && actual.PageList != null)
                 {
-                    Assert.AreEqual(a.Id, b.Id, "PageList.Id");
-                    Assert.AreEqual(a.Class, b.Class, "PageList.Class");
-                    Assert.AreEqual(a.ContentSource, b.ContentSource, "PageList.ContentSrc");
-                    Assert.AreEqual(a.Label, b.Label, "PageList.Label");
-                    Assert.AreEqual(a.Type, b.Type, "PageList.Type");
-                    Assert.AreEqual(a.Value, b.Value, "PageList.Value");
-                });
+                    AssertCollection(expected.PageList.PageTargets, actual.PageList.PageTargets, nameof(actual.PageList.PageTargets), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Id, b.Id, "PageList.Id");
+                        Assert.AreEqual(a.Class, b.Class, "PageList.Class");
+                        Assert.AreEqual(a.ContentSrc, b.ContentSrc, "PageList.ContentSrc");
+                        Assert.AreEqual(a.NavLabelText, b.NavLabelText, "PageList.Label");
+                        Assert.AreEqual(a.Type, b.Type, "PageList.Type");
+                        Assert.AreEqual(a.Value, b.Value, "PageList.Value");
+                    });
+                }
             }
         }
 
