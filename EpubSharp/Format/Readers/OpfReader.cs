@@ -64,7 +64,7 @@ namespace EpubSharp.Format.Readers
                 },
                 Guide = guide == null ? null : new OpfGuide
                 {
-                    References = guide.Elements(OpfElements.Reference)?.AsObjectList(elem => new OpfGuideReference
+                    References = guide.Elements(OpfElements.Reference).AsObjectList(elem => new OpfGuideReference
                     {
                         Title = (string) elem.Attribute(OpfGuideReference.Attributes.Title),
                         Type = (string) elem.Attribute(OpfGuideReference.Attributes.Type),
