@@ -277,9 +277,9 @@ namespace EpubSharp.Format
     {
         internal static class Attributes
         {
-            public static readonly XName Title = "id";
-            public static readonly XName Type = "name";
-            public static readonly XName Href = "refines";
+            public static readonly XName Title = "title";
+            public static readonly XName Type = "type";
+            public static readonly XName Href = "href";
         }
 
         public string Type { get; internal set; }
