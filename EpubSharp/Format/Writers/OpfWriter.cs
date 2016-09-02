@@ -149,7 +149,7 @@ namespace EpubSharp.Format.Writers
             }
             foreach (var identifier in metadata.Identifiers)
             {
-                var element = new XElement(OpfElements.Meta, identifier.Text);
+                var element = new XElement(OpfElements.Identifier, identifier.Text);
                 if (!string.IsNullOrWhiteSpace(identifier.Id))
                 {
                     element.Add(new XAttribute(OpfMetadataIdentifier.Attributes.Id, identifier.Id));
