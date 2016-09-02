@@ -13,7 +13,7 @@ namespace EpubSharp.Format.Readers
             var navList = xml.Root.Element(NcxElements.NavList);
             var ncx = new NcxDocument
             {
-                Metadata = xml.Root.Element(NcxElements.Head)?.Elements(NcxElements.Meta).AsObjectList(elem => new NcxMetadata
+                Meta = xml.Root.Element(NcxElements.Head)?.Elements(NcxElements.Meta).AsObjectList(elem => new NcxMeta
                 {
                     Name = (string)elem.Attribute("name"),
                     Content = (string)elem.Attribute("content"),

@@ -15,6 +15,23 @@ namespace EpubSharp.Format.Writers
             root.Add(new XAttribute("xmlns", Constants.NcxNamespace));
 
             var head = new XElement(NcxElements.Head);
+            foreach (var meta in ncx.Meta)
+            {
+                var element = new XElement(NcxElements.Meta);
+                if (!string.IsNullOrWhiteSpace(meta.Content))
+                {
+                    element.Add(new XAttribute(NcxMeta.Attributes.Content, meta.Content));
+                }
+                if (!string.IsNullOrWhiteSpace(meta.Name))
+                {
+                    element.Add(new XAttribute(NcxMeta.Attributes.Name, meta.Name));
+                }
+                if (!string.IsNullOrWhiteSpace(meta.Scheme))
+                {
+                    element.Add(new XAttribute(NcxMeta.Attributes.Scheme, meta.Scheme));
+                }
+                head.Add(element);
+            }
             root.Add(head);
 
             if (!string.IsNullOrWhiteSpace(ncx.DocTitle))

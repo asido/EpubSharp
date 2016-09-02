@@ -285,7 +285,7 @@ namespace EpubSharp.Tests
                 Assert.AreEqual(expected.DocAuthor, actual.DocAuthor, nameof(actual.DocAuthor));
                 Assert.AreEqual(expected.DocTitle, actual.DocTitle, nameof(actual.DocTitle));
 
-                AssertCollection(expected.Metadata, actual.Metadata, nameof(actual.Metadata), (a, b) =>
+                AssertCollection(expected.Meta, actual.Meta, nameof(actual.Meta), (a, b) =>
                 {
                     Assert.AreEqual(a.Name, b.Name, "Metadata.Name");
                     Assert.AreEqual(a.Content, b.Content, "Metadata.Content");

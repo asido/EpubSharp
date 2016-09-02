@@ -26,7 +26,7 @@ namespace EpubSharp.Format
     /// </summary>
     public class NcxDocument
     {
-        public ICollection<NcxMetadata> Metadata { get; internal set; } = new List<NcxMetadata>();
+        public ICollection<NcxMeta> Meta { get; internal set; } = new List<NcxMeta>();
         public string DocTitle { get; internal set; }
         public string DocAuthor { get; internal set; }
         public NcxNapMap NavMap { get; internal set; }
@@ -34,8 +34,15 @@ namespace EpubSharp.Format
         public NcxNavigationList NavigationList { get; internal set; }
     }
 
-    public class NcxMetadata
+    public class NcxMeta
     {
+        internal static class Attributes
+        {
+            public static readonly XName Name = "name";
+            public static readonly XName Content = "content";
+            public static readonly XName Scheme = "scheme";
+        }
+
         public string Name { get; internal set; }
         public string Content { get; internal set; }
         public string Scheme { get; internal set; }
