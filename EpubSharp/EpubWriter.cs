@@ -19,8 +19,7 @@ namespace EpubSharp
 
         private readonly OpfDocument opf = new OpfDocument
         {
-            // We could probably switch to v3 once we can format nav.xhtml
-            EpubVersion = EpubVersion.Epub2
+            EpubVersion = EpubVersion.Epub3
         };
 
         private readonly NcxDocument ncx = new NcxDocument();
