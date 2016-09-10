@@ -128,16 +128,9 @@ namespace EpubSharp
             using (var stream = new MemoryStream())
             {
                 doc.Save(stream);
-                try
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    var xml = Encoding.UTF8.GetString(stream.ReadToEnd());
-                    return XDocument.Parse(xml);
-                }
-                catch (Exception ex)
-                {
-                    return null;
-                }
+                stream.Seek(0, SeekOrigin.Begin);
+                var xml = Encoding.UTF8.GetString(stream.ReadToEnd());
+                return XDocument.Parse(xml);
             }
         }
     }
