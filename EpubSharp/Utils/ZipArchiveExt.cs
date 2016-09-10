@@ -122,6 +122,8 @@ namespace EpubSharp
                 html = html.Trim();
             }
 
+            // TODO: HtmlAgilityPack dependency is introduced just for OptionWriteEmptyNodes, which fixes up malformed HTML.
+            // i.e. <link> (instead of <link/>) makes XDocument to throw. It would be great to add fixups in the library and not depend on dependencies.
             var doc = new HtmlDocument { OptionWriteEmptyNodes = true };
             doc.LoadHtml(html);
 
