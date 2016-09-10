@@ -5,15 +5,18 @@ namespace EpubSharp.Format
 {
     internal static class NavElements
     {
-        public static readonly XName Html = Constants.XhtmlNamespace + "html";
+        public static readonly string Html = "html";
 
-        public static readonly XName Head = Constants.XhtmlNamespace + "head";
-        public static readonly XName Title = Constants.XhtmlNamespace + "title";
-        public static readonly XName Link = Constants.XhtmlNamespace + "link";
-        public static readonly XName Meta = Constants.XhtmlNamespace + "meta";
+        public static readonly string Head = "head";
+        public static readonly string Title = "title";
+        public static readonly string Link = "link";
+        public static readonly string Meta = "meta";
 
-        public static readonly XName Body = Constants.XhtmlNamespace + "body";
-        public static readonly XName Nav = Constants.XhtmlNamespace + "nav";
+        public static readonly string Body = "body";
+        public static readonly string Nav = "nav";
+        public static readonly string Ol = "ol";
+        public static readonly string Li = "li";
+        public static readonly string A = "a";
     }
 
     public class NavDocument
@@ -70,6 +73,11 @@ namespace EpubSharp.Format
 
     public class NavBody
     {
+        /// <summary>
+        /// Instantiated only when the EPUB was read.
+        /// </summary>
+        internal XElement Dom { get; set; }
+
         public ICollection<NavNav> Navs { get; internal set; }
     }
 

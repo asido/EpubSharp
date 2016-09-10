@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Readers;
 
@@ -92,15 +93,76 @@ namespace EpubSharp
 
         private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
         {
+            if (book.Format.Nav != null)
+            {
+                var tocNav = book.Format.Nav.Body.Navs.SingleOrDefault(e => e.Type == "toc");
+                if (tocNav != null)
+                {
+                    return LoadChaptersFromNav(tocNav.Dom);
+                }
+            }
+
             if (book.Format.Ncx != null)
             {
-                return LoadChaptersFromNcx(book.Format.Ncx.NavMap.NavPoints, epubArchive);
+                return LoadChaptersFromNcx(book.Format.Ncx.NavMap.NavPoints);
             }
             
             return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChaptersFromNcx(IEnumerable<NcxNavPoint> navigationPoints, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChaptersFromNav(XElement element)
+        {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+            var ns = element.Name.Namespace;
+
+            var result = new List<EpubChapter>();
+
+            var ol = element.Element(ns + NavElements.Ol);
+            if (ol == null)
+            {
+                return result;
+            }
+
+            foreach (var li in ol.Elements(ns + NavElements.Li))
+            {
+                var chapter = new EpubChapter();
+
+                var link = li.Element(ns + NavElements.A);
+                if (link != null)
+                {
+                    var url = link.Attribute("href")?.Value;
+                    if (url != null)
+                    {
+                        var contentSourceAnchorCharIndex = url.IndexOf('#');
+                        if (contentSourceAnchorCharIndex == -1)
+                        {
+                            chapter.FileName = url;
+                        }
+                        else
+                        {
+                            chapter.FileName = url.Substring(0, contentSourceAnchorCharIndex);
+                            chapter.Anchor = url.Substring(contentSourceAnchorCharIndex + 1);
+                        }
+                    }
+
+                    var titleTextElement = li.Descendants().FirstOrDefault(e => !string.IsNullOrWhiteSpace(e.Value));
+                    if (titleTextElement != null)
+                    {
+                        chapter.Title = titleTextElement.Value;
+                    }
+
+                    if (li.Element(ns + NavElements.Ol) != null)
+                    {
+                        chapter.SubChapters = LoadChaptersFromNav(li);
+                    }
+                    result.Add(chapter);
+                }
+            }
+
+            return result;
+        }
+
+        private static List<EpubChapter> LoadChaptersFromNcx(IEnumerable<NcxNavPoint> navigationPoints)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
@@ -117,7 +179,7 @@ namespace EpubSharp
                     chapter.Anchor = navigationPoint.ContentSrc.Substring(contentSourceAnchorCharIndex + 1);
                 }
 
-                chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavPoints, epubArchive);
+                chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavPoints);
                 result.Add(chapter);
             }
             return result;
