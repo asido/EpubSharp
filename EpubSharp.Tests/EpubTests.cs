@@ -379,6 +379,20 @@ namespace EpubSharp.Tests
                         Assert.AreEqual(a.Content, b.Content, "Meta.Content");
                     });
                 }
+
+                Assert.AreEqual(expected.Body == null, actual.Body == null, nameof(actual.Body));
+                if (expected.Body != null && actual.Body != null)
+                {
+                    Assert.AreEqual(expected.Body.Dom == null, actual.Body.Dom == null);
+                    AssertCollection(expected.Body.Navs, actual.Body.Navs, nameof(actual.Body.Navs), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Dom == null, b.Dom == null);
+                        Assert.AreEqual(a.Class, b.Class, "Nav.Class");
+                        Assert.AreEqual(a.Hidden, b.Hidden, "Nav.Hidden");
+                        Assert.AreEqual(a.Id, b.Id, "Nav.Id");
+                        Assert.AreEqual(a.Type, b.Type, "Nav.Type");
+                    });
+                }
             }
         }
     }
