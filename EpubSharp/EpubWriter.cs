@@ -22,6 +22,7 @@ namespace EpubSharp
             EpubVersion = EpubVersion.Epub3
         };
 
+        private readonly NavDocument nav = new NavDocument();
         private readonly NcxDocument ncx = new NcxDocument();
 
         private readonly EpubResources resources = new EpubResources();
@@ -37,6 +38,7 @@ namespace EpubSharp
             if (book.Format?.Opf == null) throw new ArgumentException("book opf instance == null", nameof(book));
 
             opf = book.Format.Opf;
+            nav = book.Format.Nav;
             ncx = book.Format.Ncx;
 
             resources = book.Resources;
