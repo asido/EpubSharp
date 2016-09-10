@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Readers
@@ -10,6 +11,7 @@ namespace EpubSharp.Format.Readers
             if (xml == null) throw new ArgumentNullException(nameof(xml));
             if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
 
+            var navMap = xml.Root.Element(NcxElements.NavMap);
             var pageList = xml.Root.Element(NcxElements.PageList);
             var navInfo = pageList?.Element(NcxElements.NavInfo);
             var navList = xml.Root.Element(NcxElements.NavList);
@@ -24,7 +26,11 @@ namespace EpubSharp.Format.Readers
                 }),
                 DocTitle = xml.Root.Element(NcxElements.DocTitle)?.Element(NcxElements.Text)?.Value,
                 DocAuthor = xml.Root.Element(NcxElements.DocAuthor)?.Element(NcxElements.Text)?.Value,
-                NavMap = new NcxNapMap { NavPoints = xml.Root.Element(NcxElements.NavMap)?.Elements(NcxElements.NavPoint).AsObjectList(ReadNavPoint) },
+                NavMap = new NcxNapMap
+                {
+                    Dom = navMap,
+                    NavPoints = navMap == null ? new List<NcxNavPoint>() : navMap.Elements(NcxElements.NavPoint).AsObjectList(ReadNavPoint)
+                },
                 PageList = pageList == null ? null : new NcxPageList
                 {
                     NavInfo = navInfo == null ? null : new NcxNavInfo { Text = navInfo.Element(NcxElements.Text)?.Value },
