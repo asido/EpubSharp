@@ -4,6 +4,11 @@ namespace EpubSharp.Format
 {
     internal class Constants
     {
+        public static readonly string Html5Doctype = "<!DOCTYPE html>";
+
+        public static readonly string XmlDeclarationPrefix = "<?xml";
+        public static readonly string XmlDeclarationSufix = "?>";
+
         public static readonly string XmlDeclaration = new XDeclaration("1.0", null, null).ToString();
 
         public static readonly XNamespace XhtmlNamespace = "http://www.w3.org/1999/xhtml";

@@ -40,7 +40,13 @@ namespace EpubSharp
 
                 format.Opf = OpfReader.Read(archive.LoadXml(rootFilePath));
 
-                // TODO: Implement epub 3.0 nav support and load ncx only if nav is not present.
+                var navPath = format.Opf.FindNavPath();
+                if (navPath != null)
+                {
+                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(rootFilePath), navPath);
+                    format.Nav = NavReader.Read(archive.LoadHtml(absolutePath));
+                }
+
                 var ncxPath = format.Opf.FindNcxPath();
                 if (ncxPath != null)
                 {

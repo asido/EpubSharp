@@ -7,7 +7,21 @@ namespace EpubSharp.Format.Readers
     {
         public static NavDocument Read(XDocument xml)
         {
-            throw new NotImplementedException();
+            if (xml == null) throw new ArgumentNullException(nameof(xml));
+            if (xml.Root == null) throw new ArgumentException("XML document has no root element.", nameof(xml));
+
+            var nav = new NavDocument
+            {
+                Head = new NavHead
+                {
+                    
+                },
+                Body = new NavBody
+                {
+                }
+            };
+
+            return nav;
         }
     }
 }

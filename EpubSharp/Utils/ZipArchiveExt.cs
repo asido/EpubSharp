@@ -5,6 +5,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using EpubSharp.Format;
+using HtmlAgilityPack;
 
 namespace EpubSharp
 {
@@ -94,6 +96,48 @@ namespace EpubSharp
             {
                 var xml = XDocument.Load(stream);
                 return xml;
+            }
+        }
+
+        public static XDocument LoadHtml(this ZipArchive archive, string entryName)
+        {
+            var html = archive.LoadText(entryName);
+            html = html.Trim();
+
+            // Strip everything above doctype, because some navigation HTMLs start with <?xml ... ?> declaration.
+            // It's a loop, because some EPUBs have multiple declarations. I.e.:
+            /*
+                <?xml version="1.0" encoding="UTF-8"?>
+                <?xml-model href="file:/C:/EPub/epub-revision/build/30/schema/epub-nav-30.rnc" type="application/relax-ng-compact-syntax"?>
+             */
+            while (html.StartsWith(Constants.XmlDeclarationPrefix))
+            {
+                var declarationEnd = html.IndexOf(Constants.XmlDeclarationSufix, StringComparison.Ordinal);
+                if (declarationEnd == -1)
+                {
+                    throw new InvalidOperationException("HTML starts with an XML declaration, but couldn't find the end.");
+                }
+
+                html = html.Substring(declarationEnd + Constants.XmlDeclarationSufix.Length);
+                html = html.Trim();
+            }
+
+            var doc = new HtmlDocument { OptionWriteEmptyNodes = true };
+            doc.LoadHtml(html);
+
+            using (var stream = new MemoryStream())
+            {
+                doc.Save(stream);
+                try
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var xml = Encoding.UTF8.GetString(stream.ReadToEnd());
+                    return XDocument.Parse(xml);
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
             }
         }
     }

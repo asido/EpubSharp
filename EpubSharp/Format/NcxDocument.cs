@@ -51,6 +51,10 @@ namespace EpubSharp.Format
 
     public class NcxNapMap
     {
+        /// <summary>
+        /// Populated only when an EPUB with NCX is read.
+        /// </summary>
+        public XElement Dom { get; internal set; }
         public ICollection<NcxNavPoint> NavPoints { get; internal set; } = new List<NcxNavPoint>();
     }
 
