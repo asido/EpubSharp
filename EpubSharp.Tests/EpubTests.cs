@@ -293,14 +293,14 @@ namespace EpubSharp.Tests
                     Assert.AreEqual(a.Scheme, b.Scheme, "Metadata.Scheme");
                 });
 
-                Assert.AreEqual(expected.NavigationList == null, actual.NavigationList == null, "NavigationList");
-                if (expected.NavigationList != null && actual.NavigationList != null)
+                Assert.AreEqual(expected.NavList == null, actual.NavList == null, "NavigationList");
+                if (expected.NavList != null && actual.NavList != null)
                 {
-                    Assert.AreEqual(expected.NavigationList.Id, actual.NavigationList.Id, "NavigationList.Id");
-                    Assert.AreEqual(expected.NavigationList.Class, actual.NavigationList.Class, "NavigationList.Class");
-                    Assert.AreEqual(expected.NavigationList.Label, actual.NavigationList.Label, "NavigationList.Label");
+                    Assert.AreEqual(expected.NavList.Id, actual.NavList.Id, "NavigationList.Id");
+                    Assert.AreEqual(expected.NavList.Class, actual.NavList.Class, "NavigationList.Class");
+                    Assert.AreEqual(expected.NavList.Label, actual.NavList.Label, "NavigationList.Label");
 
-                    AssertCollection(expected.NavigationList.NavTargets, actual.NavigationList.NavTargets, nameof(actual.NavigationList.NavTargets), (a, b) =>
+                    AssertCollection(expected.NavList.NavTargets, actual.NavList.NavTargets, nameof(actual.NavList.NavTargets), (a, b) =>
                     {
                         Assert.AreEqual(a.Id, b.Id, "NavigationTarget.Id");
                         Assert.AreEqual(a.Class, b.Class, "NavigationTarget.Class");
@@ -369,6 +369,7 @@ namespace EpubSharp.Tests
                         Assert.AreEqual(a.Rel, b.Rel, "Link.Rel");
                         Assert.AreEqual(a.Title, b.Title, "Link.Title");
                         Assert.AreEqual(a.Type, b.Type, "Link.Type");
+                        Assert.AreEqual(a.Media, b.Media, "Link.Media");
                     });
 
                     AssertCollection(expected.Head.Metas, actual.Head.Metas, nameof(actual.Head.Metas), (a, b) =>

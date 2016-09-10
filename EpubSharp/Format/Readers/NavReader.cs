@@ -27,7 +27,8 @@ namespace EpubSharp.Format.Readers
                         Href = elem.Attribute(NavHeadLink.Attributes.Href)?.Value,
                         Rel = elem.Attribute(NavHeadLink.Attributes.Rel)?.Value,
                         Title = elem.Attribute(NavHeadLink.Attributes.Title)?.Value,
-                        Type = elem.Attribute(NavHeadLink.Attributes.Type)?.Value
+                        Type = elem.Attribute(NavHeadLink.Attributes.Type)?.Value,
+                        Media = elem.Attribute(NavHeadLink.Attributes.Media)?.Value
                     }) ?? new List<NavHeadLink>(),
                     Metas = head?.Elements(NavElements.Meta).AsObjectList(elem => new NavMeta
                     {
@@ -38,6 +39,14 @@ namespace EpubSharp.Format.Readers
                 },
                 Body = new NavBody
                 {
+                    Navs = body?.Elements(NavElements.Nav).AsObjectList(elem => new NavNav
+                    {
+                        Dom = elem,
+                        Id = elem.Attribute(NavNav.Attributes.Id)?.Value,
+                        Class = elem.Attribute(NavNav.Attributes.Class)?.Value,
+                        Hidden = elem.Attribute(NavNav.Attributes.Hidden)?.Value,
+                        Type = elem.Attribute(NavNav.Attributes.Type)?.Value
+                    })
                 }
             };
 

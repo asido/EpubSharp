@@ -32,7 +32,7 @@ namespace EpubSharp.Format
         public string DocAuthor { get; internal set; }
         public NcxNapMap NavMap { get; internal set; }
         public NcxPageList PageList { get; internal set; }
-        public NcxNavigationList NavigationList { get; internal set; }
+        public NcxNavList NavList { get; internal set; }
     }
 
     public class NcxMeta
@@ -122,15 +122,15 @@ namespace EpubSharp.Format
         public string ContentSrc { get; internal set; }
     }
 
-    public class NcxNavigationList
+    public class NcxNavList
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public string Label { get; internal set; }
-        public ICollection<NcxNavigationTarget> NavTargets { get; internal set; } = new List<NcxNavigationTarget>();
+        public ICollection<NcxNavTarget> NavTargets { get; internal set; } = new List<NcxNavTarget>();
     }
 
-    public class NcxNavigationTarget
+    public class NcxNavTarget
     {
         public string Id { get; internal set; }
         public string Class { get; internal set; }

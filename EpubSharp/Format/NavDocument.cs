@@ -7,12 +7,13 @@ namespace EpubSharp.Format
     {
         public static readonly XName Html = Constants.XhtmlNamespace + "html";
 
-        public static readonly XName Head = "head";
-        public static readonly XName Title = "title";
-        public static readonly XName Link = "link";
-        public static readonly XName Meta = "meta";
+        public static readonly XName Head = Constants.XhtmlNamespace + "head";
+        public static readonly XName Title = Constants.XhtmlNamespace + "title";
+        public static readonly XName Link = Constants.XhtmlNamespace + "link";
+        public static readonly XName Meta = Constants.XhtmlNamespace + "meta";
 
-        public static readonly XName Body = "body";
+        public static readonly XName Body = Constants.XhtmlNamespace + "body";
+        public static readonly XName Nav = Constants.XhtmlNamespace + "nav";
     }
 
     public class NavDocument
@@ -42,6 +43,7 @@ namespace EpubSharp.Format
             public static readonly XName Type = "type";
             public static readonly XName Class = "class";
             public static readonly XName Title = "title";
+            public static readonly XName Media = "media";
         }
 
         public string Href { get; internal set; }
@@ -49,6 +51,7 @@ namespace EpubSharp.Format
         public string Type { get; internal set; }
         public string Class { get; internal set; }
         public string Title { get; internal set; }
+        public string Media { get; internal set; }
     }
 
     public class NavMeta
@@ -67,9 +70,15 @@ namespace EpubSharp.Format
 
     public class NavBody
     {
+        public ICollection<NavNav> Navs { get; internal set; }
+    }
+
+    public class NavNav
+    {
         internal static class Attributes
         {
             public static readonly XName Id = "id";
+            public static readonly XName Class = "class";
             public static readonly XName Type = Constants.OpsNamespace + "type";
             public static readonly XName Hidden = Constants.OpsNamespace + "hidden";
         }
@@ -81,7 +90,7 @@ namespace EpubSharp.Format
 
         public string Type { get; internal set; }
         public string Id { get; internal set; }
+        public string Class { get; internal set; }
         public string Hidden { get; internal set; }
-        public XElement Element { get; internal set; }
     }
 }

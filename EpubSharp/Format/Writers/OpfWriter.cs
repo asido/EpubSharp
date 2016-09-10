@@ -252,7 +252,7 @@ namespace EpubSharp.Format.Writers
                 {
                     element.Add(new XAttribute(OpfSpineItemRef.Attributes.IdRef, itemref.IdRef));
                 }
-                if (itemref.Properties != null && itemref.Properties.Length > 0)
+                if (itemref.Properties.Any())
                 {
                     element.Add(new XAttribute(OpfSpineItemRef.Attributes.Properties, string.Join(" ", itemref.Properties)));
                 }

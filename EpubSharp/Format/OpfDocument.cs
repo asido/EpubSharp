@@ -260,7 +260,7 @@ namespace EpubSharp.Format
         public string IdRef { get; internal set; }
         public bool Linear { get; internal set; }
         public string Id { get; internal set; }
-        public string[] Properties { get; internal set; }
+        public ICollection<string> Properties { get; internal set; } = new List<string>();
 
         public override string ToString()
         {

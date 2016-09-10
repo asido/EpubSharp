@@ -44,12 +44,12 @@ namespace EpubSharp.Format.Readers
                         ContentSrc = (string)elem.Element(NcxElements.Content)?.Attribute(NcxPageTarget.Attributes.ContentSrc)
                     })
                 },
-                NavigationList = navList == null ? null : new NcxNavigationList
+                NavList = navList == null ? null : new NcxNavList
                 {
                     Id = (string)navList.Attribute("id"),
                     Class = (string)navList.Attribute("class"),
                     Label = navList.Element(NcxElements.NavLabel)?.Element(NcxElements.Text)?.Value,
-                    NavTargets = navList.Elements(NcxElements.NavTarget).AsObjectList(elem => new NcxNavigationTarget
+                    NavTargets = navList.Elements(NcxElements.NavTarget).AsObjectList(elem => new NcxNavTarget
                     {
                         Id = (string)elem.Attribute("id"),
                         Class = (string)elem.Attribute("class"),

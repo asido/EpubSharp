@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format.Readers
@@ -92,7 +94,7 @@ namespace EpubSharp.Format.Readers
                         IdRef = (string) elem.Attribute(OpfSpineItemRef.Attributes.IdRef),
                         Linear = (string) elem.Attribute(OpfSpineItemRef.Attributes.Linear) != "no",
                         Id = (string) elem.Attribute(OpfSpineItemRef.Attributes.Id),
-                        Properties = ((string) elem.Attribute(OpfSpineItemRef.Attributes.Properties))?.Split(' ')
+                        Properties = ((string) elem.Attribute(OpfSpineItemRef.Attributes.Properties))?.Split(' ').ToList() ?? new List<string>()
                     }),
                     Toc = spine?.Attribute(OpfSpine.Attributes.Toc)?.Value
                 }
