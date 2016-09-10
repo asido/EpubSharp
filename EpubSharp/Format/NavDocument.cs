@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
 namespace EpubSharp.Format
 {
+    internal static class NavElements
+    {
+        public static readonly XName Html = Constants.XhtmlNamespace + "html";
+
+        public static readonly XName Head = "head";
+        public static readonly XName Title = "title";
+        public static readonly XName Link = "link";
+        public static readonly XName Meta = "meta";
+
+        public static readonly XName Body = "body";
+    }
+
     public class NavDocument
     {
         public NavHead Head { get; internal set; }
@@ -15,6 +23,11 @@ namespace EpubSharp.Format
 
     public class NavHead
     {
+        /// <summary>
+        /// Instantiated only when the EPUB was read.
+        /// </summary>
+        internal XElement Dom { get; set; }
+
         public string Title { get; internal set; }
         public ICollection<NavHeadLink> Links { get; internal set; } = new List<NavHeadLink>();
         public ICollection<NavMeta> Metas { get; internal set; } = new List<NavMeta>();
@@ -42,9 +55,13 @@ namespace EpubSharp.Format
     {
         internal static class Attributes
         {
+            public static readonly XName Name = "name";
+            public static readonly XName Content = "content";
             public static readonly XName Charset = "charset";
         }
 
+        public string Name { get; internal set; }
+        public string Content { get; internal set; }
         public string Charset { get; internal set; }
     }
 
@@ -56,6 +73,11 @@ namespace EpubSharp.Format
             public static readonly XName Type = Constants.OpsNamespace + "type";
             public static readonly XName Hidden = Constants.OpsNamespace + "hidden";
         }
+
+        /// <summary>
+        /// Instantiated only when the EPUB was read.
+        /// </summary>
+        internal XElement Dom { get; set; }
 
         public string Type { get; internal set; }
         public string Id { get; internal set; }
