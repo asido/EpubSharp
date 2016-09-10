@@ -130,7 +130,7 @@ namespace EpubSharp
 
                 var allFiles = new[]
                 {
-                    resources.Html.Select(dict => dict.Value).Cast<EpubContentFile>(),
+                    resources.Html.Select(dict => dict.Value),
                     resources.Css.Select(dict => dict.Value),
                     resources.Images.Select(dict => dict.Value),
                     resources.Fonts.Select(dict => dict.Value),
