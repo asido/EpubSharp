@@ -67,6 +67,12 @@ namespace EpubSharp
             writer.Write(stream);
         }
 
+        public void AddAuthor(string author)
+        {
+            if (author == null) throw new ArgumentNullException(nameof(author));
+            opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
+        }
+
         public void SetCover(byte[] image, ImageFormat format)
         {
             if (image == null) throw new ArgumentNullException(nameof(image));
@@ -99,13 +105,7 @@ namespace EpubSharp
                 MediaType = coverResource.MimeType
             });
         }
-
-        public void AddAuthor(string author)
-        {
-            if (author == null) throw new ArgumentNullException(nameof(author));
-            opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
-        }
-
+        
         public void Write(string filename)
         {
             using (var file = File.Create(filename))
