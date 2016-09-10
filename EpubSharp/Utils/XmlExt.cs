@@ -31,7 +31,7 @@ namespace EpubSharp
 
         public static ICollection<T> AsObjectList<T>(this IEnumerable<XElement> self, Func<XElement, T> factory)
         {
-            return self.Select(factory).ToList();
+            return self.Select(factory).Where(value => value != null).ToList();
         }
     }
 }
