@@ -123,7 +123,7 @@ namespace EpubSharp
             return result;
         }
 
-        public static EpubResources LoadResources(ZipArchive epubArchive, EpubBook book)
+        private static EpubResources LoadResources(ZipArchive epubArchive, EpubBook book)
         {
             var result = new EpubResources
             {
