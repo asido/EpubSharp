@@ -83,6 +83,7 @@ namespace EpubSharp.Tests
             AssertOcf(expected.Format.Ocf, actual.Format.Ocf);
             AssertOpf(expected.Format.Opf, actual.Format.Opf);
             AssertNcx(expected.Format.Ncx, actual.Format.Ncx);
+            AssertNav(expected.Format.Nav, actual.Format.Nav);
         }
 
         private void AssertCollectionWithIndex<T>(IEnumerable<T> expected, IEnumerable<T> actual, string name, Action<List<T>, List<T>, int> assert)
@@ -350,6 +351,34 @@ namespace EpubSharp.Tests
                     AssertNavigationPoints(a.NavPoints, b.NavPoints);
                 }
             });
+        }
+
+        private void AssertNav(NavDocument expected, NavDocument actual)
+        {
+            Assert.AreEqual(expected == null, actual == null, nameof(actual));
+            if (expected != null && actual != null)
+            {
+                Assert.AreEqual(expected.Head == null, actual.Head == null, nameof(actual.Head));
+                if (expected.Head != null && actual.Head != null)
+                {
+                    Assert.AreEqual(expected.Head.Title, actual.Head.Title);
+                    AssertCollection(expected.Head.Links, actual.Head.Links, nameof(actual.Head.Links), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Class, b.Class, "Link.Class");
+                        Assert.AreEqual(a.Href, b.Href, "Link.Href");
+                        Assert.AreEqual(a.Rel, b.Rel, "Link.Rel");
+                        Assert.AreEqual(a.Title, b.Title, "Link.Title");
+                        Assert.AreEqual(a.Type, b.Type, "Link.Type");
+                    });
+
+                    AssertCollection(expected.Head.Metas, actual.Head.Metas, nameof(actual.Head.Metas), (a, b) =>
+                    {
+                        Assert.AreEqual(a.Charset, b.Charset, "Meta.Charset");
+                        Assert.AreEqual(a.Name, b.Name, "Meta.Name");
+                        Assert.AreEqual(a.Content, b.Content, "Meta.Content");
+                    });
+                }
+            }
         }
     }
 }
