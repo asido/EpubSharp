@@ -72,6 +72,16 @@ namespace EpubSharp
             if (author == null) throw new ArgumentNullException(nameof(author));
             opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
         }
+        
+        public void AddChapter(string title, string html)
+        {
+            throw new NotImplementedException("Implement me!");
+        }
+
+        public void InsertChapter(string title, string html, int index, EpubChapter parent = null)
+        {
+            throw new NotImplementedException("Implement me!");
+        }
 
         public void SetCover(byte[] image, ImageFormat format)
         {
