@@ -21,10 +21,7 @@ namespace EpubSharp
         public string Author => Authors.Any() ? string.Join(AuthorsSeparator, Authors) : null;
         public EpubResources Resources { get; internal set; }
         public EpubSpecialResources SpecialResources { get; internal set; }
-
-        internal Lazy<Image> LazyCoverImage = null;
-        public Image CoverImage => LazyCoverImage?.Value;
-
+        public byte[] CoverImage { get; internal set; }
         public List<EpubChapter> TableOfContents { get; internal set; }
 
         public string ToPlainText()

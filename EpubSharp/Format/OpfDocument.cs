@@ -58,35 +58,26 @@ namespace EpubSharp.Format
 
         internal string FindCoverPath()
         {
-            string coverId = null;
-
             var coverMetaItem = Metadata.FindCoverMeta();
             if (coverMetaItem != null)
             {
-                coverId = coverMetaItem.Text;
-            }
-            else
-            {
-                var item = Manifest.FindCoverItem();
+                var item = Manifest.Items.FirstOrDefault(e => e.Id == coverMetaItem.Text);
                 if (item != null)
                 {
-                    coverId = item.Href;
+                    return item.Href;
                 }
             }
 
-            if (coverId == null)
-            {
-                return null;
-            }
-
-            var coverItem = Manifest.Items.FirstOrDefault(item => item.Id == coverId);
+            var coverItem = Manifest.FindCoverItem();
             return coverItem?.Href;
         }
 
-        internal void RemoveCover()
+        internal string FindAndRemoveCover()
         {
-            Metadata.DeleteCoverMeta();
-            Manifest.DeleteCoverItem();
+            var path = FindCoverPath();
+            var meta = Metadata.FindAndDeleteCoverMeta();
+            Manifest.DeleteCoverItem(meta?.Text);
+            return path;
         }
         
         internal string FindNcxPath()
@@ -148,13 +139,12 @@ namespace EpubSharp.Format
             return Metas.FirstOrDefault(metaItem => metaItem.Name == "cover");
         }
 
-        internal void DeleteCoverMeta()
+        internal OpfMetadataMeta FindAndDeleteCoverMeta()
         {
             var meta = FindCoverMeta();
-            if (meta != null)
-            {
-                Metas.Remove(meta);
-            }
+            if (meta == null) return null;
+            Metas.Remove(meta);
+            return meta;
         }
     }
 
@@ -232,9 +222,9 @@ namespace EpubSharp.Format
             return Items.FirstOrDefault(e => e.Properties.Contains(ManifestItemCoverImageProperty));
         }
 
-        internal void DeleteCoverItem()
+        internal void DeleteCoverItem(string id = null)
         {
-            var item = FindCoverItem();
+            var item = id != null ? Items.FirstOrDefault(e => e.Id == id) : FindCoverItem();
             if (item != null)
             {
                 Items.Remove(item);

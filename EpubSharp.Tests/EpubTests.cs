@@ -59,8 +59,9 @@ namespace EpubSharp.Tests
             Assert.AreEqual(expected.CoverImage == null, actual.CoverImage == null, nameof(actual.CoverImage));
             if (expected.CoverImage != null && actual.CoverImage != null)
             {
-                Assert.AreEqual(expected.CoverImage.Height, actual.CoverImage.Height, "CoverImage.Height");
-                Assert.AreEqual(expected.CoverImage.Width, actual.CoverImage.Width, "CoverImage.Width");
+                Assert.IsTrue(expected.CoverImage.Length > 0, "Expected CoverImage.Length > 0");
+                Assert.IsTrue(actual.CoverImage.Length > 0, "Actual CoverImage.Length > 0");
+                Assert.AreEqual(expected.CoverImage.Length, actual.CoverImage.Length, "CoverImage.Length");
             }
 
             AssertContentFileCollection(expected.Resources.Css, actual.Resources.Css, nameof(actual.Resources.Css));

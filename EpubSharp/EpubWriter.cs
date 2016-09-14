@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -8,11 +10,6 @@ using EpubSharp.Format.Writers;
 
 namespace EpubSharp
 {
-    public enum ImageFormat
-    {
-        Jpeg, Png
-    }
-
     public class EpubWriter
     {
         private readonly string opfPath = "EPUB/package.opf";
@@ -88,49 +85,51 @@ namespace EpubSharp
             throw new NotImplementedException("Implement me!");
         }
 
-        public void SetCover(byte[] image, ImageFormat format)
+        public void RemoveCover()
         {
-            if (image == null) throw new ArgumentNullException(nameof(image));
+            var path = opf.FindAndRemoveCover();
+            if (path == null) return;
 
-            var existingCover = opf.FindCoverPath();
-            if (existingCover != null)
+            var resource = resources.Images.SingleOrDefault(e => e.FileName == path);
+            if (resource != null)
             {
-                var resource = resources.Images.SingleOrDefault(e => e.FileName == existingCover);
-                if (resource != null)
+                resources.Images.Remove(resource);
+            }
+        }
+
+        public void SetCover(byte[] data)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+            RemoveCover();
+
+            var image = Image.FromStream(new MemoryStream(data));
+            if (image.RawFormat.Equals(ImageFormat.Png))
+            {
+                using (var stream = new MemoryStream())
                 {
-                    resources.Images.Remove(resource);
+                    image.Save(stream, ImageFormat.Png);
+                    data = stream.ReadToEnd();
                 }
-
-                opf.RemoveCover();
             }
 
-            var coverResource = new EpubByteFile { Content = image };
-            string filename;
-
-            switch (format)
+            var coverResource = new EpubByteFile
             {
-                case ImageFormat.Jpeg:
-                    filename = "cover.jpg";
-                    coverResource.ContentType = EpubContentType.ImageJpeg;
-                    break;
-                case ImageFormat.Png:
-                    filename = "cover.png";
-                    coverResource.ContentType = EpubContentType.ImagePng;
-                    break;
-                default:
-                    throw new ArgumentException($"Unknown format: {format}", nameof(format));
-            }
-
-            coverResource.FileName = filename;
+                Content = data,
+                FileName = "cover.png",
+                ContentType = EpubContentType.ImagePng
+            };
             coverResource.MimeType = ContentType.ContentTypeToMimeType[coverResource.ContentType];
             resources.Images.Add(coverResource);
 
-            opf.Manifest.Items.Add(new OpfManifestItem
+            var coverItem = new OpfManifestItem
             {
                 Id = OpfManifest.ManifestItemCoverImageProperty,
-                Href = filename,
+                Href = coverResource.FileName,
                 MediaType = coverResource.MimeType
-            });
+            };
+            coverItem.Properties.Add(OpfManifest.ManifestItemCoverImageProperty);
+            opf.Manifest.Items.Add(coverItem);
         }
         
         public void Write(string filename)

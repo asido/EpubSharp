@@ -58,36 +58,25 @@ namespace EpubSharp
                 var book = new EpubBook { Format = format };
                 book.Resources = LoadResources(archive, book);
                 book.SpecialResources = LoadSpecialResources(archive, book);
-                book.LazyCoverImage = LazyLoadCoverImage(book);
+                book.CoverImage = LoadCoverImage(book);
                 book.TableOfContents = LoadChapters(book);
                 return book;
             }
         }
 
-        private static Lazy<Image> LazyLoadCoverImage(EpubBook book)
+        private static byte[] LoadCoverImage(EpubBook book)
         {
             if (book == null) throw new ArgumentNullException(nameof(book));
             if (book.Format == null) throw new ArgumentNullException(nameof(book.Format));
 
-            return new Lazy<Image>(() =>
+            var coverPath = book.Format.Opf.FindCoverPath();
+            if (coverPath == null)
             {
-                var coverPath = book.Format.Opf.FindCoverPath();
-                if (coverPath == null)
-                {
-                    return null;
-                }
+                return null;
+            }
 
-                var coverImageFile = book.Resources.Images.SingleOrDefault(e => e.FileName == coverPath);
-                if (coverImageFile == null)
-                {
-                    return null;
-                }
-
-                using (var coverImageStream = new MemoryStream(coverImageFile.Content))
-                {
-                    return Image.FromStream(coverImageStream);
-                }
-            });
+            var coverImageFile = book.Resources.Images.SingleOrDefault(e => e.FileName == coverPath);
+            return coverImageFile?.Content;
         }
 
         private static List<EpubChapter> LoadChapters(EpubBook book)
