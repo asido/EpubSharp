@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>EpubSharp.dll</id>
+    <version>1.0.0</version>
+    <authors>Arvydas Sidorenko</authors>
+    <owners>Arvydas Sidorenko</owners>
+    <licenseUrl>https://www.mozilla.org/en-US/MPL/2.0/</licenseUrl>
+    <projectUrl>https://github.com/Asido/EpubSharp/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A library for reading and writing EPUB files.</description>
+    <releaseNotes>Initial release with a full support to read EPUB files.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>epub epubs book books 2.0 3.0 3.1</tags>
+    <dependencies>
+      <dependency id="HtmlAgilityPack" version="1.4.9.5" />
+    </dependencies>
+  </metadata>
+</package>
