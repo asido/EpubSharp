@@ -63,16 +63,15 @@ namespace EpubSharp.Tests
         public void RemoveCoverTest()
         {
             var epub1 = EpubReader.Read(@"../../Samples/epub-assorted/Inversions - Iain M. Banks.epub");
-            var epub1ImageCount = epub1.Resources.Images.Count; // This is not necessary if EpubWriter would be able to make a deep clone of the book.
 
-            var writer = new EpubWriter(epub1);
+            var writer = new EpubWriter(EpubWriter.MakeCopy(epub1));
             writer.RemoveCover();
 
             var epub2 = WriteAndRead(writer);
 
             Assert.IsNotNull(epub1.CoverImage);
             Assert.IsNull(epub2.CoverImage);
-            Assert.AreEqual(epub1ImageCount - 1, epub2.Resources.Images.Count);
+            Assert.AreEqual(epub1.Resources.Images.Count - 1, epub2.Resources.Images.Count);
         }
 
         private EpubBook WriteAndRead(EpubWriter writer)

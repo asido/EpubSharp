@@ -69,6 +69,21 @@ namespace EpubSharp
             writer.Write(stream);
         }
 
+        /// <summary>
+        /// Clones the book instance by writing and reading it from memory.
+        /// </summary>
+        /// <param name="book"></param>
+        /// <returns></returns>
+        public static EpubBook MakeCopy(EpubBook book)
+        {
+            var stream = new MemoryStream();
+            var writer = new EpubWriter(book);
+            writer.Write(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            var epub = EpubReader.Read(stream, false);
+            return epub;
+        }
+
         public void AddAuthor(string author)
         {
             if (author == null) throw new ArgumentNullException(nameof(author));
@@ -169,7 +184,7 @@ namespace EpubSharp
                 }
             }
         }
-
+        
         // Old code to add toc.ncx
         /*
             if (opf.Spine.Toc != null)
