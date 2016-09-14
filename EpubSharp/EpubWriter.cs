@@ -110,7 +110,7 @@ namespace EpubSharp
 
             coverResource.FileName = filename;
             coverResource.MimeType = ContentType.ContentTypeToMimeType[coverResource.ContentType];
-            resources.Images.Add(coverResource.FileName, coverResource);
+            resources.images.Add(coverResource);
 
             opf.Manifest.Items.Add(new OpfManifestItem
             {
@@ -143,11 +143,11 @@ namespace EpubSharp
 
                 var allFiles = new[]
                 {
-                    resources.Html.Select(dict => dict.Value),
-                    resources.Css.Select(dict => dict.Value),
-                    resources.Images.Select(dict => dict.Value),
-                    resources.Fonts.Select(dict => dict.Value),
-                    resources.Other.Select(dict => dict.Value)
+                    resources.Html,
+                    resources.Css,
+                    resources.Images,
+                    resources.Fonts,
+                    resources.Other
                 }.SelectMany(collection => collection as EpubFile[] ?? collection.ToArray());
                 var relativePath = PathExt.GetDirectoryPath(opfPath);
                 foreach (var file in allFiles)

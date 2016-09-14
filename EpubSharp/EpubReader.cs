@@ -59,7 +59,7 @@ namespace EpubSharp
                 book.Resources = LoadResources(archive, book);
                 book.SpecialResources = LoadSpecialResources(archive, book);
                 book.LazyCoverImage = LazyLoadCoverImage(book);
-                book.TableOfContents = LoadChapters(book, archive);
+                book.TableOfContents = LoadChapters(book);
                 return book;
             }
         }
@@ -71,15 +71,14 @@ namespace EpubSharp
 
             return new Lazy<Image>(() =>
             {
-                EpubByteFile coverImageFile;
-
                 var coverPath = book.Format.Opf.FindCoverPath();
                 if (coverPath == null)
                 {
                     return null;
                 }
 
-                if (!book.Resources.Images.TryGetValue(coverPath, out coverImageFile))
+                var coverImageFile = book.Resources.Images.SingleOrDefault(e => e.FileName == coverPath);
+                if (coverImageFile == null)
                 {
                     return null;
                 }
@@ -91,7 +90,7 @@ namespace EpubSharp
             });
         }
 
-        private static List<EpubChapter> LoadChapters(EpubBook book, ZipArchive epubArchive)
+        private static List<EpubChapter> LoadChapters(EpubBook book)
         {
             if (book.Format.Nav != null)
             {
@@ -187,13 +186,11 @@ namespace EpubSharp
 
         private static EpubResources LoadResources(ZipArchive epubArchive, EpubBook book)
         {
-            var result = new EpubResources
-            {
-                Html = new Dictionary<string, EpubTextFile>(),
-                Css = new Dictionary<string, EpubTextFile>(),
-                Images = new Dictionary<string, EpubByteFile>(),
-                Fonts = new Dictionary<string, EpubByteFile>()
-            };
+            var html = new List<EpubTextFile>();
+            var css = new List<EpubTextFile>();
+            var images = new List<EpubByteFile>();
+            var fonts = new List<EpubByteFile>();
+            var other = new List<EpubFile>();
 
             foreach (var item in book.Format.Opf.Manifest.Items)
             {
@@ -242,13 +239,13 @@ namespace EpubSharp
                         switch (contentType)
                         {
                             case EpubContentType.Xhtml11:
-                                result.Html.Add(fileName, file);
+                                html.Add(file);
                                 break;
                             case EpubContentType.Css:
-                                result.Css.Add(fileName, file);
+                                css.Add(file);
                                 break;
                             default:
-                                result.Other.Add(fileName, file);
+                                other.Add(file);
                                 break;
                             }
                         break;
@@ -282,22 +279,29 @@ namespace EpubSharp
                             case EpubContentType.ImageJpeg:
                             case EpubContentType.ImagePng:
                             case EpubContentType.ImageSvg:
-                                result.Images.Add(fileName, file);
+                                images.Add(file);
                                 break;
                             case EpubContentType.FontTruetype:
                             case EpubContentType.FontOpentype:
-                                result.Fonts.Add(fileName, file);
+                                fonts.Add(file);
                                 break;
                             default:
-                                result.Other.Add(fileName, file);
+                                other.Add(file);
                                 break;
                         }
                         break;
                     }
                 }
             }
-            
-            return result;
+
+            return new EpubResources
+            {
+                html = html,
+                css= css,
+                images = images,
+                fonts = fonts,
+                other = other
+            };
         }
 
         private static EpubSpecialResources LoadSpecialResources(ZipArchive epubArchive, EpubBook book)
@@ -333,8 +337,8 @@ namespace EpubSharp
                     continue;
                 }
 
-                EpubTextFile html;
-                if (book.Resources.Html.TryGetValue(href, out html))
+                var html = book.Resources.Html.SingleOrDefault(e => e.FileName == href);
+                if (html != null)
                 {
                     result.HtmlInReadingOrder.Add(html);
                 }
