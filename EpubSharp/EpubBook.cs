@@ -17,11 +17,26 @@ namespace EpubSharp
         public EpubFormat Format { get; internal set; }
 
         public string Title => Format.Opf.Metadata.Titles.FirstOrDefault();
+
         public IList<string> Authors => Format.Opf.Metadata.Creators.Select(creator => creator.Text).ToList();
+
+        /// <summary>
+        /// Comma-separated authors.
+        /// </summary>
         public string Author => Authors.Any() ? string.Join(AuthorsSeparator, Authors) : null;
+
+        /// <summary>
+        /// All files within the EPUB.
+        /// </summary>
         public EpubResources Resources { get; internal set; }
+
+        /// <summary>
+        /// EPUB format specific resources.
+        /// </summary>
         public EpubSpecialResources SpecialResources { get; internal set; }
+
         public byte[] CoverImage { get; internal set; }
+
         public List<EpubChapter> TableOfContents { get; internal set; }
 
         public string ToPlainText()
