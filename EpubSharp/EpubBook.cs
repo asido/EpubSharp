@@ -12,7 +12,7 @@ namespace EpubSharp
         internal const string AuthorsSeparator = ", ";
 
         /// <summary>
-        /// Raw epub format structures. This is populated only when the instance is retrieved using EpubReader.Read()
+        /// Read-only raw epub format structures.
         /// </summary>
         public EpubFormat Format { get; internal set; }
 
