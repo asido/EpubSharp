@@ -30,7 +30,9 @@ namespace EpubSharp
 
         public EpubWriter()
         {
-            opf.Metadata.Dates.Add(new OpfMetadataDate { Text = DateTimeOffset.UtcNow.ToString() });
+            opf.Metadata.Dates.Add(new OpfMetadataDate { Text = DateTimeOffset.UtcNow.ToString("o") });
+            opf.Manifest.Items.Add(new OpfManifestItem { Id = "ncx", Href = "toc.ncx", MediaType = ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx] });
+            opf.Spine.Toc = "ncx";
         }
 
         public EpubWriter(EpubBook book)
