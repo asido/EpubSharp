@@ -89,7 +89,17 @@ namespace EpubSharp
         {
             if (image == null) throw new ArgumentNullException(nameof(image));
 
-            // TODO: Remove old cover.
+            var existingCover = opf.FindCoverPath();
+            if (existingCover != null)
+            {
+                var resource = resources.images.SingleOrDefault(e => e.FileName == existingCover);
+                if (resource != null)
+                {
+                    resources.images.Remove(resource);
+                }
+
+                opf.RemoveCover();
+            }
 
             var coverResource = new EpubByteFile { Content = image };
             string filename;
@@ -114,7 +124,7 @@ namespace EpubSharp
 
             opf.Manifest.Items.Add(new OpfManifestItem
             {
-                Id = "cover-image",
+                Id = OpfManifest.ManifestItemCoverImageProperty,
                 Href = filename,
                 MediaType = coverResource.MimeType
             });

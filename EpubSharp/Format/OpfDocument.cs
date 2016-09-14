@@ -49,26 +49,25 @@ namespace EpubSharp.Format
         {
             public static readonly XName Version = "version";
         }
-
+        
         public EpubVersion EpubVersion { get; internal set; } = new EpubVersion();
         public OpfMetadata Metadata { get; internal set; } = new OpfMetadata();
         public OpfManifest Manifest { get; internal set; } = new OpfManifest();
         public OpfSpine Spine { get; internal set; } = new OpfSpine();
         public OpfGuide Guide { get; internal set; } = new OpfGuide();
 
-        public string FindCoverPath()
+        internal string FindCoverPath()
         {
             string coverId = null;
 
-            var coverMetaItem = Metadata.Metas
-                .FirstOrDefault(metaItem => string.Compare(metaItem.Name, "cover", StringComparison.OrdinalIgnoreCase) == 0);
+            var coverMetaItem = Metadata.FindCoverMeta();
             if (coverMetaItem != null)
             {
                 coverId = coverMetaItem.Text;
             }
             else
             {
-                var item = Manifest.Items.FirstOrDefault(e => e.Properties.Contains("cover-image"));
+                var item = Manifest.FindCoverItem();
                 if (item != null)
                 {
                     coverId = item.Href;
@@ -84,7 +83,13 @@ namespace EpubSharp.Format
             return coverItem?.Href;
         }
 
-        public string FindNcxPath()
+        internal void RemoveCover()
+        {
+            Metadata.DeleteCoverMeta();
+            Manifest.DeleteCoverItem();
+        }
+        
+        internal string FindNcxPath()
         {
             string path = null;
 
@@ -112,7 +117,7 @@ namespace EpubSharp.Format
             return path;
         }
 
-        public string FindNavPath()
+        internal string FindNavPath()
         {
             var navItem = Manifest.Items.FirstOrDefault(e => e.Properties.Contains("nav"));
             return navItem?.Href;
@@ -137,6 +142,20 @@ namespace EpubSharp.Format
         public ICollection<string> Coverages { get; internal set; } = new List<string>();
         public ICollection<string> Rights { get; internal set; } = new List<string>();
         public ICollection<OpfMetadataMeta> Metas { get; internal set; } = new List<OpfMetadataMeta>();
+
+        internal OpfMetadataMeta FindCoverMeta()
+        {
+            return Metas.FirstOrDefault(metaItem => metaItem.Name == "cover");
+        }
+
+        internal void DeleteCoverMeta()
+        {
+            var meta = FindCoverMeta();
+            if (meta != null)
+            {
+                Metas.Remove(meta);
+            }
+        }
     }
 
     public class OpfMetadataDate
@@ -204,7 +223,23 @@ namespace EpubSharp.Format
 
     public class OpfManifest
     {
+        internal const string ManifestItemCoverImageProperty = "cover-image";
+
         public ICollection<OpfManifestItem> Items { get; internal set; } = new List<OpfManifestItem>();
+
+        internal OpfManifestItem FindCoverItem()
+        {
+            return Items.FirstOrDefault(e => e.Properties.Contains(ManifestItemCoverImageProperty));
+        }
+
+        internal void DeleteCoverItem()
+        {
+            var item = FindCoverItem();
+            if (item != null)
+            {
+                Items.Remove(item);
+            }
+        }
     }
 
     public class OpfManifestItem
