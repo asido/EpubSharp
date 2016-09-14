@@ -43,7 +43,9 @@ EpubWriter.Write(book, "new.epub");
 _**Editing capabilities are currently very limited and not production ready. The next release will bring a much better support.**_
 ```cs
 EpubWriter writer = new EpubWriter();
+
 writer.AddAuthor("Foo Bar");
 writer.SetCover(imgData, ImageFormat.Png);
+
 writer.Write("new.epub");
 ```
