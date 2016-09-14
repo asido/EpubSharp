@@ -89,7 +89,9 @@ namespace EpubSharp
         {
             if (image == null) throw new ArgumentNullException(nameof(image));
 
-            var coverResource = new EpubByteContentFile { Content = image };
+            // TODO: Remove old cover.
+
+            var coverResource = new EpubByteFile { Content = image };
             string filename;
 
             switch (format)
@@ -146,7 +148,7 @@ namespace EpubSharp
                     resources.Images.Select(dict => dict.Value),
                     resources.Fonts.Select(dict => dict.Value),
                     resources.Other.Select(dict => dict.Value)
-                }.SelectMany(collection => collection as EpubContentFile[] ?? collection.ToArray());
+                }.SelectMany(collection => collection as EpubFile[] ?? collection.ToArray());
                 var relativePath = PathExt.GetDirectoryPath(opfPath);
                 foreach (var file in allFiles)
                 {

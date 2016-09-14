@@ -120,7 +120,7 @@ namespace EpubSharp.Tests
         }
 
         private void AssertContentFileCollection<TContent>(Dictionary<string, TContent> expected, Dictionary<string, TContent> actual, string collectionName)
-            where TContent : EpubContentFile
+            where TContent : EpubFile
         {
             AssertCollection(expected, actual, collectionName, (a, b) =>
             {
@@ -129,15 +129,15 @@ namespace EpubSharp.Tests
             });
         }
 
-        private void AssertContentFile(EpubContentFile expected, EpubContentFile actual, string name)
+        private void AssertContentFile(EpubFile expected, EpubFile actual, string name)
         {
             Assert.IsTrue(expected.Content.SequenceEqual(actual.Content), $"{name}.Content");
             Assert.AreEqual(expected.ContentType, actual.ContentType, $"{name}.ContentType");
             Assert.AreEqual(expected.FileName, actual.FileName, $"{name}.FileName");
             Assert.AreEqual(expected.MimeType, actual.MimeType, $"{name}.MimeType");
 
-            var castedOld = expected as EpubTextContentFile;
-            var castedNew = actual as EpubTextContentFile;
+            var castedOld = expected as EpubTextFile;
+            var castedNew = actual as EpubTextFile;
             Assert.AreEqual(castedOld == null, castedNew == null);
             if (castedOld != null && castedNew != null)
             {

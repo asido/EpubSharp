@@ -71,7 +71,7 @@ namespace EpubSharp
 
             return new Lazy<Image>(() =>
             {
-                EpubByteContentFile coverImageContentFile;
+                EpubByteFile coverImageFile;
 
                 var coverPath = book.Format.Opf.FindCoverPath();
                 if (coverPath == null)
@@ -79,12 +79,12 @@ namespace EpubSharp
                     return null;
                 }
 
-                if (!book.Resources.Images.TryGetValue(coverPath, out coverImageContentFile))
+                if (!book.Resources.Images.TryGetValue(coverPath, out coverImageFile))
                 {
                     return null;
                 }
 
-                using (var coverImageStream = new MemoryStream(coverImageContentFile.Content))
+                using (var coverImageStream = new MemoryStream(coverImageFile.Content))
                 {
                     return Image.FromStream(coverImageStream);
                 }
@@ -189,10 +189,10 @@ namespace EpubSharp
         {
             var result = new EpubResources
             {
-                Html = new Dictionary<string, EpubTextContentFile>(),
-                Css = new Dictionary<string, EpubTextContentFile>(),
-                Images = new Dictionary<string, EpubByteContentFile>(),
-                Fonts = new Dictionary<string, EpubByteContentFile>()
+                Html = new Dictionary<string, EpubTextFile>(),
+                Css = new Dictionary<string, EpubTextFile>(),
+                Images = new Dictionary<string, EpubByteFile>(),
+                Fonts = new Dictionary<string, EpubByteFile>()
             };
 
             foreach (var item in book.Format.Opf.Manifest.Items)
@@ -227,7 +227,7 @@ namespace EpubSharp
                     case EpubContentType.Dtbook:
                     case EpubContentType.DtbookNcx:
                     {
-                        var file = new EpubTextContentFile
+                        var file = new EpubTextFile
                         {
                             FileName = fileName,
                             MimeType = mimeType,
@@ -255,7 +255,7 @@ namespace EpubSharp
                     }
                     default:
                     {
-                        var file = new EpubByteContentFile
+                        var file = new EpubByteFile
                         {
                             FileName = fileName,
                             MimeType = mimeType,
@@ -304,21 +304,21 @@ namespace EpubSharp
         {
             var result = new EpubSpecialResources
             {
-                Ocf = new EpubTextContentFile
+                Ocf = new EpubTextFile
                 {
                     FileName = Constants.OcfPath,
                     ContentType = EpubContentType.Xml,
                     MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
                     Content = epubArchive.LoadBytes(Constants.OcfPath)
                 },
-                Opf = new EpubTextContentFile
+                Opf = new EpubTextFile
                 {
                     FileName = book.Format.Ocf.RootFilePath,
                     ContentType = EpubContentType.Xml,
                     MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
                     Content = epubArchive.LoadBytes(book.Format.Ocf.RootFilePath)
                 },
-                HtmlInReadingOrder = new List<EpubTextContentFile>()
+                HtmlInReadingOrder = new List<EpubTextFile>()
             };
 
             var htmlFiles = book.Format.Opf.Manifest.Items
@@ -333,7 +333,7 @@ namespace EpubSharp
                     continue;
                 }
 
-                EpubTextContentFile html;
+                EpubTextFile html;
                 if (book.Resources.Html.TryGetValue(href, out html))
                 {
                     result.HtmlInReadingOrder.Add(html);

@@ -54,21 +54,21 @@ namespace EpubSharp
 
     public class EpubResources
     {
-        public Dictionary<string, EpubTextContentFile> Html { get; internal set; } = new Dictionary<string, EpubTextContentFile>();
-        public Dictionary<string, EpubTextContentFile> Css { get; internal set; } = new Dictionary<string, EpubTextContentFile>();
-        public Dictionary<string, EpubByteContentFile> Images { get; internal set; } = new Dictionary<string, EpubByteContentFile>();
-        public Dictionary<string, EpubByteContentFile> Fonts { get; internal set; } = new Dictionary<string, EpubByteContentFile>();
-        public Dictionary<string, EpubContentFile> Other { get; internal set; } = new Dictionary<string, EpubContentFile>();
+        public Dictionary<string, EpubTextFile> Html { get; internal set; } = new Dictionary<string, EpubTextFile>();
+        public Dictionary<string, EpubTextFile> Css { get; internal set; } = new Dictionary<string, EpubTextFile>();
+        public Dictionary<string, EpubByteFile> Images { get; internal set; } = new Dictionary<string, EpubByteFile>();
+        public Dictionary<string, EpubByteFile> Fonts { get; internal set; } = new Dictionary<string, EpubByteFile>();
+        public Dictionary<string, EpubFile> Other { get; internal set; } = new Dictionary<string, EpubFile>();
     }
 
     public class EpubSpecialResources
     {
-        public EpubTextContentFile Ocf { get; internal set; }
-        public EpubTextContentFile Opf { get; internal set; }
-        public List<EpubTextContentFile> HtmlInReadingOrder { get; internal set; } = new List<EpubTextContentFile>();
+        public EpubTextFile Ocf { get; internal set; }
+        public EpubTextFile Opf { get; internal set; }
+        public List<EpubTextFile> HtmlInReadingOrder { get; internal set; } = new List<EpubTextFile>();
     }
 
-    public abstract class EpubContentFile
+    public abstract class EpubFile
     {
         public string FileName { get; set; }
         public EpubContentType ContentType { get; set; }
@@ -76,9 +76,9 @@ namespace EpubSharp
         public byte[] Content { get; set; }
     }
 
-    public class EpubByteContentFile : EpubContentFile { }
+    public class EpubByteFile : EpubFile { }
     
-    public class EpubTextContentFile : EpubContentFile
+    public class EpubTextFile : EpubFile
     {
         public string TextContent => Encoding.UTF8.GetString(Content);
     }
