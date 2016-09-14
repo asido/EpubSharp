@@ -103,6 +103,18 @@ namespace EpubSharp
                 opf.Metadata.Creators.Remove(entity);
             }
         }
+        
+        public void RemoveTitle()
+        {
+            opf.Metadata.Titles.Clear();
+        }
+
+        public void SetTitle(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title)) throw new ArgumentNullException(nameof(title));
+            RemoveTitle();
+            opf.Metadata.Titles.Add(title);
+        }
 
         public void AddChapter(string title, string html)
         {

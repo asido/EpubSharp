@@ -78,6 +78,26 @@ namespace EpubSharp.Tests
         }
 
         [TestMethod]
+        public void AddRemoveTitleTest()
+        {
+            var writer = new EpubWriter();
+
+            writer.SetTitle("Title1");
+            var epub = WriteAndRead(writer);
+            Assert.AreEqual("Title1", epub.Title);
+
+            writer.SetTitle("Title2");
+            epub = WriteAndRead(writer);
+            Assert.AreEqual("Title2", epub.Title);
+
+            writer.RemoveTitle();
+            epub = WriteAndRead(writer);
+            Assert.IsNull(epub.Title);
+
+            writer.RemoveTitle();
+        }
+
+        [TestMethod]
         public void SetCoverTest()
         {
             var writer = new EpubWriter();
