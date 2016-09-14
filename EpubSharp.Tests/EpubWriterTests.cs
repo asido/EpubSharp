@@ -48,6 +48,36 @@ namespace EpubSharp.Tests
         }
 
         [TestMethod]
+        public void AddRemoveAuthorTest()
+        {
+            var writer = new EpubWriter();
+
+            writer.AddAuthor("Foo Bar");
+            var epub = WriteAndRead(writer);
+            Assert.AreEqual(1, epub.Authors.Count);
+
+            writer.AddAuthor("Zoo Gar");
+            epub = WriteAndRead(writer);
+            Assert.AreEqual(2, epub.Authors.Count);
+
+            writer.RemoveAuthor("Foo Bar");
+            epub = WriteAndRead(writer);
+            Assert.AreEqual(1, epub.Authors.Count);
+            Assert.AreEqual("Zoo Gar", epub.Authors[0]);
+
+            writer.RemoveAuthor("Unexisting");
+            epub = WriteAndRead(writer);
+            Assert.AreEqual(1, epub.Authors.Count);
+
+            writer.ClearAuthors();
+            epub = WriteAndRead(writer);
+            Assert.AreEqual(0, epub.Authors.Count);
+
+            writer.RemoveAuthor("Unexisting");
+            writer.ClearAuthors();
+        }
+
+        [TestMethod]
         public void SetCoverTest()
         {
             var writer = new EpubWriter();

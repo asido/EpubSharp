@@ -86,10 +86,24 @@ namespace EpubSharp
 
         public void AddAuthor(string author)
         {
-            if (author == null) throw new ArgumentNullException(nameof(author));
+            if (string.IsNullOrWhiteSpace(author)) throw new ArgumentNullException(nameof(author));
             opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
         }
-        
+
+        public void ClearAuthors()
+        {
+            opf.Metadata.Creators.Clear();
+        }
+
+        public void RemoveAuthor(string author)
+        {
+            if (string.IsNullOrWhiteSpace(author)) throw new ArgumentNullException(nameof(author));
+            foreach (var entity in opf.Metadata.Creators.Where(e => e.Text == author).ToList())
+            {
+                opf.Metadata.Creators.Remove(entity);
+            }
+        }
+
         public void AddChapter(string title, string html)
         {
             throw new NotImplementedException("Implement me!");

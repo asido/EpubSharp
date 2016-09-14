@@ -17,7 +17,7 @@ namespace EpubSharp
         public EpubFormat Format { get; internal set; }
 
         public string Title => Format.Opf.Metadata.Titles.FirstOrDefault();
-        public List<string> Authors => Format.Opf.Metadata.Creators.Select(creator => creator.Text).ToList();
+        public IList<string> Authors => Format.Opf.Metadata.Creators.Select(creator => creator.Text).ToList();
         public string Author => Authors.Any() ? string.Join(AuthorsSeparator, Authors) : null;
         public EpubResources Resources { get; internal set; }
         public EpubSpecialResources SpecialResources { get; internal set; }
@@ -41,7 +41,7 @@ namespace EpubSharp
         public string Title { get; set; }
         public string FileName { get; set; }
         public string Anchor { get; set; }
-        public List<EpubChapter> SubChapters { get; set; } = new List<EpubChapter>();
+        public IList<EpubChapter> SubChapters { get; set; } = new List<EpubChapter>();
 
         public override string ToString()
         {
