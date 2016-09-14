@@ -186,11 +186,7 @@ namespace EpubSharp
 
         private static EpubResources LoadResources(ZipArchive epubArchive, EpubBook book)
         {
-            var html = new List<EpubTextFile>();
-            var css = new List<EpubTextFile>();
-            var images = new List<EpubByteFile>();
-            var fonts = new List<EpubByteFile>();
-            var other = new List<EpubFile>();
+            var resources = new EpubResources();
 
             foreach (var item in book.Format.Opf.Manifest.Items)
             {
@@ -239,13 +235,13 @@ namespace EpubSharp
                         switch (contentType)
                         {
                             case EpubContentType.Xhtml11:
-                                html.Add(file);
+                                resources.Html.Add(file);
                                 break;
                             case EpubContentType.Css:
-                                css.Add(file);
+                                resources.Css.Add(file);
                                 break;
                             default:
-                                other.Add(file);
+                                resources.Other.Add(file);
                                 break;
                             }
                         break;
@@ -279,14 +275,14 @@ namespace EpubSharp
                             case EpubContentType.ImageJpeg:
                             case EpubContentType.ImagePng:
                             case EpubContentType.ImageSvg:
-                                images.Add(file);
+                                resources.Images.Add(file);
                                 break;
                             case EpubContentType.FontTruetype:
                             case EpubContentType.FontOpentype:
-                                fonts.Add(file);
+                                resources.Fonts.Add(file);
                                 break;
                             default:
-                                other.Add(file);
+                                resources.Other.Add(file);
                                 break;
                         }
                         break;
@@ -294,14 +290,7 @@ namespace EpubSharp
                 }
             }
 
-            return new EpubResources
-            {
-                html = html,
-                css= css,
-                images = images,
-                fonts = fonts,
-                other = other
-            };
+            return resources;
         }
 
         private static EpubSpecialResources LoadSpecialResources(ZipArchive epubArchive, EpubBook book)

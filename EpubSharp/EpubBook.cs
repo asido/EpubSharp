@@ -54,20 +54,11 @@ namespace EpubSharp
 
     public class EpubResources
     {
-        internal List<EpubTextFile> html = new List<EpubTextFile>();
-        public IReadOnlyCollection<EpubTextFile> Html => html;
-
-        internal List<EpubTextFile> css = new List<EpubTextFile>();
-        public IReadOnlyCollection<EpubTextFile> Css => css;
-
-        internal List<EpubByteFile> images = new List<EpubByteFile>();
-        public IReadOnlyCollection<EpubByteFile> Images => images;
-
-        internal List<EpubByteFile> fonts = new List<EpubByteFile>();
-        public IReadOnlyCollection<EpubByteFile> Fonts => fonts;
-
-        internal List<EpubFile> other = new List<EpubFile>();
-        public IReadOnlyCollection<EpubFile> Other => other;
+        public ICollection<EpubTextFile> Html { get; internal set; } = new List<EpubTextFile>();
+        public ICollection<EpubTextFile> Css { get; internal set; } = new List<EpubTextFile>();
+        public ICollection<EpubByteFile> Images { get; internal set; } = new List<EpubByteFile>();
+        public ICollection<EpubByteFile> Fonts { get; internal set; } = new List<EpubByteFile>();
+        public ICollection<EpubFile> Other { get; internal set; } = new List<EpubFile>();
     }
 
     public class EpubSpecialResources

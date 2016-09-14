@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -92,10 +93,10 @@ namespace EpubSharp
             var existingCover = opf.FindCoverPath();
             if (existingCover != null)
             {
-                var resource = resources.images.SingleOrDefault(e => e.FileName == existingCover);
+                var resource = resources.Images.SingleOrDefault(e => e.FileName == existingCover);
                 if (resource != null)
                 {
-                    resources.images.Remove(resource);
+                    resources.Images.Remove(resource);
                 }
 
                 opf.RemoveCover();
@@ -120,7 +121,7 @@ namespace EpubSharp
 
             coverResource.FileName = filename;
             coverResource.MimeType = ContentType.ContentTypeToMimeType[coverResource.ContentType];
-            resources.images.Add(coverResource);
+            resources.Images.Add(coverResource);
 
             opf.Manifest.Items.Add(new OpfManifestItem
             {
@@ -153,7 +154,7 @@ namespace EpubSharp
 
                 var allFiles = new[]
                 {
-                    resources.Html,
+                    resources.Html.Cast<EpubFile>(),
                     resources.Css,
                     resources.Images,
                     resources.Fonts,
