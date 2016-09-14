@@ -74,6 +74,14 @@ namespace EpubSharp.Tests
             Assert.AreEqual(epub1.Resources.Images.Count - 1, epub2.Resources.Images.Count);
         }
 
+        [TestMethod]
+        public void RemoveCoverWhenThereIsNoCoverTest()
+        {
+            var writer = new EpubWriter();
+            writer.RemoveCover();
+            writer.RemoveCover();
+        }
+
         private EpubBook WriteAndRead(EpubWriter writer)
         {
             var stream = new MemoryStream();
