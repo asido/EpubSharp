@@ -17,13 +17,13 @@ string[] authors = book.Authors;
 Image cover = book.CoverImage;
 
 // Get table of contents
-IReadOnlyCollection<EpubChapter> chapters = book.TableOfContents;
+ICollection<EpubChapter> chapters = book.TableOfContents;
 
 // Get contained files
-IReadOnlyCollection<EpubTextFile> html = book.Resources.Html;
-IReadOnlyCollection<EpubTextFile> css = book.Resources.Css;
-IReadOnlyCollection<EpubByteFile> images = book.Resources.Images;
-IReadOnlyCollection<EpubByteFile> fonts = book.Resources.Fonts;
+ICollection<EpubTextFile> html = book.Resources.Html;
+ICollection<EpubTextFile> css = book.Resources.Css;
+ICollection<EpubByteFile> images = book.Resources.Images;
+ICollection<EpubByteFile> fonts = book.Resources.Fonts;
 
 // Convert to plain text
 string text = book.ToPlainText();
