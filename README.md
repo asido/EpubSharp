@@ -1,4 +1,12 @@
 # EpubSharp
-C# library for reading EPUB file format
+C# library for reading and writing EPUB files
 
-##### The library is still under development and not production ready yet.
+# Usage
+
+```cs
+// Read an epub file
+EpubBook book = EpubReader.Read("my.epub");
+
+// Convert to plain text.
+string text = book.ToPlainText();
+```
