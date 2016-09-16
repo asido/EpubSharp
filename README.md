@@ -3,6 +3,12 @@ C# library for reading and writing EPUB files.
 
 Supported EPUB versions: **2.0**, **3.0**, **3.1**
 
+# Installation
+
+```
+Install-Package EpubSharp.dll
+```
+
 # Usage
 
 ### Reading an EPUB
@@ -40,7 +46,7 @@ EpubWriter.Write(book, "new.epub");
 ```
 
 ### Writing an EPUB
-_**Editing capabilities are currently very limited and not production ready. The next release will bring a much better support.**_
+_**Editing capabilities are currently very limited and might not work at all. Use it at your own risk. The next release will bring a true write support.**_
 ```cs
 EpubWriter writer = new EpubWriter();
 
