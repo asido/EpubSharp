@@ -50,7 +50,7 @@ namespace EpubSharp
             return builder.ToString().Trim();
         }
     }
-    
+
     public class EpubChapter
     {
         public string Title { get; set; }
@@ -89,9 +89,13 @@ namespace EpubSharp
     }
 
     public class EpubByteFile : EpubFile { }
-    
+
     public class EpubTextFile : EpubFile
     {
-        public string TextContent => Encoding.UTF8.GetString(Content);
+        public string TextContent
+        {
+            get { return Encoding.UTF8.GetString(Content); }
+            set { Content = Encoding.UTF8.GetBytes(value); }
+        }
     }
 }
