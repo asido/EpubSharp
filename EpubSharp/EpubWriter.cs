@@ -15,21 +15,24 @@ namespace EpubSharp
         private readonly string opfPath = "EPUB/package.opf";
         private readonly string ncxPath = "EPUB/toc.ncx";
 
-        private readonly OpfDocument opf = new OpfDocument
-        {
-            EpubVersion = EpubVersion.Epub3
-        };
-
-        private readonly NavDocument nav = new NavDocument();
-        private readonly NcxDocument ncx = new NcxDocument();
-
-        private readonly EpubResources resources = new EpubResources();
+        private readonly EpubFormat format;
+        private readonly EpubResources resources;
 
         public EpubWriter()
         {
+            var opf = new OpfDocument { EpubVersion = EpubVersion.Epub3 };
             opf.Metadata.Dates.Add(new OpfMetadataDate { Text = DateTimeOffset.UtcNow.ToString("o") });
             opf.Manifest.Items.Add(new OpfManifestItem { Id = "ncx", Href = "toc.ncx", MediaType = ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx] });
             opf.Spine.Toc = "ncx";
+
+            format = new EpubFormat
+            {
+                Opf = opf,
+                Nav = new NavDocument(),
+                Ncx = new NcxDocument()
+            };
+
+            resources = new EpubResources();
         }
 
         public EpubWriter(EpubBook book)
@@ -37,14 +40,11 @@ namespace EpubSharp
             if (book == null) throw new ArgumentNullException(nameof(book));
             if (book.Format?.Opf == null) throw new ArgumentException("book opf instance == null", nameof(book));
 
-            opf = book.Format.Opf;
-            nav = book.Format.Nav;
-            ncx = book.Format.Ncx;
-
+            format = book.Format;
             resources = book.Resources;
 
-            opfPath = book.Format.Ocf.RootFilePath;
-            ncxPath = book.Format.Opf.FindNcxPath();
+            opfPath = format.Ocf.RootFilePath;
+            ncxPath = format.Opf.FindNcxPath();
             if (ncxPath != null)
             {
                 ncxPath = PathExt.Combine(PathExt.GetDirectoryPath(opfPath), ncxPath);
@@ -87,33 +87,33 @@ namespace EpubSharp
         public void AddAuthor(string author)
         {
             if (string.IsNullOrWhiteSpace(author)) throw new ArgumentNullException(nameof(author));
-            opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
+            format.Opf.Metadata.Creators.Add(new OpfMetadataCreator { Text = author });
         }
 
         public void ClearAuthors()
         {
-            opf.Metadata.Creators.Clear();
+            format.Opf.Metadata.Creators.Clear();
         }
 
         public void RemoveAuthor(string author)
         {
             if (string.IsNullOrWhiteSpace(author)) throw new ArgumentNullException(nameof(author));
-            foreach (var entity in opf.Metadata.Creators.Where(e => e.Text == author).ToList())
+            foreach (var entity in format.Opf.Metadata.Creators.Where(e => e.Text == author).ToList())
             {
-                opf.Metadata.Creators.Remove(entity);
+                format.Opf.Metadata.Creators.Remove(entity);
             }
         }
         
         public void RemoveTitle()
         {
-            opf.Metadata.Titles.Clear();
+            format.Opf.Metadata.Titles.Clear();
         }
 
         public void SetTitle(string title)
         {
             if (string.IsNullOrWhiteSpace(title)) throw new ArgumentNullException(nameof(title));
             RemoveTitle();
-            opf.Metadata.Titles.Add(title);
+            format.Opf.Metadata.Titles.Add(title);
         }
 
         public void AddChapter(string title, string html)
@@ -128,7 +128,7 @@ namespace EpubSharp
 
         public void RemoveCover()
         {
-            var path = opf.FindAndRemoveCover();
+            var path = format.Opf.FindAndRemoveCover();
             if (path == null) return;
 
             var resource = resources.Images.SingleOrDefault(e => e.FileName == path);
@@ -170,7 +170,7 @@ namespace EpubSharp
                 MediaType = coverResource.MimeType
             };
             coverItem.Properties.Add(OpfManifest.ManifestItemCoverImageProperty);
-            opf.Manifest.Items.Add(coverItem);
+            format.Opf.Manifest.Items.Add(coverItem);
         }
         
         public void Write(string filename)
@@ -187,11 +187,11 @@ namespace EpubSharp
             {
                 archive.CreateEntry("mimetype", MimeTypeWriter.Format());
                 archive.CreateEntry(Constants.OcfPath, OcfWriter.Format(opfPath));
-                archive.CreateEntry(opfPath, OpfWriter.Format(opf));
+                archive.CreateEntry(opfPath, OpfWriter.Format(format.Opf));
 
-                if (ncx != null)
+                if (format.Ncx != null)
                 {
-                    archive.CreateEntry(ncxPath, NcxWriter.Format(ncx));
+                    archive.CreateEntry(ncxPath, NcxWriter.Format(format.Ncx));
                 }
 
                 var allFiles = new[]
