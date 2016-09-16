@@ -3,6 +3,12 @@ C# library for reading and writing EPUB files.
 
 Supported EPUB versions: **2.0**, **3.0**, **3.1**
 
+# Installation
+
+```
+Install-Package EpubSharp.dll
+```
+
 # Usage
 
 ### Reading an EPUB
