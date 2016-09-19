@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -53,8 +52,12 @@ namespace EpubSharp
 
             opfPath = format.Ocf.RootFilePath;
             ncxPath = format.Opf.FindNcxPath();
+
             if (ncxPath != null)
             {
+                // Remove NCX file from the resources - Write() will format a new one.
+                resources.Other = resources.Other.Where(e => e.FileName != ncxPath).ToList();
+
                 ncxPath = PathExt.Combine(PathExt.GetDirectoryPath(opfPath), ncxPath);
             }
         }
@@ -150,36 +153,56 @@ namespace EpubSharp
             var spineItem = new OpfSpineItemRef { IdRef = manifestItem.Id };
             format.Opf.Spine.ItemRefs.Add(spineItem);
 
-            if (format.Nav != null)
+            FindNavTocOl()?.Add(new XElement(NavElements.Li, new XElement(NavElements.A, new XAttribute("href", file.FileName), title)));
+
+            format.Ncx?.NavMap.NavPoints.Add(new NcxNavPoint
             {
-                var tocOl = format.Nav.Body.Dom.Descendants(NavElements.Nav)
-                    .SingleOrDefault(e => (string)e.Attribute(NavNav.Attributes.Type) == NavNav.Attributes.TypeValues.Toc)
-                    ?.Element(NavElements.Ol);
+                Id = Guid.NewGuid().ToString("N"),
+                NavLabelText = title,
+                ContentSrc = file.FileName,
+                PlayOrder = format.Ncx.NavMap.NavPoints.Any() ? format.Ncx.NavMap.NavPoints.Max(e => e.PlayOrder) : 1
+            });
 
-                if (tocOl == null)
-                {
-                    throw new EpubWriteException(@"Missing ol: <nav type=""toc""><ol/></nav>");
-                }
-
-                tocOl.Add(new XElement(NavElements.Li, new XElement(NavElements.A, new XAttribute("href", file.FileName), title)));
-            }
-
-            if (format.Ncx != null)
-            {
-                format.Ncx.NavMap.NavPoints.Add(new NcxNavPoint
-                {
-                    Id = Guid.NewGuid().ToString("N"),
-                    NavLabelText = title,
-                    ContentSrc = file.FileName,
-                    PlayOrder = format.Ncx.NavMap.NavPoints.Any() ? format.Ncx.NavMap.NavPoints.Max(e => e.PlayOrder) : 1
-                });
-            }
-            
             return new EpubChapter
             {
                 Title = title,
                 FileName = file.FileName
             };
+        }
+
+        public void ClearChapters()
+        {
+            var spineItems = format.Opf.Spine.ItemRefs.Select(spine => format.Opf.Manifest.Items.Single(e => e.Id == spine.IdRef));
+            var otherItems = format.Opf.Manifest.Items.Where(e => !spineItems.Contains(e)).ToList();
+
+            foreach (var item in spineItems)
+            {
+                var href = new Href(item.Href);
+                if (otherItems.All(e => new Href(e.Href).Filename != href.Filename))
+                {
+                    // The HTML file is not referenced by anything outside spine item, thus can be removed from the archive.
+                    var file = resources.Html.Single(e => e.FileName == href.Filename);
+                    resources.Html.Remove(file);
+                }
+
+                format.Opf.Manifest.Items.Remove(item);
+            }
+
+            format.Opf.Spine.ItemRefs.Clear();
+            format.Opf.Guide = null;
+            format.Ncx?.NavMap.NavPoints.Clear();
+            FindNavTocOl()?.Descendants().Remove();
+
+            // Remove all images except the cover.
+            // I can't think of a case where this is a bad idea.
+            var coverPath = format.Opf.FindCoverPath();
+            foreach (var item in format.Opf.Manifest.Items.Where(e => e.MediaType.StartsWith("image/") && e.Href != coverPath).ToList())
+            {
+                format.Opf.Manifest.Items.Remove(item);
+
+                var image = resources.Images.Single(e => e.FileName == new Href(item.Href).Filename);
+                resources.Images.Remove(image);
+            }
         }
 
         //public void InsertChapter(string title, string html, int index, EpubChapter parent = null)
@@ -270,6 +293,26 @@ namespace EpubSharp
                     archive.CreateEntry(absolutePath, file.Content);
                 }
             }
+        }
+
+        private XElement FindNavTocOl()
+        {
+            if (format.Nav == null)
+            {
+                return null;
+            }
+
+            var ns = format.Nav.Body.Dom.Name.Namespace;
+            var element = format.Nav.Body.Dom.Descendants(ns + NavElements.Nav)
+                .SingleOrDefault(e => (string)e.Attribute(NavNav.Attributes.Type) == NavNav.Attributes.TypeValues.Toc)
+                ?.Element(ns + NavElements.Ol);
+
+            if (element == null)
+            {
+                throw new EpubWriteException(@"Missing ol: <nav type=""toc""><ol/></nav>");
+            }
+
+            return element;
         }
         
         // Old code to add toc.ncx

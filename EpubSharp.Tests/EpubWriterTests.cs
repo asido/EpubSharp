@@ -157,6 +157,29 @@ namespace EpubSharp.Tests
             }
         }
 
+        [TestMethod]
+        public void ClearChaptersTest()
+        {
+            var writer = new EpubWriter();
+            writer.AddChapter("Chapter 1", "bla bla bla");
+            writer.AddChapter("Chapter 2", "foo bar");
+            writer.AddChapter("Chapter 3", "fooz barz");
+
+            var epub = WriteAndRead(writer);
+            Assert.AreEqual(3, epub.TableOfContents.Count);
+
+            writer = new EpubWriter(epub);
+            writer.ClearChapters();
+
+            var epub1 = EpubReader.Read(@"../../Samples/epub-assorted/bogtyven.epub");
+            var bogtyven = new EpubWriter(epub1);
+            bogtyven.ClearChapters();
+            bogtyven.Write(@"D:\bogtyven.epub");
+
+            epub = WriteAndRead(writer);
+            Assert.AreEqual(0, epub.TableOfContents.Count);
+        }
+
         private EpubBook WriteAndRead(EpubWriter writer)
         {
             var stream = new MemoryStream();
