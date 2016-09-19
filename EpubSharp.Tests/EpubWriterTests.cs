@@ -170,12 +170,7 @@ namespace EpubSharp.Tests
 
             writer = new EpubWriter(epub);
             writer.ClearChapters();
-
-            var epub1 = EpubReader.Read(@"../../Samples/epub-assorted/bogtyven.epub");
-            var bogtyven = new EpubWriter(epub1);
-            bogtyven.ClearChapters();
-            bogtyven.Write(@"D:\bogtyven.epub");
-
+            
             epub = WriteAndRead(writer);
             Assert.AreEqual(0, epub.TableOfContents.Count);
         }
