@@ -121,16 +121,9 @@ namespace EpubSharp
                     var url = link.Attribute("href")?.Value;
                     if (url != null)
                     {
-                        var contentSourceAnchorCharIndex = url.IndexOf('#');
-                        if (contentSourceAnchorCharIndex == -1)
-                        {
-                            chapter.FileName = url;
-                        }
-                        else
-                        {
-                            chapter.FileName = url.Substring(0, contentSourceAnchorCharIndex);
-                            chapter.Anchor = url.Substring(contentSourceAnchorCharIndex + 1);
-                        }
+                        var href = new Href(url);
+                        chapter.FileName = href.Filename;
+                        chapter.Anchor = href.Anchor;
                     }
 
                     var titleTextElement = li.Descendants().FirstOrDefault(e => !string.IsNullOrWhiteSpace(e.Value));
@@ -156,17 +149,9 @@ namespace EpubSharp
             foreach (var navigationPoint in navigationPoints)
             {
                 var chapter = new EpubChapter { Title = navigationPoint.NavLabelText };
-                var contentSourceAnchorCharIndex = navigationPoint.ContentSrc.IndexOf('#');
-                if (contentSourceAnchorCharIndex == -1)
-                {
-                    chapter.FileName = navigationPoint.ContentSrc;
-                }
-                else
-                {
-                    chapter.FileName = navigationPoint.ContentSrc.Substring(0, contentSourceAnchorCharIndex);
-                    chapter.Anchor = navigationPoint.ContentSrc.Substring(contentSourceAnchorCharIndex + 1);
-                }
-
+                var href = new Href(navigationPoint.ContentSrc);
+                chapter.FileName = href.Filename;
+                chapter.Anchor = href.Anchor;
                 chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavPoints);
                 result.Add(chapter);
             }

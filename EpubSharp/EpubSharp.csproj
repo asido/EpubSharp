@@ -61,6 +61,7 @@
     <Compile Include="Format\Writers\NcxWriter.cs" />
     <Compile Include="Format\Writers\OcfWriter.cs" />
     <Compile Include="Format\Writers\OpfWriter.cs" />
+    <Compile Include="Utils\Href.cs" />
     <Compile Include="Utils\HtmlProcessor.cs" />
     <Compile Include="Utils\StreamExt.cs" />
     <Compile Include="Utils\ZipArchiveExt.cs" />
