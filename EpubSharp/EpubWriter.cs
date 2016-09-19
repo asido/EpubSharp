@@ -124,12 +124,10 @@ namespace EpubSharp
             format.Opf.Metadata.Titles.Add(title);
         }
 
-        public EpubChapter AddChapter(string title, string html, EpubChapter parent = null)
+        public EpubChapter AddChapter(string title, string html)
         {
             if (string.IsNullOrWhiteSpace(title)) throw new ArgumentNullException(nameof(title));
             if (html == null) throw new ArgumentNullException(nameof(html));
-
-            if (parent != null) throw new NotImplementedException("Adding subchapters is not implement yet.");
 
             var fileId = Guid.NewGuid().ToString("N");
             var file = new EpubTextFile
