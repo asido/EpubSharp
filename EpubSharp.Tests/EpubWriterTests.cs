@@ -141,7 +141,6 @@ namespace EpubSharp.Tests
                 writer.AddChapter("Chapter 1", "bla bla bla"),
                 writer.AddChapter("Chapter 2", "foo bar")
             };
-            writer.Write(@"new.epub");
             var epub = WriteAndRead(writer);
 
             Assert.AreEqual("Chapter 1", chapters[0].Title);
