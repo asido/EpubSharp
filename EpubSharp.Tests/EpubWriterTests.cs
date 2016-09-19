@@ -175,6 +175,16 @@ namespace EpubSharp.Tests
             Assert.AreEqual(0, epub.TableOfContents.Count);
         }
 
+        [TestMethod]
+        public void ClearBogtyvenChaptersTest()
+        {
+            var writer = new EpubWriter(EpubReader.Read(@"../../Samples/epub-assorted/bogtyven.epub"));
+            writer.ClearChapters();
+
+            var epub = WriteAndRead(writer);
+            Assert.AreEqual(0, epub.TableOfContents.Count);
+        }
+
         private EpubBook WriteAndRead(EpubWriter writer)
         {
             var stream = new MemoryStream();
