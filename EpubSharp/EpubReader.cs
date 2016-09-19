@@ -83,7 +83,7 @@ namespace EpubSharp
         {
             if (book.Format.Nav != null)
             {
-                var tocNav = book.Format.Nav.Body.Navs.SingleOrDefault(e => e.Type == "toc");
+                var tocNav = book.Format.Nav.Body.Navs.SingleOrDefault(e => e.Type == NavNav.Attributes.TypeValues.Toc);
                 if (tocNav != null)
                 {
                     return LoadChaptersFromNav(tocNav.Dom);

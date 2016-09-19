@@ -21,8 +21,8 @@ namespace EpubSharp.Format
 
     public class NavDocument
     {
-        public NavHead Head { get; internal set; }
-        public NavBody Body { get; internal set; }
+        public NavHead Head { get; internal set; } = new NavHead();
+        public NavBody Body { get; internal set; } = new NavBody();
     }
 
     public class NavHead
@@ -78,7 +78,7 @@ namespace EpubSharp.Format
         /// </summary>
         internal XElement Dom { get; set; }
 
-        public ICollection<NavNav> Navs { get; internal set; }
+        public ICollection<NavNav> Navs { get; internal set; } = new List<NavNav>();
     }
 
     public class NavNav
@@ -89,6 +89,13 @@ namespace EpubSharp.Format
             public static readonly XName Class = "class";
             public static readonly XName Type = Constants.OpsNamespace + "type";
             public static readonly XName Hidden = Constants.OpsNamespace + "hidden";
+
+            internal static class TypeValues
+            {
+                public const string Toc = "toc";
+                public const string Landmarks = "landmarks";
+                public const string PageList = "page-list";
+            }
         }
 
         /// <summary>

@@ -132,6 +132,32 @@ namespace EpubSharp.Tests
             writer.RemoveCover();
         }
 
+        [TestMethod]
+        public void CanAddChapterTest()
+        {
+            var writer = new EpubWriter();
+            var chapters = new[]
+            {
+                writer.AddChapter("Chapter 1", "bla bla bla"),
+                writer.AddChapter("Chapter 2", "foo bar")
+            };
+            writer.Write(@"new.epub");
+            var epub = WriteAndRead(writer);
+
+            Assert.AreEqual("Chapter 1", chapters[0].Title);
+            Assert.AreEqual("Chapter 2", chapters[1].Title);
+
+            Assert.AreEqual(2, epub.TableOfContents.Count);
+            for (var i = 0; i < chapters.Length; ++i)
+            {
+                Assert.AreEqual(chapters[i].Title, epub.TableOfContents[i].Title);
+                Assert.AreEqual(chapters[i].FileName, epub.TableOfContents[i].FileName);
+                Assert.AreEqual(chapters[i].Anchor, epub.TableOfContents[i].Anchor);
+                Assert.AreEqual(0, chapters[i].SubChapters.Count);
+                Assert.AreEqual(0, epub.TableOfContents[i].SubChapters.Count);
+            }
+        }
+
         private EpubBook WriteAndRead(EpubWriter writer)
         {
             var stream = new MemoryStream();

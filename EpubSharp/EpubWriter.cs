@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Writers;
 
@@ -31,6 +32,13 @@ namespace EpubSharp
                 Nav = new NavDocument(),
                 Ncx = new NcxDocument()
             };
+
+            format.Nav.Head.Dom = new XElement(NavElements.Head);
+            format.Nav.Body.Dom =
+                new XElement(
+                    NavElements.Body,
+                        new XElement(NavElements.Nav, new XAttribute(NavNav.Attributes.Type, NavNav.Attributes.TypeValues.Toc),
+                            new XElement(NavElements.Ol)));
 
             resources = new EpubResources();
         }
@@ -116,15 +124,70 @@ namespace EpubSharp
             format.Opf.Metadata.Titles.Add(title);
         }
 
-        public void AddChapter(string title, string html)
+        public EpubChapter AddChapter(string title, string html, EpubChapter parent = null)
         {
-            throw new NotImplementedException("Implement me!");
+            if (string.IsNullOrWhiteSpace(title)) throw new ArgumentNullException(nameof(title));
+            if (html == null) throw new ArgumentNullException(nameof(html));
+
+            if (parent != null) throw new NotImplementedException("Adding subchapters is not implement yet.");
+
+            var fileId = Guid.NewGuid().ToString("N");
+            var file = new EpubTextFile
+            {
+                FileName = fileId + ".xhtml",
+                TextContent = html,
+                ContentType = EpubContentType.Xhtml11
+            };
+            file.MimeType = ContentType.ContentTypeToMimeType[file.ContentType];
+            resources.Html.Add(file);
+
+            var manifestItem = new OpfManifestItem
+            {
+                Id = fileId,
+                Href = file.FileName,
+                MediaType = file.MimeType
+            };
+            format.Opf.Manifest.Items.Add(manifestItem);
+
+            var spineItem = new OpfSpineItemRef { IdRef = manifestItem.Id };
+            format.Opf.Spine.ItemRefs.Add(spineItem);
+
+            if (format.Nav != null)
+            {
+                var tocOl = format.Nav.Body.Dom.Descendants(NavElements.Nav)
+                    .SingleOrDefault(e => (string)e.Attribute(NavNav.Attributes.Type) == NavNav.Attributes.TypeValues.Toc)
+                    ?.Element(NavElements.Ol);
+
+                if (tocOl == null)
+                {
+                    throw new EpubWriteException(@"Missing ol: <nav type=""toc""><ol/></nav>");
+                }
+
+                tocOl.Add(new XElement(NavElements.Li, new XElement(NavElements.A, new XAttribute("href", file.FileName), title)));
+            }
+
+            if (format.Ncx != null)
+            {
+                format.Ncx.NavMap.NavPoints.Add(new NcxNavPoint
+                {
+                    Id = Guid.NewGuid().ToString("N"),
+                    NavLabelText = title,
+                    ContentSrc = file.FileName,
+                    PlayOrder = format.Ncx.NavMap.NavPoints.Any() ? format.Ncx.NavMap.NavPoints.Max(e => e.PlayOrder) : 1
+                });
+            }
+            
+            return new EpubChapter
+            {
+                Title = title,
+                FileName = file.FileName
+            };
         }
 
-        public void InsertChapter(string title, string html, int index, EpubChapter parent = null)
-        {
-            throw new NotImplementedException("Implement me!");
-        }
+        //public void InsertChapter(string title, string html, int index, EpubChapter parent = null)
+        //{
+        //    throw new NotImplementedException("Implement me!");
+        //}
 
         public void RemoveCover()
         {
