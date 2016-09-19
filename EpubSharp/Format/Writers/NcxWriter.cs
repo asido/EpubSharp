@@ -18,7 +18,7 @@ namespace EpubSharp.Format.Writers
             foreach (var meta in ncx.Meta)
             {
                 var element = new XElement(NcxElements.Meta);
-                if (!string.IsNullOrWhiteSpace(meta.Content))
+                if (meta.Content != null)
                 {
                     element.Add(new XAttribute(NcxMeta.Attributes.Content, meta.Content));
                 }
