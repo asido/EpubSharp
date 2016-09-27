@@ -14,7 +14,7 @@ namespace EpubSharp
     {
         public static void CreateEntry(this ZipArchive archive, string file, string content)
         {
-            var data = Encoding.UTF8.GetBytes(content);
+            var data = Constants.DefaultEncoding.GetBytes(content);
             archive.CreateEntry(file, data);
         }
 
@@ -84,7 +84,7 @@ namespace EpubSharp
         public static string LoadText(this ZipArchive archive, string entryName)
         {
             var data = archive.LoadBytes(entryName);
-            var str = Encoding.UTF8.GetString(data);
+            var str = Constants.DefaultEncoding.GetString(data);
             return str;
         }
 
@@ -131,7 +131,7 @@ namespace EpubSharp
             {
                 doc.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
-                var xml = Encoding.UTF8.GetString(stream.ReadToEnd());
+                var xml = Constants.DefaultEncoding.GetString(stream.ReadToEnd());
                 return XDocument.Parse(xml);
             }
         }

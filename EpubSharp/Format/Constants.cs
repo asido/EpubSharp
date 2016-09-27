@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Text;
+using System.Xml.Linq;
 
 namespace EpubSharp.Format
 {
@@ -20,5 +21,7 @@ namespace EpubSharp.Format
 
         public const string OcfPath = "META-INF/container.xml";
         public const string OcfMediaType = "application/oebps-package+xml";
+
+        public static readonly Encoding DefaultEncoding = Encoding.UTF8;
     }
 }

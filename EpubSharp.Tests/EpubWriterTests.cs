@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EpubSharp.Format;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EpubSharp.Tests
@@ -183,6 +184,31 @@ namespace EpubSharp.Tests
 
             var epub = WriteAndRead(writer);
             Assert.AreEqual(0, epub.TableOfContents.Count);
+        }
+
+        [TestMethod]
+        public void AddFileTest()
+        {
+            var writer = new EpubWriter();
+            writer.AddFile("style.css", "body {}", EpubContentType.Css);
+            writer.AddFile("img.jpeg", new byte[] { 0x42 }, EpubContentType.ImageJpeg);
+            writer.AddFile("font.ttf", new byte[] { 0x24 }, EpubContentType.FontTruetype);
+
+            var epub = WriteAndRead(writer);
+
+            Assert.AreEqual(1, epub.Resources.Css.Count);
+            Assert.AreEqual("style.css", epub.Resources.Css.First().FileName);
+            Assert.AreEqual("body {}", epub.Resources.Css.First().TextContent);
+
+            Assert.AreEqual(1, epub.Resources.Images.Count);
+            Assert.AreEqual("img.jpeg", epub.Resources.Images.First().FileName);
+            Assert.AreEqual(1, epub.Resources.Images.First().Content.Length);
+            Assert.AreEqual(0x42, epub.Resources.Images.First().Content.First());
+
+            Assert.AreEqual(1, epub.Resources.Fonts.Count);
+            Assert.AreEqual("font.ttf", epub.Resources.Fonts.First().FileName);
+            Assert.AreEqual(1, epub.Resources.Fonts.First().Content.Length);
+            Assert.AreEqual(0x24, epub.Resources.Fonts.First().Content.First());
         }
 
         private EpubBook WriteAndRead(EpubWriter writer)

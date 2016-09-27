@@ -88,14 +88,26 @@ namespace EpubSharp
         public byte[] Content { get; set; }
     }
 
-    public class EpubByteFile : EpubFile { }
+    public class EpubByteFile : EpubFile
+    {
+        internal EpubTextFile ToTextFile()
+        {
+            return new EpubTextFile
+            {
+                Content = Content,
+                ContentType = ContentType,
+                FileName = FileName,
+                MimeType = MimeType
+            };
+        }
+    }
 
     public class EpubTextFile : EpubFile
     {
         public string TextContent
         {
-            get { return Encoding.UTF8.GetString(Content); }
-            set { Content = Encoding.UTF8.GetBytes(value); }
+            get { return Constants.DefaultEncoding.GetString(Content); }
+            set { Content = Constants.DefaultEncoding.GetBytes(value); }
         }
     }
 }

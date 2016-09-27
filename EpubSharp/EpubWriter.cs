@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Writers;
@@ -93,6 +94,60 @@ namespace EpubSharp
             stream.Seek(0, SeekOrigin.Begin);
             var epub = EpubReader.Read(stream, false);
             return epub;
+        }
+        
+        public void AddFile(string filename, byte[] content, EpubContentType type)
+        {
+            if (string.IsNullOrWhiteSpace(filename)) throw new ArgumentNullException(nameof(filename));
+            if (content == null) throw new ArgumentNullException(nameof(content));
+
+            var file = new EpubByteFile
+            {
+                FileName = filename,
+                ContentType = type,
+                Content = content
+            };
+            file.MimeType = ContentType.ContentTypeToMimeType[file.ContentType];
+
+            switch (type)
+            {
+                case EpubContentType.Css:
+                    resources.Css.Add(file.ToTextFile());
+                    break;
+
+                case EpubContentType.FontOpentype:
+                case EpubContentType.FontTruetype:
+                    resources.Fonts.Add(file);
+                    break;
+
+                case EpubContentType.ImageGif:
+                case EpubContentType.ImageJpeg:
+                case EpubContentType.ImagePng:
+                case EpubContentType.ImageSvg:
+                    resources.Images.Add(file);
+                    break;
+
+                case EpubContentType.Xml:
+                case EpubContentType.Xhtml11:
+                case EpubContentType.Other:
+                    resources.Other.Add(file);
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Unsupported file type: {type}");
+            }
+
+            format.Opf.Manifest.Items.Add(new OpfManifestItem
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Href = filename,
+                MediaType = file.MimeType
+            });
+        }
+
+        public void AddFile(string filename, string content, EpubContentType type)
+        {
+            AddFile(filename, Constants.DefaultEncoding.GetBytes(content), type);
         }
 
         public void AddAuthor(string author)

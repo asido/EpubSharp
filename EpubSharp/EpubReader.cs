@@ -29,7 +29,7 @@ namespace EpubSharp
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-            using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen, Encoding.UTF8))
+            using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen, Constants.DefaultEncoding))
             {
                 var format = new EpubFormat { Ocf = OcfReader.Read(archive.LoadXml(Constants.OcfPath)) };
 
