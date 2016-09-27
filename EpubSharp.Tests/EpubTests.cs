@@ -3,31 +3,31 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using EpubSharp.Format;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace EpubSharp.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class EpubTests
     {
-        [TestMethod]
+        [Test]
         public void ReadWriteEpub30Test()
         {
-            var archives = Utils.ZipAndCopyEpubs(@"../../Samples/epub30");
+            var archives = Utils.ZipAndCopyEpubs(@"Samples/epub30");
             ReadWriteTest(archives);
         }
 
-        [TestMethod]
+        [Test]
         public void ReadWriteEpub31Test()
         {
-            var archives = Utils.ZipAndCopyEpubs(@"../../Samples/epub31");
+            var archives = Utils.ZipAndCopyEpubs(@"Samples/epub31");
             ReadWriteTest(archives);
         }
 
-        [TestMethod]
+        [Test]
         public void ReadWriteEpubAssortedTest()
         {
-            var archives = Utils.ZipAndCopyEpubs(@"../../Samples/epub-assorted");
+            var archives = Utils.ZipAndCopyEpubs(@"Samples/epub-assorted");
             ReadWriteTest(archives);
         }
 

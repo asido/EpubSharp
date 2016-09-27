@@ -5,8 +5,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using cloudscribe.HtmlAgilityPack;
 using EpubSharp.Format;
-using HtmlAgilityPack;
 
 namespace EpubSharp
 {
@@ -83,7 +83,7 @@ namespace EpubSharp
 
         public static string LoadText(this ZipArchive archive, string entryName)
         {
-            var data = archive.LoadBytes(entryName);
+            var data = archive.LoadBytes(entryName).TrimEncodingPreamble();
             var str = Constants.DefaultEncoding.GetString(data);
             return str;
         }
@@ -103,6 +103,7 @@ namespace EpubSharp
         {
             var html = archive.LoadText(entryName);
             html = html.Trim();
+            var bytes1 = Constants.DefaultEncoding.GetBytes(html);
 
             // Strip everything above doctype, because some navigation HTMLs start with <?xml ... ?> declaration.
             // It's a loop, because some EPUBs have multiple declarations. I.e.:
@@ -131,7 +132,8 @@ namespace EpubSharp
             {
                 doc.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
-                var xml = Constants.DefaultEncoding.GetString(stream.ReadToEnd());
+                var data = stream.ReadToEnd().TrimEncodingPreamble();
+                var xml = Constants.DefaultEncoding.GetString(data);
                 return XDocument.Parse(xml);
             }
         }

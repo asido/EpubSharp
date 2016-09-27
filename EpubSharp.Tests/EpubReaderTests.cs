@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EpubSharp.Format;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace EpubSharp.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class EpubReaderTests
     {
-        [TestMethod]
+        [Test]
         public void ReadBogtyvenFormatTest()
         {
-            var book = EpubReader.Read(@"../../Samples/epub-assorted/Bogtyven.epub");
+            var book = EpubReader.Read(@"Samples/epub-assorted/Bogtyven.epub");
             var format = book.Format;
 
             Assert.IsNotNull(format, nameof(format));

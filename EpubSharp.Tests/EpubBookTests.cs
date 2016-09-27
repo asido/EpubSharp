@@ -2,21 +2,21 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace EpubSharp.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class EpubBookTests
     {
-        [TestMethod]
+        [Test]
         public void EpubAsPlainTextTest1()
         {
-            var book = EpubReader.Read(@"../../Samples/epub-assorted/boothbyg3249432494-8epub.epub");
-            //File.WriteAllText("../../Samples/epub-assorted/boothbyg3249432494-8epub.txt", book.ToPlainText());
+            var book = EpubReader.Read(@"Samples/epub-assorted/boothbyg3249432494-8epub.epub");
+            //File.WriteAllText("Samples/epub-assorted/boothbyg3249432494-8epub.txt", book.ToPlainText());
 
             Func<string, string> normalize = text => text.Replace("\r", "").Replace("\n", "").Replace(" ", "");
-            var expected = File.ReadAllText(@"../../Samples/epub-assorted/boothbyg3249432494-8epub.txt");
+            var expected = File.ReadAllText(@"Samples/epub-assorted/boothbyg3249432494-8epub.txt");
             var actual = book.ToPlainText();
             Assert.AreEqual(normalize(expected), normalize(actual));
 
@@ -40,14 +40,14 @@ namespace EpubSharp.Tests
             Assert.IsNotNull(lines.SingleOrDefault(e => e == "XVII. KAPITEL."));
         }
 
-        [TestMethod]
+        [Test]
         public void EpubAsPlainTextTest2()
         {
-            var book = EpubReader.Read(@"../../Samples/epub-assorted/iOS Hackers Handbook.epub");
-            //File.WriteAllText("../../Samples/epub-assorted/iOS Hackers Handbook.txt", book.ToPlainText());
+            var book = EpubReader.Read(@"Samples/epub-assorted/iOS Hackers Handbook.epub");
+            //File.WriteAllText("Samples/epub-assorted/iOS Hackers Handbook.txt", book.ToPlainText());
 
             Func<string, string> normalize = text => text.Replace("\r", "").Replace("\n", "").Replace(" ", "");
-            var expected = File.ReadAllText(@"../../Samples/epub-assorted/iOS Hackers Handbook.txt");
+            var expected = File.ReadAllText(@"Samples/epub-assorted/iOS Hackers Handbook.txt");
             var actual = book.ToPlainText();
             Assert.AreEqual(normalize(expected), normalize(actual));
             

@@ -1,26 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EpubSharp.Format;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace EpubSharp.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class EpubWriterTests
     {
-        [TestMethod]
+        [Test]
         public void CanWriteTest()
         {
-            var book = EpubReader.Read(@"../../Samples/epub-assorted/Inversions - Iain M. Banks.epub");
+            var book = EpubReader.Read(@"Samples/epub-assorted/Inversions - Iain M. Banks.epub");
             var writer = new EpubWriter(book);
             writer.Write(new MemoryStream());
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateEmptyEpubTest()
         {
             var epub = WriteAndRead(new EpubWriter());
@@ -48,7 +44,7 @@ namespace EpubSharp.Tests
             Assert.IsNull(epub.Format.Nav);
         }
 
-        [TestMethod]
+        [Test]
         public void AddRemoveAuthorTest()
         {
             var writer = new EpubWriter();
@@ -78,7 +74,7 @@ namespace EpubSharp.Tests
             writer.ClearAuthors();
         }
 
-        [TestMethod]
+        [Test]
         public void AddRemoveTitleTest()
         {
             var writer = new EpubWriter();
@@ -98,7 +94,7 @@ namespace EpubSharp.Tests
             writer.RemoveTitle();
         }
 
-        [TestMethod]
+        [Test]
         public void SetCoverTest()
         {
             var writer = new EpubWriter();
@@ -110,10 +106,10 @@ namespace EpubSharp.Tests
             Assert.IsNotNull(epub.CoverImage);
         }
 
-        [TestMethod]
+        [Test]
         public void RemoveCoverTest()
         {
-            var epub1 = EpubReader.Read(@"../../Samples/epub-assorted/Inversions - Iain M. Banks.epub");
+            var epub1 = EpubReader.Read(@"Samples/epub-assorted/Inversions - Iain M. Banks.epub");
 
             var writer = new EpubWriter(EpubWriter.MakeCopy(epub1));
             writer.RemoveCover();
@@ -125,7 +121,7 @@ namespace EpubSharp.Tests
             Assert.AreEqual(epub1.Resources.Images.Count - 1, epub2.Resources.Images.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void RemoveCoverWhenThereIsNoCoverTest()
         {
             var writer = new EpubWriter();
@@ -133,7 +129,7 @@ namespace EpubSharp.Tests
             writer.RemoveCover();
         }
 
-        [TestMethod]
+        [Test]
         public void CanAddChapterTest()
         {
             var writer = new EpubWriter();
@@ -158,7 +154,7 @@ namespace EpubSharp.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ClearChaptersTest()
         {
             var writer = new EpubWriter();
@@ -176,17 +172,17 @@ namespace EpubSharp.Tests
             Assert.AreEqual(0, epub.TableOfContents.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void ClearBogtyvenChaptersTest()
         {
-            var writer = new EpubWriter(EpubReader.Read(@"../../Samples/epub-assorted/bogtyven.epub"));
+            var writer = new EpubWriter(EpubReader.Read(@"Samples/epub-assorted/bogtyven.epub"));
             writer.ClearChapters();
 
             var epub = WriteAndRead(writer);
             Assert.AreEqual(0, epub.TableOfContents.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void AddFileTest()
         {
             var writer = new EpubWriter();

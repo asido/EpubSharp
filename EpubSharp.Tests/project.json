@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": false
+  },
+  "testRunner": "nunit",
+
+  "dependencies": {
+    "dotnet-test-nunit": "3.4.0-beta-2",
+    "EpubSharp": "1.0.0-*",
+    "Microsoft.NETCore.App": {
+        "type": "platform",
+        "version": "1.0.1"
+    },
+    "NUnit": "3.4.1"
+  },
+
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "dnxcore50"
+    }
+  }
+}

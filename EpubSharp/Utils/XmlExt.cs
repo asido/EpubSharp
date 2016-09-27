@@ -13,7 +13,7 @@ namespace EpubSharp
         {
             var xmlReaderSettings = new XmlReaderSettings
             {
-                XmlResolver = null,
+                //XmlResolver = null,
                 DtdProcessing = DtdProcessing.Ignore
             };
             using (var reader = XmlReader.Create(stream, xmlReaderSettings))
