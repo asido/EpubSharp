@@ -98,7 +98,7 @@ namespace EpubSharp.Tests
         public void SetCoverTest()
         {
             var writer = new EpubWriter();
-            writer.SetCover(File.ReadAllBytes("Cover.png"));
+            writer.SetCover(File.ReadAllBytes("Cover.png"), ImageFormat.Png);
 
             var epub = WriteAndRead(writer);
 

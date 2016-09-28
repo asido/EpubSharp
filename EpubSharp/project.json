@@ -3,12 +3,11 @@
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "CoreCompat.System.Drawing": "1.0.0-beta006",
     "System.Xml.XmlDocument": "4.0.1"
   },
 
   "frameworks": {
-    "netstandard1.2": {
+    "netstandard1.3": {
       "imports": "dnxcore50"
     }
   }

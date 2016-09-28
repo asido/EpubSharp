@@ -1,16 +1,18 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 using EpubSharp.Format;
 using EpubSharp.Format.Writers;
 
 namespace EpubSharp
 {
+    public enum ImageFormat
+    {
+        Gif, Png, Jpeg, Svg
+    }
+
     public class EpubWriter
     {
         private readonly string opfPath = "EPUB/package.opf";
@@ -277,27 +279,42 @@ namespace EpubSharp
             }
         }
 
-        public void SetCover(byte[] data)
+        public void SetCover(byte[] data, ImageFormat imageFormat)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
 
             RemoveCover();
 
-            var image = Image.FromStream(new MemoryStream(data));
-            if (image.RawFormat.Equals(ImageFormat.Png))
+            string filename;
+            EpubContentType type;
+
+            switch (imageFormat)
             {
-                using (var stream = new MemoryStream())
-                {
-                    image.Save(stream, ImageFormat.Png);
-                    data = stream.ReadToEnd();
-                }
+                case ImageFormat.Gif:
+                    filename = "cover.gif";
+                    type = EpubContentType.ImageGif;
+                    break;
+                case ImageFormat.Jpeg:
+                    filename = "cover.jpeg";
+                    type = EpubContentType.ImageJpeg;
+                    break;
+                case ImageFormat.Png:
+                    filename = "cover.png";
+                    type = EpubContentType.ImagePng;
+                    break;
+                case ImageFormat.Svg:
+                    filename = "cover.svg";
+                    type = EpubContentType.ImageSvg;
+                    break;
+                default:
+                    throw new ArgumentException($"Unsupported cover format: {format}", nameof(format));
             }
 
             var coverResource = new EpubByteFile
             {
                 Content = data,
-                FileName = "cover.png",
-                ContentType = EpubContentType.ImagePng
+                FileName = filename,
+                ContentType = type
             };
             coverResource.MimeType = ContentType.ContentTypeToMimeType[coverResource.ContentType];
             resources.Images.Add(coverResource);
