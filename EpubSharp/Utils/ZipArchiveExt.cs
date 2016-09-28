@@ -82,7 +82,7 @@ namespace EpubSharp
         public static string LoadText(this ZipArchive archive, string entryName)
         {
             var data = archive.LoadBytes(entryName).TrimEncodingPreamble();
-            var str = Constants.DefaultEncoding.GetString(data);
+            var str = Constants.DefaultEncoding.GetString(data, 0, data.Length);
             return str;
         }
 

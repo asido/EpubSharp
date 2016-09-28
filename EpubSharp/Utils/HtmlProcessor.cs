@@ -6,14 +6,10 @@ namespace EpubSharp
 {
     internal static class HtmlProcessor
     {
-        private static readonly RegexOptions REO_ = RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture;
-        private static readonly RegexOptions REO_c = RegexOptions.Compiled | REO_;
-        private static readonly RegexOptions REO_i = RegexOptions.IgnoreCase | REO_;
-        private static readonly RegexOptions REO_ci = RegexOptions.IgnoreCase | REO_c;
-        private static readonly RegexOptions REO_si = RegexOptions.Singleline | REO_i;
-        private static readonly RegexOptions REO_csi = RegexOptions.Compiled | REO_si;
-        private static readonly RegexOptions REO_mi = RegexOptions.Multiline | REO_i;
-        private static readonly RegexOptions REO_cmi = RegexOptions.Compiled | REO_mi;
+        private static readonly RegexOptions RegexOptions = RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture;
+        private static readonly RegexOptions RegexOptionsIgnoreCase = RegexOptions.IgnoreCase | RegexOptions;
+        private static readonly RegexOptions RegexOptionsIgnoreCaseSingleLine = RegexOptions.Singleline | RegexOptionsIgnoreCase;
+        private static readonly RegexOptions RegexOptionsIgnoreCaseMultiLine = RegexOptions.Multiline | RegexOptionsIgnoreCase;
 
         public static string GetContentAsPlainText(string html)
         {
@@ -21,7 +17,7 @@ namespace EpubSharp
 
             html = html.Trim();
             html = Regex.Replace(html, @"\r\n?|\n", "");
-            var match = Regex.Match(html, @"<body[^>]*>.+</body>", REO_csi);
+            var match = Regex.Match(html, @"<body[^>]*>.+</body>", RegexOptionsIgnoreCaseSingleLine);
             return match.Success ? ClearText(match.Value).Trim(' ', '\r', '\n') : "";
         }
 
@@ -37,19 +33,19 @@ namespace EpubSharp
 
         private static string RemoveHtmlTags(string text)
         {
-            return text == null ? null : Regex.Replace(text, @"</?(\w+|\s*!--)[^>]*>", " ", REO_c);
+            return text == null ? null : Regex.Replace(text, @"</?(\w+|\s*!--)[^>]*>", " ", RegexOptions);
         }
 
         private static string ReplaceBlockTagsWithNewLines(string text)
         {
-            return text == null ? null : Regex.Replace(text, @"(?<!^\s*)<(p|div|h1|h2|h3|h4|h5|h6)[^>]*>", "\n", REO_cmi);
+            return text == null ? null : Regex.Replace(text, @"(?<!^\s*)<(p|div|h1|h2|h3|h4|h5|h6)[^>]*>", "\n", RegexOptionsIgnoreCaseMultiLine);
         }
 
         private static string DecodeHtmlSymbols(string text)
         {
             if (text == null) return null;
-            var regex = new Regex(@"(?<defined>(&nbsp|&quot|&mdash|&ldquo|&rdquo|\&\#8211|\&\#8212|&\#8230|\&\#171|&laquo|&raquo|&amp);?)|(?<other>\&\#\d+;?)", REO_ci);
-            text = Regex.Replace(regex.Replace(text, SpecialSymbolsEvaluator), @"\ {2,}", " ", REO_c);
+            var regex = new Regex(@"(?<defined>(&nbsp|&quot|&mdash|&ldquo|&rdquo|\&\#8211|\&\#8212|&\#8230|\&\#171|&laquo|&raquo|&amp);?)|(?<other>\&\#\d+;?)", RegexOptionsIgnoreCase);
+            text = Regex.Replace(regex.Replace(text, SpecialSymbolsEvaluator), @"\ {2,}", " ", RegexOptions);
             text = WebUtility.HtmlDecode(text);
             return text;
         }

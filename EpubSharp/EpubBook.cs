@@ -106,7 +106,7 @@ namespace EpubSharp
     {
         public string TextContent
         {
-            get { return Constants.DefaultEncoding.GetString(Content); }
+            get { return Constants.DefaultEncoding.GetString(Content, 0, Content.Length); }
             set { Content = Constants.DefaultEncoding.GetBytes(value); }
         }
     }
