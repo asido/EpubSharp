@@ -23,6 +23,11 @@ namespace EpubSharp
             return Read(File.Open(filePath, FileMode.Open, FileAccess.Read), false);
         }
 
+        public static EpubBook Read(byte[] epubData)
+        {
+            return Read(new MemoryStream(epubData), false);
+        }
+
         public static EpubBook Read(Stream stream, bool leaveOpen)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
