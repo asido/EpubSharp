@@ -24,18 +24,28 @@ namespace EpubSharp
                 stream.Write(data, 0, data.Length);
             }
         }
-
+        
         /// <summary>
         /// ZIP's are slash-side sensitive and ZIP's created on Windows and Linux can contain their own variation.
         /// </summary>
-        public static ZipArchiveEntry GetEntryIgnoringSlashDirection(this ZipArchive archive, string entryName)
+        public static ZipArchiveEntry GetEntryImproved(this ZipArchive archive, string entryName)
+        {
+            var entry = TryGetEntryImproved(archive, entryName);
+            if (entry == null)
+            {
+                throw new EpubParseException($"{entryName} file not found in archive.");
+            }
+            return entry;
+        }
+
+        public static ZipArchiveEntry TryGetEntryImproved(this ZipArchive archive, string entryName)
         {
             var entry = archive.GetEntry(entryName);
 
             if (entry == null)
             {
                 var namesToTry = new List<string>();
-                
+
                 // I've seen epubs, where manifest href's are url encoded, but files in archive not.
                 namesToTry.Add(Uri.UnescapeDataString(entryName));
 
@@ -43,7 +53,7 @@ namespace EpubSharp
                 // That could happen if an epub is re-archived manually.
                 foreach (var newName in new[]
                 {
-                    entryName.Replace(@"\", @"/"),
+                    entryName.Replace(@"\", "/"),
                     entryName.Replace("/", @"\")
                 }.Where(newName => newName != entryName))
                 {
@@ -61,17 +71,12 @@ namespace EpubSharp
                 }
             }
 
-            if (entry == null)
-            {
-                throw new EpubParseException($"{entryName} file not found in archive.");
-            }
-
             return entry;
         }
-        
+
         public static byte[] LoadBytes(this ZipArchive archive, string entryName)
         {
-            var entry = archive.GetEntryIgnoringSlashDirection(entryName);
+            var entry = archive.GetEntryImproved(entryName);
             using (var stream = entry.Open())
             {
                 var data = stream.ReadToEnd();
@@ -88,7 +93,7 @@ namespace EpubSharp
 
         public static XDocument LoadXml(this ZipArchive archive, string entryName)
         {
-            var entry = archive.GetEntryIgnoringSlashDirection(entryName);
+            var entry = archive.GetEntryImproved(entryName);
 
             using (var stream = entry.Open())
             {

@@ -168,7 +168,7 @@ namespace EpubSharp
             foreach (var item in book.Format.Opf.Manifest.Items)
             {
                 var path = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFilePath), item.Href);
-                var entry = epubArchive.GetEntryIgnoringSlashDirection(path);
+                var entry = epubArchive.GetEntryImproved(path);
 
                 if (entry == null)
                 {
