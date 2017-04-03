@@ -52,7 +52,6 @@ namespace EpubSharp.Tests
 
             Assert.Equal(expected.Title, actual.Title);
 
-            Assert.Equal(expected.Author, actual.Author);
             AssertPrimitiveCollection(expected.Authors, actual.Authors, nameof(actual.Authors));
 
             Assert.Equal(expected.CoverImage == null, actual.CoverImage == null);

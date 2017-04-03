@@ -16,12 +16,7 @@ namespace EpubSharp
 
         public string Title => Format.Opf.Metadata.Titles.FirstOrDefault();
 
-        public IList<string> Authors => Format.Opf.Metadata.Creators.Select(creator => creator.Text).ToList();
-
-        /// <summary>
-        /// Comma-separated authors.
-        /// </summary>
-        public string Author => Authors.Any() ? string.Join(AuthorsSeparator, Authors) : null;
+        public IEnumerable<string> Authors => Format.Opf.Metadata.Creators.Select(creator => creator.Text);
 
         /// <summary>
         /// All files within the EPUB.

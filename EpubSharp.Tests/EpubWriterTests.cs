@@ -21,8 +21,7 @@ namespace EpubSharp.Tests
             var epub = WriteAndRead(new EpubWriter());
 
             Assert.Null(epub.Title);
-            Assert.Null(epub.Author);
-            Assert.Equal(0, epub.Authors.Count);
+            Assert.Equal(0, epub.Authors.Count());
             Assert.Null(epub.CoverImage);
 
             Assert.Equal(0, epub.Resources.Html.Count);
@@ -50,24 +49,24 @@ namespace EpubSharp.Tests
 
             writer.AddAuthor("Foo Bar");
             var epub = WriteAndRead(writer);
-            Assert.Equal(1, epub.Authors.Count);
+            Assert.Equal(1, epub.Authors.Count());
 
             writer.AddAuthor("Zoo Gar");
             epub = WriteAndRead(writer);
-            Assert.Equal(2, epub.Authors.Count);
+            Assert.Equal(2, epub.Authors.Count());
 
             writer.RemoveAuthor("Foo Bar");
             epub = WriteAndRead(writer);
-            Assert.Equal(1, epub.Authors.Count);
-            Assert.Equal("Zoo Gar", epub.Authors[0]);
+            Assert.Equal(1, epub.Authors.Count());
+            Assert.Equal("Zoo Gar", epub.Authors.First());
 
             writer.RemoveAuthor("Unexisting");
             epub = WriteAndRead(writer);
-            Assert.Equal(1, epub.Authors.Count);
+            Assert.Equal(1, epub.Authors.Count());
 
             writer.ClearAuthors();
             epub = WriteAndRead(writer);
-            Assert.Equal(0, epub.Authors.Count);
+            Assert.Equal(0, epub.Authors.Count());
 
             writer.RemoveAuthor("Unexisting");
             writer.ClearAuthors();
