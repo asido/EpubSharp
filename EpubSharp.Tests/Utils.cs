@@ -12,7 +12,7 @@ namespace EpubSharp.Tests
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
 
-            var destination = Path.Combine("Samples", Path.GetFileName(path));
+            var destination = Path.Combine(Cwd.Combine("Samples"), Path.GetFileName(path));
             if (!Directory.Exists(destination))
             {
                 Directory.CreateDirectory(destination);
@@ -39,7 +39,7 @@ namespace EpubSharp.Tests
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
 
-            var destination = Path.Combine("Samples", Path.GetFileName(path));
+            var destination = Path.Combine(Cwd.Combine("Samples"), Path.GetFileName(path));
             if (!Directory.Exists(destination))
             {
                 Directory.CreateDirectory(destination);
