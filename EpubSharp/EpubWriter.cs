@@ -328,6 +328,14 @@ namespace EpubSharp
             coverItem.Properties.Add(OpfManifest.ManifestItemCoverImageProperty);
             format.Opf.Manifest.Items.Add(coverItem);
         }
+
+        public byte[] Write()
+        {
+            var stream = new MemoryStream();
+            Write(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream.ReadToEnd();
+        }
         
         public void Write(string filename)
         {
