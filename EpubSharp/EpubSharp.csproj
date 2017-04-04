@@ -6,7 +6,11 @@
     <Authors>Arvydas Sidorenko</Authors>
     <PackageTags>epub epubs book books 2.0 3.0 3.1</PackageTags>
     <PackageId>EpubSharp.dll</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.1.4</Version>
+    <Description>A library for reading and writing EPUB files.</Description>
+    <PackageIconUrl>https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/EPUB_silk_icon.svg/2000px-EPUB_silk_icon.svg.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/Asido/EpubSharp/</PackageProjectUrl>
+    <Copyright>Copyright 2017</Copyright>
   </PropertyGroup>
 
 </Project>
