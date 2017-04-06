@@ -192,7 +192,7 @@ namespace EpubSharp
             var fileId = Guid.NewGuid().ToString("N");
             var file = new EpubTextFile
             {
-                FileName = fileId + ".xhtml",
+                FileName = fileId + ".html",
                 TextContent = html,
                 ContentType = EpubContentType.Xhtml11
             };
