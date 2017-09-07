@@ -184,12 +184,12 @@ namespace EpubSharp
             format.Opf.Metadata.Titles.Add(title);
         }
 
-        public EpubChapter AddChapter(string title, string html)
+        public EpubChapter AddChapter(string title, string html, string fileId = null)
         {
             if (string.IsNullOrWhiteSpace(title)) throw new ArgumentNullException(nameof(title));
             if (html == null) throw new ArgumentNullException(nameof(html));
 
-            var fileId = Guid.NewGuid().ToString("N");
+            fileId = fileId ?? Guid.NewGuid().ToString("N");
             var file = new EpubTextFile
             {
                 FileName = fileId + ".html",
@@ -222,6 +222,7 @@ namespace EpubSharp
 
             return new EpubChapter
             {
+                Id = fileId,
                 Title = title,
                 FileName = file.FileName
             };
