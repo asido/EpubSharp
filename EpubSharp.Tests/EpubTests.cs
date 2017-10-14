@@ -217,6 +217,13 @@ namespace EpubSharp.Tests
                         Assert.Equal(a.Text, b.Text);
                     });
 
+                    AssertCollection(expected.Metadata.Identifiers, actual.Metadata.Identifiers, (a, b) =>
+                    {
+                        Assert.Equal(a.Id, b.Id);
+                        Assert.Equal(a.Scheme, b.Scheme);
+                        Assert.Equal(a.Text, b.Text);
+                    });
+
                     AssertPrimitiveCollection(expected.Metadata.Coverages, actual.Metadata.Coverages, "Coverage");
                     AssertPrimitiveCollection(expected.Metadata.Descriptions, actual.Metadata.Descriptions, "Description");
                     AssertPrimitiveCollection(expected.Metadata.Languages, actual.Metadata.Languages, "Language");

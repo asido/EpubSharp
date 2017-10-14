@@ -100,7 +100,7 @@ namespace EpubSharp.Format.Readers
                     Toc = spine?.Attribute(OpfSpine.Attributes.Toc)?.Value
                 }
             };
-            
+
             return package;
         }
 

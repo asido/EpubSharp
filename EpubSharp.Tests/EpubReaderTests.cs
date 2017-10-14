@@ -186,6 +186,11 @@ namespace EpubSharp.Tests
             Assert.Equal(1, format.Opf.Metadata.Titles.Count);
             Assert.Equal("Bogtyven", format.Opf.Metadata.Titles.ElementAt(0));
 
+            Assert.Equal(1, format.Opf.Metadata.Identifiers.Count);
+            Assert.Null(format.Opf.Metadata.Identifiers.ElementAt(0).Scheme);
+            Assert.Equal("ISBN9788711332412", format.Opf.Metadata.Identifiers.ElementAt(0).Id);
+            Assert.Equal("9788711332412", format.Opf.Metadata.Identifiers.ElementAt(0).Text);
+
             Assert.Equal("ncx", format.Opf.Spine.Toc);
             Assert.Equal(108, format.Opf.Spine.ItemRefs.Count);
             Assert.Equal(6, format.Opf.Spine.ItemRefs.Count(e => e.Properties.Contains("page-spread-right")));

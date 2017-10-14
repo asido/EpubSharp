@@ -185,7 +185,7 @@ namespace EpubSharp.Format
         internal static class Attributes
         {
             public static readonly XName Id = "id";
-            public static readonly XName Scheme = "scheme";
+            public static readonly XName Scheme = Constants.OpfNamespace + "scheme";
         }
 
         public string Id { get; internal set; }

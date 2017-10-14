@@ -22,6 +22,8 @@ namespace EpubSharp.Format
         public const string OcfPath = "META-INF/container.xml";
         public const string OcfMediaType = "application/oebps-package+xml";
 
+        public const string DefaultOpfUniqueIdentifier = "uuid_id";
+
         public static readonly Encoding DefaultEncoding = Encoding.UTF8;
     }
 }
