@@ -8,7 +8,7 @@ using EpubSharp.Format;
 
 namespace EpubSharp
 {
-    internal static class ZipArchiveExt
+    public static class ZipArchiveExt
     {
         public static void CreateEntry(this ZipArchive archive, string file, string content)
         {
