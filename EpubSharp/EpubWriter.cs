@@ -23,7 +23,12 @@ namespace EpubSharp
 
         public EpubWriter()
         {
-            var opf = new OpfDocument { EpubVersion = EpubVersion.Epub3 };
+            var opf = new OpfDocument
+            {
+                UniqueIdentifier = Guid.NewGuid().ToString("D"),
+                EpubVersion = EpubVersion.Epub3
+            };
+
             opf.Metadata.Dates.Add(new OpfMetadataDate { Text = DateTimeOffset.UtcNow.ToString("o") });
             opf.Manifest.Items.Add(new OpfManifestItem { Id = "ncx", Href = "toc.ncx", MediaType = ContentType.ContentTypeToMimeType[EpubContentType.DtbookNcx] });
             opf.Spine.Toc = "ncx";

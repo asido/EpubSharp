@@ -12,6 +12,12 @@ namespace EpubSharp.Format.Writers
             root.Add(new XAttribute("xmlns", Constants.OpfNamespace));
             root.Add(new XAttribute(XNamespace.Xmlns + "dc", Constants.OpfMetadataNamespace));
 
+            // This attribute is required, but some books don't have it. So we leave it as it is.
+            if (!string.IsNullOrWhiteSpace(opf.UniqueIdentifier))
+            {
+                root.Add(new XAttribute(OpfDocument.Attributes.UniqueIdentifier, opf.UniqueIdentifier));
+            }
+
             string versionString;
             switch (opf.EpubVersion)
             {

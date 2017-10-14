@@ -185,6 +185,7 @@ namespace EpubSharp.Tests
             Assert.Equal(expected == null, actual == null);
             if (expected != null && actual != null)
             {
+                Assert.Equal(expected.UniqueIdentifier, actual.UniqueIdentifier);
                 Assert.Equal(expected.EpubVersion, actual.EpubVersion);
 
                 Assert.Equal(expected.Metadata == null, actual.Metadata == null);

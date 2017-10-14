@@ -25,6 +25,7 @@ namespace EpubSharp.Tests
             Assert.Equal("OPS/9788711332412.opf", format.Ocf.RootFilePath);
 
             Assert.NotNull(format.Opf);
+            Assert.Equal("ISBN9788711332412", format.Opf.UniqueIdentifier);
             Assert.Equal(EpubVersion.Epub3, format.Opf.EpubVersion);
 
             /*

@@ -47,10 +47,12 @@ namespace EpubSharp.Format
     {
         internal static class Attributes
         {
+            public static readonly XName UniqueIdentifier = "unique-identifier";
             public static readonly XName Version = "version";
         }
-        
-        public EpubVersion EpubVersion { get; internal set; } = new EpubVersion();
+
+        public string UniqueIdentifier { get; internal set; }
+        public EpubVersion EpubVersion { get; internal set; }
         public OpfMetadata Metadata { get; internal set; } = new OpfMetadata();
         public OpfManifest Manifest { get; internal set; } = new OpfManifest();
         public OpfSpine Spine { get; internal set; } = new OpfSpine();
