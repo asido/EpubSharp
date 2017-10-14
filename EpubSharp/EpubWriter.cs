@@ -214,7 +214,7 @@ namespace EpubSharp
             };
             format.Opf.Manifest.Items.Add(manifestItem);
 
-            var spineItem = new OpfSpineItemRef { IdRef = manifestItem.Id };
+            var spineItem = new OpfSpineItemRef { IdRef = manifestItem.Id, Linear = true };
             format.Opf.Spine.ItemRefs.Add(spineItem);
 
             FindNavTocOl()?.Add(new XElement(NavElements.Li, new XElement(NavElements.A, new XAttribute("href", file.FileName), title)));
