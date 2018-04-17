@@ -66,7 +66,7 @@ namespace EpubSharp
             if (ncxPath != null)
             {
                 // Remove NCX file from the resources - Write() will format a new one.
-                resources.Other = resources.Other.Where(e => e.FileName != ncxPath).ToList();
+                resources.Other = resources.Other.Where(e => e.Href != ncxPath).ToList();
 
                 ncxPath = PathExt.Combine(PathExt.GetDirectoryPath(opfPath), ncxPath);
             }
@@ -112,7 +112,8 @@ namespace EpubSharp
 
             var file = new EpubByteFile
             {
-                FileName = filename,
+                AbsolutePath = filename,
+                Href = filename,
                 ContentType = type,
                 Content = content
             };
@@ -199,7 +200,8 @@ namespace EpubSharp
             fileId = fileId ?? Guid.NewGuid().ToString("N");
             var file = new EpubTextFile
             {
-                FileName = fileId + ".html",
+                AbsolutePath = fileId + ".html",
+                Href = fileId + ".html",
                 TextContent = html,
                 ContentType = EpubContentType.Xhtml11
             };
@@ -209,7 +211,7 @@ namespace EpubSharp
             var manifestItem = new OpfManifestItem
             {
                 Id = fileId,
-                Href = file.FileName,
+                Href = file.Href,
                 MediaType = file.MimeType
             };
             format.Opf.Manifest.Items.Add(manifestItem);
@@ -217,13 +219,13 @@ namespace EpubSharp
             var spineItem = new OpfSpineItemRef { IdRef = manifestItem.Id, Linear = true };
             format.Opf.Spine.ItemRefs.Add(spineItem);
 
-            FindNavTocOl()?.Add(new XElement(NavElements.Li, new XElement(NavElements.A, new XAttribute("href", file.FileName), title)));
+            FindNavTocOl()?.Add(new XElement(NavElements.Li, new XElement(NavElements.A, new XAttribute("href", file.Href), title)));
 
             format.Ncx?.NavMap.NavPoints.Add(new NcxNavPoint
             {
                 Id = Guid.NewGuid().ToString("N"),
                 NavLabelText = title,
-                ContentSrc = file.FileName,
+                ContentSrc = file.Href,
                 PlayOrder = format.Ncx.NavMap.NavPoints.Any() ? format.Ncx.NavMap.NavPoints.Max(e => e.PlayOrder) : 1
             });
 
@@ -231,7 +233,7 @@ namespace EpubSharp
             {
                 Id = fileId,
                 Title = title,
-                FileName = file.FileName
+                FileName = file.AbsolutePath
             };
         }
 
@@ -246,7 +248,7 @@ namespace EpubSharp
                 if (otherItems.All(e => new Href(e.Href).Filename != href.Filename))
                 {
                     // The HTML file is not referenced by anything outside spine item, thus can be removed from the archive.
-                    var file = resources.Html.Single(e => e.FileName == href.Filename);
+                    var file = resources.Html.Single(e => e.Href == href.Filename);
                     resources.Html.Remove(file);
                 }
 
@@ -265,7 +267,7 @@ namespace EpubSharp
             {
                 format.Opf.Manifest.Items.Remove(item);
 
-                var image = resources.Images.Single(e => e.FileName == new Href(item.Href).Filename);
+                var image = resources.Images.Single(e => e.Href == new Href(item.Href).Filename);
                 resources.Images.Remove(image);
             }
         }
@@ -280,7 +282,7 @@ namespace EpubSharp
             var path = format.Opf.FindAndRemoveCover();
             if (path == null) return;
 
-            var resource = resources.Images.SingleOrDefault(e => e.FileName == path);
+            var resource = resources.Images.SingleOrDefault(e => e.Href == path);
             if (resource != null)
             {
                 resources.Images.Remove(resource);
@@ -320,9 +322,10 @@ namespace EpubSharp
 
             var coverResource = new EpubByteFile
             {
-                Content = data,
-                FileName = filename,
-                ContentType = type
+                AbsolutePath = filename,
+                Href = filename,
+                ContentType = type,
+                Content = data
             };
             coverResource.MimeType = ContentType.ContentTypeToMimeType[coverResource.ContentType];
             resources.Images.Add(coverResource);
@@ -330,7 +333,7 @@ namespace EpubSharp
             var coverItem = new OpfManifestItem
             {
                 Id = OpfManifest.ManifestItemCoverImageProperty,
-                Href = coverResource.FileName,
+                Href = coverResource.Href,
                 MediaType = coverResource.MimeType
             };
             coverItem.Properties.Add(OpfManifest.ManifestItemCoverImageProperty);
@@ -377,7 +380,7 @@ namespace EpubSharp
                 var relativePath = PathExt.GetDirectoryPath(opfPath);
                 foreach (var file in allFiles)
                 {
-                    var absolutePath = PathExt.Combine(relativePath, file.FileName);
+                    var absolutePath = PathExt.Combine(relativePath, file.Href);
                     archive.CreateEntry(absolutePath, file.Content);
                 }
             }

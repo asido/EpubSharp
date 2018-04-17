@@ -76,7 +76,8 @@ namespace EpubSharp
 
     public abstract class EpubFile
     {
-        public string FileName { get; set; }
+        public string AbsolutePath { get; set; }
+        public string Href { get; set; }
         public EpubContentType ContentType { get; set; }
         public string MimeType { get; set; }
         public byte[] Content { get; set; }
@@ -90,7 +91,8 @@ namespace EpubSharp
             {
                 Content = Content,
                 ContentType = ContentType,
-                FileName = FileName,
+                AbsolutePath = AbsolutePath,
+                Href = Href,
                 MimeType = MimeType
             };
         }

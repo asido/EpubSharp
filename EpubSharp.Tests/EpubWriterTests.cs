@@ -191,16 +191,16 @@ namespace EpubSharp.Tests
             var epub = WriteAndRead(writer);
 
             Assert.Equal(1, epub.Resources.Css.Count);
-            Assert.Equal("style.css", epub.Resources.Css.First().FileName);
+            Assert.Equal("style.css", epub.Resources.Css.First().Href);
             Assert.Equal("body {}", epub.Resources.Css.First().TextContent);
 
             Assert.Equal(1, epub.Resources.Images.Count);
-            Assert.Equal("img.jpeg", epub.Resources.Images.First().FileName);
+            Assert.Equal("img.jpeg", epub.Resources.Images.First().Href);
             Assert.Equal(1, epub.Resources.Images.First().Content.Length);
             Assert.Equal(0x42, epub.Resources.Images.First().Content.First());
 
             Assert.Equal(1, epub.Resources.Fonts.Count);
-            Assert.Equal("font.ttf", epub.Resources.Fonts.First().FileName);
+            Assert.Equal("font.ttf", epub.Resources.Fonts.First().Href);
             Assert.Equal(1, epub.Resources.Fonts.First().Content.Length);
             Assert.Equal(0x24, epub.Resources.Fonts.First().Content.First());
         }

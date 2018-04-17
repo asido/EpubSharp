@@ -82,7 +82,7 @@ namespace EpubSharp
                 return null;
             }
 
-            var coverImageFile = book.Resources.Images.SingleOrDefault(e => e.FileName == coverPath);
+            var coverImageFile = book.Resources.Images.SingleOrDefault(e => e.Href == coverPath);
             return coverImageFile?.Content;
         }
 
@@ -183,7 +183,7 @@ namespace EpubSharp
                     throw new EpubParseException($"file {path} is bigger than 2 Gb.");
                 }
 
-                var fileName = item.Href;
+                var href = item.Href;
                 var mimeType = item.MediaType;
 
                 EpubContentType contentType;
@@ -203,7 +203,8 @@ namespace EpubSharp
                     {
                         var file = new EpubTextFile
                         {
-                            FileName = fileName,
+                            AbsolutePath = path,
+                            Href = href,
                             MimeType = mimeType,
                             ContentType = contentType
                         };
@@ -231,7 +232,8 @@ namespace EpubSharp
                     {
                         var file = new EpubByteFile
                         {
-                            FileName = fileName,
+                            AbsolutePath = path,
+                            Href = href,
                             MimeType = mimeType,
                             ContentType = contentType
                         };
@@ -240,7 +242,7 @@ namespace EpubSharp
                         {
                             if (stream == null)
                             {
-                                throw new EpubException($"Incorrect EPUB file: content file \"{fileName}\" specified in manifest is not found");
+                                throw new EpubException($"Incorrect EPUB file: content file \"{href}\" specified in manifest is not found");
                             }
 
                             using (var memoryStream = new MemoryStream((int) entry.Length))
@@ -280,14 +282,16 @@ namespace EpubSharp
             {
                 Ocf = new EpubTextFile
                 {
-                    FileName = Constants.OcfPath,
+                    AbsolutePath = Constants.OcfPath,
+                    Href = Constants.OcfPath,
                     ContentType = EpubContentType.Xml,
                     MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
                     Content = epubArchive.LoadBytes(Constants.OcfPath)
                 },
                 Opf = new EpubTextFile
                 {
-                    FileName = book.Format.Ocf.RootFilePath,
+                    AbsolutePath = book.Format.Ocf.RootFilePath,
+                    Href = book.Format.Ocf.RootFilePath,
                     ContentType = EpubContentType.Xml,
                     MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
                     Content = epubArchive.LoadBytes(book.Format.Ocf.RootFilePath)
@@ -307,7 +311,7 @@ namespace EpubSharp
                     continue;
                 }
 
-                var html = book.Resources.Html.SingleOrDefault(e => e.FileName == href);
+                var html = book.Resources.Html.SingleOrDefault(e => e.Href == href);
                 if (html != null)
                 {
                     result.HtmlInReadingOrder.Add(html);
