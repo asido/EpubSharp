@@ -146,7 +146,7 @@ namespace EpubSharp.Tests
             {
                 Assert.Equal(chapters[i].Title, epub.TableOfContents[i].Title);
                 Assert.Equal(chapters[i].FileName, epub.TableOfContents[i].FileName);
-                Assert.Equal(chapters[i].Anchor, epub.TableOfContents[i].Anchor);
+                Assert.Equal(chapters[i].HashLocation, epub.TableOfContents[i].HashLocation);
                 Assert.Equal(0, chapters[i].SubChapters.Count);
                 Assert.Equal(0, epub.TableOfContents[i].SubChapters.Count);
             }

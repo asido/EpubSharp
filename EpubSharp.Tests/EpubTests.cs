@@ -155,8 +155,8 @@ namespace EpubSharp.Tests
 
         private void AssertChapter(EpubChapter expected, EpubChapter actual)
         {
-            Assert.Equal(expected.Anchor, actual.Anchor);
             Assert.Equal(expected.FileName, actual.FileName);
+            Assert.Equal(expected.HashLocation, actual.HashLocation);
             Assert.Equal(expected.Title, actual.Title);
 
             Assert.Equal(expected.SubChapters.Count, actual.SubChapters.Count);

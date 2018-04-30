@@ -130,7 +130,7 @@ namespace EpubSharp
                     {
                         var href = new Href(url);
                         chapter.FileName = href.Filename;
-                        chapter.Anchor = href.Anchor;
+                        chapter.HashLocation = href.HashLocation;
                     }
 
                     var titleTextElement = li.Descendants().FirstOrDefault(e => !string.IsNullOrWhiteSpace(e.Value));
@@ -158,7 +158,7 @@ namespace EpubSharp
                 var chapter = new EpubChapter { Title = navigationPoint.NavLabelText };
                 var href = new Href(navigationPoint.ContentSrc);
                 chapter.FileName = href.Filename;
-                chapter.Anchor = href.Anchor;
+                chapter.HashLocation = href.HashLocation;
                 chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavPoints);
                 result.Add(chapter);
             }
