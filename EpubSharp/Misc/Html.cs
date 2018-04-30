@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace EpubSharp
 {
-    internal static class HtmlProcessor
+    internal static class Html
     {
         private static readonly RegexOptions RegexOptions = RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.ExplicitCapture;
         private static readonly RegexOptions RegexOptionsIgnoreCase = RegexOptions.IgnoreCase | RegexOptions;

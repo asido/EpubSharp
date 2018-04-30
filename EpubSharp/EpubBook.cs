@@ -37,7 +37,7 @@ namespace EpubSharp
             var builder = new StringBuilder();
             foreach (var html in SpecialResources.HtmlInReadingOrder)
             {
-                builder.Append(HtmlProcessor.GetContentAsPlainText(html.TextContent));
+                builder.Append(Html.GetContentAsPlainText(html.TextContent));
                 builder.Append('\n');
             }
             return builder.ToString().Trim();
