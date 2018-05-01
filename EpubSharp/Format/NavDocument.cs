@@ -33,8 +33,8 @@ namespace EpubSharp.Format
         internal XElement Dom { get; set; }
 
         public string Title { get; internal set; }
-        public ICollection<NavHeadLink> Links { get; internal set; } = new List<NavHeadLink>();
-        public ICollection<NavMeta> Metas { get; internal set; } = new List<NavMeta>();
+        public IList<NavHeadLink> Links { get; internal set; } = new List<NavHeadLink>();
+        public IList<NavMeta> Metas { get; internal set; } = new List<NavMeta>();
     }
 
     public class NavHeadLink
@@ -78,7 +78,7 @@ namespace EpubSharp.Format
         /// </summary>
         internal XElement Dom { get; set; }
 
-        public ICollection<NavNav> Navs { get; internal set; } = new List<NavNav>();
+        public IList<NavNav> Navs { get; internal set; } = new List<NavNav>();
     }
 
     public class NavNav

@@ -30,7 +30,7 @@ namespace EpubSharp
 
         public byte[] CoverImage { get; internal set; }
 
-        public List<EpubChapter> TableOfContents { get; internal set; }
+        public IList<EpubChapter> TableOfContents { get; internal set; }
 
         public string ToPlainText()
         {
@@ -47,9 +47,10 @@ namespace EpubSharp
     public class EpubChapter
     {
         public string Id { get; set; }
-        public string Title { get; set; }
+        public string AbsolutePath { get; set; }
         public string FileName { get; set; }
         public string HashLocation { get; set; }
+        public string Title { get; set; }
         public IList<EpubChapter> SubChapters { get; set; } = new List<EpubChapter>();
 
         public override string ToString()
@@ -60,18 +61,23 @@ namespace EpubSharp
 
     public class EpubResources
     {
-        public ICollection<EpubTextFile> Html { get; internal set; } = new List<EpubTextFile>();
-        public ICollection<EpubTextFile> Css { get; internal set; } = new List<EpubTextFile>();
-        public ICollection<EpubByteFile> Images { get; internal set; } = new List<EpubByteFile>();
-        public ICollection<EpubByteFile> Fonts { get; internal set; } = new List<EpubByteFile>();
-        public ICollection<EpubFile> Other { get; internal set; } = new List<EpubFile>();
+        public IList<EpubTextFile> Html { get; internal set; } = new List<EpubTextFile>();
+        public IList<EpubTextFile> Css { get; internal set; } = new List<EpubTextFile>();
+        public IList<EpubByteFile> Images { get; internal set; } = new List<EpubByteFile>();
+        public IList<EpubByteFile> Fonts { get; internal set; } = new List<EpubByteFile>();
+        public IList<EpubFile> Other { get; internal set; } = new List<EpubFile>();
+
+        /// <summary>
+        /// This is a concatination of all the resources files in the epub: html, css, images, etc.
+        /// </summary>
+        public IList<EpubFile> All { get; internal set; } = new List<EpubFile>();
     }
 
     public class EpubSpecialResources
     {
         public EpubTextFile Ocf { get; internal set; }
         public EpubTextFile Opf { get; internal set; }
-        public List<EpubTextFile> HtmlInReadingOrder { get; internal set; } = new List<EpubTextFile>();
+        public IList<EpubTextFile> HtmlInReadingOrder { get; internal set; } = new List<EpubTextFile>();
     }
 
     public abstract class EpubFile

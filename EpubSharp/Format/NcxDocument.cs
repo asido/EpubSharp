@@ -27,7 +27,7 @@ namespace EpubSharp.Format
     /// </summary>
     public class NcxDocument
     {
-        public ICollection<NcxMeta> Meta { get; internal set; } = new List<NcxMeta>();
+        public IList<NcxMeta> Meta { get; internal set; } = new List<NcxMeta>();
         public string DocTitle { get; internal set; }
         public string DocAuthor { get; internal set; }
         public NcxNapMap NavMap { get; internal set; } = new NcxNapMap(); // <navMap> is a required element in NCX.
@@ -55,7 +55,7 @@ namespace EpubSharp.Format
         /// Populated only when an EPUB with NCX is read.
         /// </summary>
         public XElement Dom { get; internal set; }
-        public ICollection<NcxNavPoint> NavPoints { get; internal set; } = new List<NcxNavPoint>();
+        public IList<NcxNavPoint> NavPoints { get; internal set; } = new List<NcxNavPoint>();
     }
 
     public class NcxNavPoint
@@ -75,7 +75,7 @@ namespace EpubSharp.Format
         // In case <navLabel> or <content/> need to carry more data, then they should have a dedicated model created.
         public string NavLabelText { get; internal set; }
         public string ContentSrc { get; internal set; }
-        public ICollection<NcxNavPoint> NavPoints { get; internal set; } = new List<NcxNavPoint>();
+        public IList<NcxNavPoint> NavPoints { get; internal set; } = new List<NcxNavPoint>();
 
         public override string ToString()
         {
@@ -95,7 +95,7 @@ namespace EpubSharp.Format
     {
         public NcxNavInfo NavInfo { get; internal set; }
 
-        public ICollection<NcxPageTarget> PageTargets { get; internal set; } = new List<NcxPageTarget>();
+        public IList<NcxPageTarget> PageTargets { get; internal set; } = new List<NcxPageTarget>();
     }
 
     public class NcxNavInfo
@@ -127,7 +127,7 @@ namespace EpubSharp.Format
         public string Id { get; internal set; }
         public string Class { get; internal set; }
         public string Label { get; internal set; }
-        public ICollection<NcxNavTarget> NavTargets { get; internal set; } = new List<NcxNavTarget>();
+        public IList<NcxNavTarget> NavTargets { get; internal set; } = new List<NcxNavTarget>();
     }
 
     public class NcxNavTarget

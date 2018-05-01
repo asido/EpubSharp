@@ -119,22 +119,22 @@ namespace EpubSharp.Format
 
     public class OpfMetadata
     {
-        public ICollection<string> Titles { get; internal set; } = new List<string>();
-        public ICollection<string> Subjects { get; internal set; } = new List<string>();
-        public ICollection<string> Descriptions { get; internal set; } = new List<string>();
-        public ICollection<string> Publishers { get; internal set; } = new List<string>();
-        public ICollection<OpfMetadataCreator> Creators { get; internal set; } = new List<OpfMetadataCreator>();
-        public ICollection<OpfMetadataCreator> Contributors { get; internal set; } = new List<OpfMetadataCreator>();
-        public ICollection<OpfMetadataDate> Dates { get; internal set; } = new List<OpfMetadataDate>();
-        public ICollection<string> Types { get; internal set; } = new List<string>();
-        public ICollection<string> Formats { get; internal set; } = new List<string>();
-        public ICollection<OpfMetadataIdentifier> Identifiers { get; internal set; } = new List<OpfMetadataIdentifier>();
-        public ICollection<string> Sources { get; internal set; } = new List<string>();
-        public ICollection<string> Languages { get; internal set; } = new List<string>();
-        public ICollection<string> Relations { get; internal set; } = new List<string>();
-        public ICollection<string> Coverages { get; internal set; } = new List<string>();
-        public ICollection<string> Rights { get; internal set; } = new List<string>();
-        public ICollection<OpfMetadataMeta> Metas { get; internal set; } = new List<OpfMetadataMeta>();
+        public IList<string> Titles { get; internal set; } = new List<string>();
+        public IList<string> Subjects { get; internal set; } = new List<string>();
+        public IList<string> Descriptions { get; internal set; } = new List<string>();
+        public IList<string> Publishers { get; internal set; } = new List<string>();
+        public IList<OpfMetadataCreator> Creators { get; internal set; } = new List<OpfMetadataCreator>();
+        public IList<OpfMetadataCreator> Contributors { get; internal set; } = new List<OpfMetadataCreator>();
+        public IList<OpfMetadataDate> Dates { get; internal set; } = new List<OpfMetadataDate>();
+        public IList<string> Types { get; internal set; } = new List<string>();
+        public IList<string> Formats { get; internal set; } = new List<string>();
+        public IList<OpfMetadataIdentifier> Identifiers { get; internal set; } = new List<OpfMetadataIdentifier>();
+        public IList<string> Sources { get; internal set; } = new List<string>();
+        public IList<string> Languages { get; internal set; } = new List<string>();
+        public IList<string> Relations { get; internal set; } = new List<string>();
+        public IList<string> Coverages { get; internal set; } = new List<string>();
+        public IList<string> Rights { get; internal set; } = new List<string>();
+        public IList<OpfMetadataMeta> Metas { get; internal set; } = new List<OpfMetadataMeta>();
 
         internal OpfMetadataMeta FindCoverMeta()
         {
@@ -217,7 +217,7 @@ namespace EpubSharp.Format
     {
         internal const string ManifestItemCoverImageProperty = "cover-image";
 
-        public ICollection<OpfManifestItem> Items { get; internal set; } = new List<OpfManifestItem>();
+        public IList<OpfManifestItem> Items { get; internal set; } = new List<OpfManifestItem>();
 
         internal OpfManifestItem FindCoverItem()
         {
@@ -250,7 +250,7 @@ namespace EpubSharp.Format
 
         public string Id { get; internal set; }
         public string Href { get; internal set; }
-        public ICollection<string> Properties { get; internal set; } = new List<string>();
+        public IList<string> Properties { get; internal set; } = new List<string>();
         public string MediaType { get; internal set; }
         public string RequiredNamespace { get; internal set; }
         public string RequiredModules { get; internal set; }
@@ -271,7 +271,7 @@ namespace EpubSharp.Format
         }
 
         public string Toc { get; internal set; }
-        public ICollection<OpfSpineItemRef> ItemRefs { get; internal set; } = new List<OpfSpineItemRef>();
+        public IList<OpfSpineItemRef> ItemRefs { get; internal set; } = new List<OpfSpineItemRef>();
     }
 
     public class OpfSpineItemRef
@@ -287,7 +287,7 @@ namespace EpubSharp.Format
         public string IdRef { get; internal set; }
         public bool Linear { get; internal set; }
         public string Id { get; internal set; }
-        public ICollection<string> Properties { get; internal set; } = new List<string>();
+        public IList<string> Properties { get; internal set; } = new List<string>();
 
         public override string ToString()
         {
@@ -297,7 +297,7 @@ namespace EpubSharp.Format
 
     public class OpfGuide
     {
-        public ICollection<OpfGuideReference> References { get; internal set; } = new List<OpfGuideReference>();
+        public IList<OpfGuideReference> References { get; internal set; } = new List<OpfGuideReference>();
     }
 
     public class OpfGuideReference

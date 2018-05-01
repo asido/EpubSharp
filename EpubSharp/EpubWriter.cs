@@ -68,7 +68,7 @@ namespace EpubSharp
                 // Remove NCX file from the resources - Write() will format a new one.
                 resources.Other = resources.Other.Where(e => e.Href != ncxPath).ToList();
 
-                ncxPath = PathExt.Combine(PathExt.GetDirectoryPath(opfPath), ncxPath);
+                ncxPath = ncxPath.ToAbsolutePath(opfPath);
             }
         }
 

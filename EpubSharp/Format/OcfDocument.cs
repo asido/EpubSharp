@@ -6,7 +6,7 @@ namespace EpubSharp.Format
 {
     public class OcfDocument
     {
-        public ICollection<OcfRootFile> RootFiles { get; internal set; } = new List<OcfRootFile>();
+        public IList<OcfRootFile> RootFiles { get; internal set; } = new List<OcfRootFile>();
 
         private OcfRootFile rootFile;
         public string RootFilePath => rootFile?.FullPath ?? (rootFile = RootFiles.FirstOrDefault(e => e.MediaType == Constants.OcfMediaType))?.FullPath;

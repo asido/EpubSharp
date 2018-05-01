@@ -40,11 +40,23 @@ namespace EpubSharp
 
         public static ZipArchiveEntry TryGetEntryImproved(this ZipArchive archive, string entryName)
         {
+            // The zip specs says all file paths in an archive should be relative.
+            // That is, they should not include a leading '/' character.
+            // Therefore for performance reasons to maximize a match on first attempt
+            // exclude it initially and try with a leading slash in the later attempts.
+            if (entryName.StartsWith("/") || entryName.StartsWith("\\"))
+            {
+                entryName = entryName.Substring(1);
+            }
+
             var entry = archive.GetEntry(entryName);
 
             if (entry == null)
             {
                 var namesToTry = new List<string>();
+
+                namesToTry.Add("/" + entryName);
+                namesToTry.Add("\\" + entryName);
 
                 // I've seen epubs, where manifest href's are url encoded, but files in archive not.
                 namesToTry.Add(Uri.UnescapeDataString(entryName));

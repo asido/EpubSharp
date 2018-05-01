@@ -39,27 +39,29 @@ namespace EpubSharp
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen, encoding))
             {
                 var format = new EpubFormat { Ocf = OcfReader.Read(archive.LoadXml(Constants.OcfPath)) };
-            
-                var rootFilePath = format.Ocf.RootFilePath;
-                if (rootFilePath == null)
+
+                format.Paths.OcfAbsolutePath = Constants.OcfPath;
+
+                format.Paths.OpfAbsolutePath = format.Ocf.RootFilePath;
+                if (format.Paths.OpfAbsolutePath == null)
                 {
                     throw new EpubParseException("Epub OCF doesn't specify a root file.");
                 }
                 
-                format.Opf = OpfReader.Read(archive.LoadXml(rootFilePath));
+                format.Opf = OpfReader.Read(archive.LoadXml(format.Paths.OpfAbsolutePath));
                 
                 var navPath = format.Opf.FindNavPath();
                 if (navPath != null)
                 {
-                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(rootFilePath), navPath);
-                    format.Nav = NavReader.Read(archive.LoadHtml(absolutePath));
+                    format.Paths.NavAbsolutePath = navPath.ToAbsolutePath(format.Paths.OpfAbsolutePath);
+                    format.Nav = NavReader.Read(archive.LoadHtml(format.Paths.NavAbsolutePath));
                 }
                 
                 var ncxPath = format.Opf.FindNcxPath();
                 if (ncxPath != null)
                 {
-                    var absolutePath = PathExt.Combine(PathExt.GetDirectoryPath(rootFilePath), ncxPath);
-                    format.Ncx = NcxReader.Read(archive.LoadXml(absolutePath));
+                    format.Paths.NcxAbsolutePath = ncxPath.ToAbsolutePath(format.Paths.OpfAbsolutePath);
+                    format.Ncx = NcxReader.Read(archive.LoadXml(format.Paths.NcxAbsolutePath));
                 }
                 
                 var book = new EpubBook { Format = format };
@@ -93,7 +95,7 @@ namespace EpubSharp
                 var tocNav = book.Format.Nav.Body.Navs.SingleOrDefault(e => e.Type == NavNav.Attributes.TypeValues.Toc);
                 if (tocNav != null)
                 {
-                    return LoadChaptersFromNav(tocNav.Dom);
+                    return LoadChaptersFromNav(book.Format.Paths.NavAbsolutePath, tocNav.Dom);
                 }
             }
 
@@ -105,7 +107,7 @@ namespace EpubSharp
             return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChaptersFromNav(XElement element)
+        private static List<EpubChapter> LoadChaptersFromNav(string navAbsolutePath, XElement element)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
             var ns = element.Name.Namespace;
@@ -125,12 +127,19 @@ namespace EpubSharp
                 var link = li.Element(ns + NavElements.A);
                 if (link != null)
                 {
+                    var id = link.Attribute("id")?.Value;
+                    if (id != null)
+                    {
+                        chapter.Id = id;
+                    }
+
                     var url = link.Attribute("href")?.Value;
                     if (url != null)
                     {
                         var href = new Href(url);
                         chapter.FileName = href.Filename;
                         chapter.HashLocation = href.HashLocation;
+                        chapter.AbsolutePath = chapter.FileName.ToAbsolutePath(navAbsolutePath);
                     }
 
                     var titleTextElement = li.Descendants().FirstOrDefault(e => !string.IsNullOrWhiteSpace(e.Value));
@@ -141,7 +150,7 @@ namespace EpubSharp
 
                     if (li.Element(ns + NavElements.Ol) != null)
                     {
-                        chapter.SubChapters = LoadChaptersFromNav(li);
+                        chapter.SubChapters = LoadChaptersFromNav(navAbsolutePath, li);
                     }
                     result.Add(chapter);
                 }
@@ -171,7 +180,7 @@ namespace EpubSharp
 
             foreach (var item in book.Format.Opf.Manifest.Items)
             {
-                var path = PathExt.Combine(Path.GetDirectoryName(book.Format.Ocf.RootFilePath), item.Href);
+                var path = item.Href.ToAbsolutePath(book.Format.Paths.OpfAbsolutePath);
                 var entry = epubArchive.GetEntryImproved(path);
 
                 if (entry == null)
@@ -208,7 +217,9 @@ namespace EpubSharp
                             MimeType = mimeType,
                             ContentType = contentType
                         };
-
+                        
+                        resources.All.Add(file);
+                        
                         using (var stream = entry.Open())
                         {
                             file.Content = stream.ReadToEnd();
@@ -237,7 +248,9 @@ namespace EpubSharp
                             MimeType = mimeType,
                             ContentType = contentType
                         };
-
+                        
+                        resources.All.Add(file);
+                        
                         using (var stream = entry.Open())
                         {
                             if (stream == null)
@@ -290,11 +303,11 @@ namespace EpubSharp
                 },
                 Opf = new EpubTextFile
                 {
-                    AbsolutePath = book.Format.Ocf.RootFilePath,
-                    Href = book.Format.Ocf.RootFilePath,
+                    AbsolutePath = book.Format.Paths.OpfAbsolutePath,
+                    Href = book.Format.Paths.OpfAbsolutePath,
                     ContentType = EpubContentType.Xml,
                     MimeType = ContentType.ContentTypeToMimeType[EpubContentType.Xml],
-                    Content = epubArchive.LoadBytes(book.Format.Ocf.RootFilePath)
+                    Content = epubArchive.LoadBytes(book.Format.Paths.OpfAbsolutePath)
                 },
                 HtmlInReadingOrder = new List<EpubTextFile>()
             };
@@ -305,8 +318,7 @@ namespace EpubSharp
 
             foreach (var item in book.Format.Opf.Spine.ItemRefs)
             {
-                string href;
-                if (!htmlFiles.TryGetValue(item.IdRef, out href))
+                if (!htmlFiles.TryGetValue(item.IdRef, out string href))
                 {
                     continue;
                 }
