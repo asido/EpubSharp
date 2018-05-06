@@ -48,10 +48,13 @@ namespace EpubSharp
     {
         public string Id { get; set; }
         public string AbsolutePath { get; set; }
-        public string FileName { get; set; }
+        public string RelativePath { get; set; }
         public string HashLocation { get; set; }
         public string Title { get; set; }
+
         public EpubChapter Parent { get; set; }
+        public EpubChapter Previous { get; set; }
+        public EpubChapter Next { get; set; }
         public IList<EpubChapter> SubChapters { get; set; } = new List<EpubChapter>();
 
         public override string ToString()

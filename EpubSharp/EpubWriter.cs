@@ -233,7 +233,7 @@ namespace EpubSharp
             {
                 Id = fileId,
                 Title = title,
-                FileName = file.AbsolutePath
+                RelativePath = file.AbsolutePath
             };
         }
 
@@ -245,10 +245,10 @@ namespace EpubSharp
             foreach (var item in spineItems)
             {
                 var href = new Href(item.Href);
-                if (otherItems.All(e => new Href(e.Href).Filename != href.Filename))
+                if (otherItems.All(e => new Href(e.Href).Path != href.Path))
                 {
                     // The HTML file is not referenced by anything outside spine item, thus can be removed from the archive.
-                    var file = resources.Html.Single(e => e.Href == href.Filename);
+                    var file = resources.Html.Single(e => e.Href == href.Path);
                     resources.Html.Remove(file);
                 }
 
@@ -267,7 +267,7 @@ namespace EpubSharp
             {
                 format.Opf.Manifest.Items.Remove(item);
 
-                var image = resources.Images.Single(e => e.Href == new Href(item.Href).Filename);
+                var image = resources.Images.Single(e => e.Href == new Href(item.Href).Path);
                 resources.Images.Remove(image);
             }
         }

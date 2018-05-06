@@ -4,7 +4,7 @@ namespace EpubSharp
 {
     internal class Href
     {
-        public readonly string Filename;
+        public readonly string Path;
         public readonly string HashLocation;
 
         public Href(string href)
@@ -14,11 +14,11 @@ namespace EpubSharp
             var contentSourceAnchorCharIndex = href.IndexOf('#');
             if (contentSourceAnchorCharIndex == -1)
             {
-                Filename = href;
+                Path = href;
             }
             else
             {
-                Filename = href.Substring(0, contentSourceAnchorCharIndex);
+                Path = href.Substring(0, contentSourceAnchorCharIndex);
                 HashLocation = href.Substring(contentSourceAnchorCharIndex + 1);
             }
         }

@@ -303,6 +303,7 @@ namespace EpubSharp.Tests
         {
             var book = EpubReader.Read(Cwd.Combine(@"Samples/epub-assorted/iOS Hackers Handbook.epub"));
             book.TableOfContents.Should().HaveCount(14);
+            book.TableOfContents.SelectMany(e => e.SubChapters).Concat(book.TableOfContents).Should().HaveCount(78);
             book.TableOfContents[0].AbsolutePath.Should().Be("/OEBPS/9781118240755cover.xhtml");
             book.TableOfContents[1].AbsolutePath.Should().Be("/OEBPS/9781118240755c01.xhtml");
             book.TableOfContents[1].SubChapters.Should().HaveCount(6);
@@ -319,6 +320,39 @@ namespace EpubSharp.Tests
                 chapter.Parent.Should().BeNull();
                 chapter.SubChapters.All(e => e.Parent == chapter).Should().BeTrue();
             }
+        }
+
+        [Fact]
+        public void SetsChapterPreviousNext()
+        {
+            var book = EpubReader.Read(Cwd.Combine(@"Samples/epub-assorted/iOS Hackers Handbook.epub"));
+
+            EpubChapter previousChapter = null;
+            var currentChapter = book.TableOfContents[0];
+            currentChapter.Previous.Should().Be(previousChapter);
+
+            for (var i = 1; i <= 77; ++i)
+            {
+                previousChapter = currentChapter;
+                currentChapter = currentChapter.Next;
+
+                previousChapter.Next.Should().Be(currentChapter);
+                currentChapter.Previous.Should().Be(previousChapter);
+            }
+
+            EpubChapter nextChapter = null;
+            currentChapter.Next.Should().Be(nextChapter);
+            
+            for (var i = 1; i <= 77; ++i)
+            {
+                nextChapter = currentChapter;
+                currentChapter = currentChapter.Previous;
+
+                currentChapter.Next.Should().Be(nextChapter);
+                nextChapter.Previous.Should().Be(currentChapter);
+            }
+
+            currentChapter.Previous.Should().BeNull();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace EpubSharp
     public static class EpubReader
     {
         public static EpubBook Read(string filePath, Encoding encoding = null)
-	    {
+        {
             if (filePath == null) throw new ArgumentNullException(nameof(filePath));
             if (encoding == null) encoding = Constants.DefaultEncoding;
 
@@ -35,7 +35,7 @@ namespace EpubSharp
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (encoding == null) encoding = Constants.DefaultEncoding;
-            
+
             using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen, encoding))
             {
                 var format = new EpubFormat { Ocf = OcfReader.Read(archive.LoadXml(Constants.OcfPath)) };
@@ -47,23 +47,23 @@ namespace EpubSharp
                 {
                     throw new EpubParseException("Epub OCF doesn't specify a root file.");
                 }
-                
+
                 format.Opf = OpfReader.Read(archive.LoadXml(format.Paths.OpfAbsolutePath));
-                
+
                 var navPath = format.Opf.FindNavPath();
                 if (navPath != null)
                 {
                     format.Paths.NavAbsolutePath = navPath.ToAbsolutePath(format.Paths.OpfAbsolutePath);
                     format.Nav = NavReader.Read(archive.LoadHtml(format.Paths.NavAbsolutePath));
                 }
-                
+
                 var ncxPath = format.Opf.FindNcxPath();
                 if (ncxPath != null)
                 {
                     format.Paths.NcxAbsolutePath = ncxPath.ToAbsolutePath(format.Paths.OpfAbsolutePath);
                     format.Ncx = NcxReader.Read(archive.LoadXml(format.Paths.NcxAbsolutePath));
                 }
-                
+
                 var book = new EpubBook { Format = format };
                 book.Resources = LoadResources(archive, book);
                 book.SpecialResources = LoadSpecialResources(archive, book);
@@ -72,7 +72,7 @@ namespace EpubSharp
                 return book;
             }
         }
-        
+
         private static byte[] LoadCoverImage(EpubBook book)
         {
             if (book == null) throw new ArgumentNullException(nameof(book));
@@ -103,7 +103,7 @@ namespace EpubSharp
             {
                 return LoadChaptersFromNcx(book.Format.Paths.NcxAbsolutePath, book.Format.Ncx.NavMap.NavPoints);
             }
-            
+
             return new List<EpubChapter>();
         }
 
@@ -113,19 +113,22 @@ namespace EpubSharp
             var ns = element.Name.Namespace;
 
             var result = new List<EpubChapter>();
+            var previous = parentChapter;
 
             var ol = element.Element(ns + NavElements.Ol);
             if (ol == null)
-            {
                 return result;
-            }
 
             foreach (var li in ol.Elements(ns + NavElements.Li))
             {
                 var chapter = new EpubChapter
                 {
-                    Parent = parentChapter
+                    Parent = parentChapter,
+                    Previous = previous
                 };
+
+                if (previous != null)
+                    previous.Next = chapter;
 
                 var link = li.Element(ns + NavElements.A);
                 if (link != null)
@@ -140,9 +143,9 @@ namespace EpubSharp
                     if (url != null)
                     {
                         var href = new Href(url);
-                        chapter.FileName = href.Filename;
+                        chapter.RelativePath = href.Path;
                         chapter.HashLocation = href.HashLocation;
-                        chapter.AbsolutePath = chapter.FileName.ToAbsolutePath(navAbsolutePath);
+                        chapter.AbsolutePath = chapter.RelativePath.ToAbsolutePath(navAbsolutePath);
                     }
 
                     var titleTextElement = li.Descendants().FirstOrDefault(e => !string.IsNullOrWhiteSpace(e.Value));
@@ -156,6 +159,8 @@ namespace EpubSharp
                         chapter.SubChapters = LoadChaptersFromNav(navAbsolutePath, li, chapter);
                     }
                     result.Add(chapter);
+
+                    previous = chapter.SubChapters.Any() ? chapter.SubChapters.Last() : chapter;
                 }
             }
 
@@ -165,15 +170,28 @@ namespace EpubSharp
         private static List<EpubChapter> LoadChaptersFromNcx(string ncxAbsolutePath, IEnumerable<NcxNavPoint> navigationPoints, EpubChapter parentChapter = null)
         {
             var result = new List<EpubChapter>();
+            var previous = parentChapter;
+
             foreach (var navigationPoint in navigationPoints)
             {
-                var chapter = new EpubChapter { Title = navigationPoint.NavLabelText, Parent = parentChapter };
+                var chapter = new EpubChapter
+                {
+                    Title = navigationPoint.NavLabelText,
+                    Parent = parentChapter,
+                    Previous = previous
+                };
+
+                if (previous != null)
+                    previous.Next = chapter;
+
                 var href = new Href(navigationPoint.ContentSrc);
-                chapter.FileName = href.Filename;
-                chapter.AbsolutePath = href.Filename.ToAbsolutePath(ncxAbsolutePath);
+                chapter.RelativePath = href.Path;
+                chapter.AbsolutePath = href.Path.ToAbsolutePath(ncxAbsolutePath);
                 chapter.HashLocation = href.HashLocation;
                 chapter.SubChapters = LoadChaptersFromNcx(ncxAbsolutePath, navigationPoint.NavPoints, chapter);
                 result.Add(chapter);
+
+                previous = chapter.SubChapters.Any() ? chapter.SubChapters.Last() : chapter;
             }
             return result;
         }
@@ -213,80 +231,80 @@ namespace EpubSharp
                     case EpubContentType.Xml:
                     case EpubContentType.Dtbook:
                     case EpubContentType.DtbookNcx:
-                    {
-                        var file = new EpubTextFile
                         {
-                            AbsolutePath = path,
-                            Href = href,
-                            MimeType = mimeType,
-                            ContentType = contentType
-                        };
-                        
-                        resources.All.Add(file);
-                        
-                        using (var stream = entry.Open())
-                        {
-                            file.Content = stream.ReadToEnd();
-                        }
+                            var file = new EpubTextFile
+                            {
+                                AbsolutePath = path,
+                                Href = href,
+                                MimeType = mimeType,
+                                ContentType = contentType
+                            };
 
-                        switch (contentType)
-                        {
-                            case EpubContentType.Xhtml11:
-                                resources.Html.Add(file);
-                                break;
-                            case EpubContentType.Css:
-                                resources.Css.Add(file);
-                                break;
-                            default:
-                                resources.Other.Add(file);
-                                break;
+                            resources.All.Add(file);
+
+                            using (var stream = entry.Open())
+                            {
+                                file.Content = stream.ReadToEnd();
                             }
-                        break;
-                    }
+
+                            switch (contentType)
+                            {
+                                case EpubContentType.Xhtml11:
+                                    resources.Html.Add(file);
+                                    break;
+                                case EpubContentType.Css:
+                                    resources.Css.Add(file);
+                                    break;
+                                default:
+                                    resources.Other.Add(file);
+                                    break;
+                            }
+                            break;
+                        }
                     default:
-                    {
-                        var file = new EpubByteFile
                         {
-                            AbsolutePath = path,
-                            Href = href,
-                            MimeType = mimeType,
-                            ContentType = contentType
-                        };
-                        
-                        resources.All.Add(file);
-                        
-                        using (var stream = entry.Open())
-                        {
-                            if (stream == null)
+                            var file = new EpubByteFile
                             {
-                                throw new EpubException($"Incorrect EPUB file: content file \"{href}\" specified in manifest is not found");
+                                AbsolutePath = path,
+                                Href = href,
+                                MimeType = mimeType,
+                                ContentType = contentType
+                            };
+
+                            resources.All.Add(file);
+
+                            using (var stream = entry.Open())
+                            {
+                                if (stream == null)
+                                {
+                                    throw new EpubException($"Incorrect EPUB file: content file \"{href}\" specified in manifest is not found");
+                                }
+
+                                using (var memoryStream = new MemoryStream((int)entry.Length))
+                                {
+                                    stream.CopyTo(memoryStream);
+                                    file.Content = memoryStream.ToArray();
+                                }
                             }
 
-                            using (var memoryStream = new MemoryStream((int) entry.Length))
+                            switch (contentType)
                             {
-                                stream.CopyTo(memoryStream);
-                                file.Content = memoryStream.ToArray();
+                                case EpubContentType.ImageGif:
+                                case EpubContentType.ImageJpeg:
+                                case EpubContentType.ImagePng:
+                                case EpubContentType.ImageSvg:
+                                    resources.Images.Add(file);
+                                    break;
+                                case EpubContentType.FontTruetype:
+                                case EpubContentType.FontOpentype:
+                                    resources.Fonts.Add(file);
+                                    break;
+                                default:
+                                    resources.Other.Add(file);
+                                    break;
                             }
+                            break;
                         }
-
-                        switch (contentType)
-                        {
-                            case EpubContentType.ImageGif:
-                            case EpubContentType.ImageJpeg:
-                            case EpubContentType.ImagePng:
-                            case EpubContentType.ImageSvg:
-                                resources.Images.Add(file);
-                                break;
-                            case EpubContentType.FontTruetype:
-                            case EpubContentType.FontOpentype:
-                                resources.Fonts.Add(file);
-                                break;
-                            default:
-                                resources.Other.Add(file);
-                                break;
-                        }
-                        break;
-                    }
                 }
             }
 
