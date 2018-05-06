@@ -308,5 +308,17 @@ namespace EpubSharp.Tests
             book.TableOfContents[1].SubChapters.Should().HaveCount(6);
             book.TableOfContents[1].SubChapters[0].AbsolutePath.Should().Be("/OEBPS/9781118240755c01.xhtml");
         }
+
+        [Fact]
+        public void SetsChapterParents()
+        {
+            var book = EpubReader.Read(Cwd.Combine(@"Samples/epub-assorted/iOS Hackers Handbook.epub"));
+
+            foreach (var chapter in book.TableOfContents)
+            {
+                chapter.Parent.Should().BeNull();
+                chapter.SubChapters.All(e => e.Parent == chapter).Should().BeTrue();
+            }
+        }
     }
 }

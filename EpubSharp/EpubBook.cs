@@ -51,6 +51,7 @@ namespace EpubSharp
         public string FileName { get; set; }
         public string HashLocation { get; set; }
         public string Title { get; set; }
+        public EpubChapter Parent { get; set; }
         public IList<EpubChapter> SubChapters { get; set; } = new List<EpubChapter>();
 
         public override string ToString()

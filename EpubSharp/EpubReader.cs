@@ -107,7 +107,7 @@ namespace EpubSharp
             return new List<EpubChapter>();
         }
 
-        private static List<EpubChapter> LoadChaptersFromNav(string navAbsolutePath, XElement element)
+        private static List<EpubChapter> LoadChaptersFromNav(string navAbsolutePath, XElement element, EpubChapter parentChapter = null)
         {
             if (element == null) throw new ArgumentNullException(nameof(element));
             var ns = element.Name.Namespace;
@@ -122,7 +122,10 @@ namespace EpubSharp
 
             foreach (var li in ol.Elements(ns + NavElements.Li))
             {
-                var chapter = new EpubChapter();
+                var chapter = new EpubChapter
+                {
+                    Parent = parentChapter
+                };
 
                 var link = li.Element(ns + NavElements.A);
                 if (link != null)
@@ -150,7 +153,7 @@ namespace EpubSharp
 
                     if (li.Element(ns + NavElements.Ol) != null)
                     {
-                        chapter.SubChapters = LoadChaptersFromNav(navAbsolutePath, li);
+                        chapter.SubChapters = LoadChaptersFromNav(navAbsolutePath, li, chapter);
                     }
                     result.Add(chapter);
                 }
@@ -159,17 +162,17 @@ namespace EpubSharp
             return result;
         }
 
-        private static List<EpubChapter> LoadChaptersFromNcx(string ncxAbsolutePath, IEnumerable<NcxNavPoint> navigationPoints)
+        private static List<EpubChapter> LoadChaptersFromNcx(string ncxAbsolutePath, IEnumerable<NcxNavPoint> navigationPoints, EpubChapter parentChapter = null)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
             {
-                var chapter = new EpubChapter { Title = navigationPoint.NavLabelText };
+                var chapter = new EpubChapter { Title = navigationPoint.NavLabelText, Parent = parentChapter };
                 var href = new Href(navigationPoint.ContentSrc);
                 chapter.FileName = href.Filename;
                 chapter.AbsolutePath = href.Filename.ToAbsolutePath(ncxAbsolutePath);
                 chapter.HashLocation = href.HashLocation;
-                chapter.SubChapters = LoadChaptersFromNcx(ncxAbsolutePath, navigationPoint.NavPoints);
+                chapter.SubChapters = LoadChaptersFromNcx(ncxAbsolutePath, navigationPoint.NavPoints, chapter);
                 result.Add(chapter);
             }
             return result;
