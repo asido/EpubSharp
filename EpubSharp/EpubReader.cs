@@ -22,7 +22,7 @@ namespace EpubSharp
                 throw new FileNotFoundException("Specified epub file not found.", filePath);
             }
 
-            return Read(File.Open(filePath, FileMode.Open, FileAccess.Read), false, encoding);
+            return Read(File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read), false, encoding);
         }
 
         public static EpubBook Read(byte[] epubData, Encoding encoding = null)
