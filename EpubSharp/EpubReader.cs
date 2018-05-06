@@ -101,7 +101,7 @@ namespace EpubSharp
 
             if (book.Format.Ncx != null)
             {
-                return LoadChaptersFromNcx(book.Format.Ncx.NavMap.NavPoints);
+                return LoadChaptersFromNcx(book.Format.Paths.NcxAbsolutePath, book.Format.Ncx.NavMap.NavPoints);
             }
             
             return new List<EpubChapter>();
@@ -159,7 +159,7 @@ namespace EpubSharp
             return result;
         }
 
-        private static List<EpubChapter> LoadChaptersFromNcx(IEnumerable<NcxNavPoint> navigationPoints)
+        private static List<EpubChapter> LoadChaptersFromNcx(string ncxAbsolutePath, IEnumerable<NcxNavPoint> navigationPoints)
         {
             var result = new List<EpubChapter>();
             foreach (var navigationPoint in navigationPoints)
@@ -167,8 +167,9 @@ namespace EpubSharp
                 var chapter = new EpubChapter { Title = navigationPoint.NavLabelText };
                 var href = new Href(navigationPoint.ContentSrc);
                 chapter.FileName = href.Filename;
+                chapter.AbsolutePath = href.Filename.ToAbsolutePath(ncxAbsolutePath);
                 chapter.HashLocation = href.HashLocation;
-                chapter.SubChapters = LoadChaptersFromNcx(navigationPoint.NavPoints);
+                chapter.SubChapters = LoadChaptersFromNcx(ncxAbsolutePath, navigationPoint.NavPoints);
                 result.Add(chapter);
             }
             return result;

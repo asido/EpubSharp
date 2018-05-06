@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EpubSharp.Format;
+using FluentAssertions;
 using Xunit;
 
 namespace EpubSharp.Tests
@@ -295,6 +296,17 @@ namespace EpubSharp.Tests
             Assert.Equal("hide", format.Nav.Body.Navs.ElementAt(2).Class);
             Assert.Null(format.Nav.Body.Navs.ElementAt(2).Id);
             Assert.Null(format.Nav.Body.Navs.ElementAt(2).Hidden);
+        }
+
+        [Fact]
+        public void ReadIOSHackersHandbookTest()
+        {
+            var book = EpubReader.Read(Cwd.Combine(@"Samples/epub-assorted/iOS Hackers Handbook.epub"));
+            book.TableOfContents.Should().HaveCount(14);
+            book.TableOfContents[0].AbsolutePath.Should().Be("/OEBPS/9781118240755cover.xhtml");
+            book.TableOfContents[1].AbsolutePath.Should().Be("/OEBPS/9781118240755c01.xhtml");
+            book.TableOfContents[1].SubChapters.Should().HaveCount(6);
+            book.TableOfContents[1].SubChapters[0].AbsolutePath.Should().Be("/OEBPS/9781118240755c01.xhtml");
         }
     }
 }
