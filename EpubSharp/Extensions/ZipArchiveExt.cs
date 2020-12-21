@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using EpubSharp.Format;
 
@@ -109,7 +110,7 @@ namespace EpubSharp
 
             using (var stream = entry.Open())
             {
-                var xml = XDocument.Load(stream);
+                var xml = LoadXDocumentWithoutDtd(stream);
                 return xml;
             }
         }
@@ -117,7 +118,30 @@ namespace EpubSharp
         public static XDocument LoadHtml(this ZipArchive archive, string entryName)
         {
             var html = archive.LoadText(entryName);
-            return XDocument.Parse(html);
+            return LoadXDocumentWithoutDtd(html);
+        }
+        
+        /// <summary>
+        /// Loads the given xml into an XDocument without loading external DTD definitions (which seems to not work in some cases).
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        private static XDocument LoadXDocumentWithoutDtd(string xml)
+        {
+            using (var stream = new MemoryStream(Constants.DefaultEncoding.GetBytes(xml)))
+                return LoadXDocumentWithoutDtd(stream);
+        }
+
+        /// <summary>
+        /// Loads the given stream into a XDocument without loading external DTD definitions (which seems to not work in some cases).
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        private static XDocument LoadXDocumentWithoutDtd(Stream stream)
+        {
+            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
+            using (var reader = XmlReader.Create(stream, settings))
+                return XDocument.Load(reader);
         }
     }
 }
