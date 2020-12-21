@@ -73,7 +73,7 @@ namespace EpubSharp.Format.Writers
                     {
                         pageTargetElement.Add(new XAttribute(NcxPageTarget.Attributes.Type, pageTarget.Type.Value));
                     }
-                    if (pageTarget.Value.HasValue)
+                    if (!string.IsNullOrWhiteSpace(pageTarget.Value))
                     {
                         pageTargetElement.Add(new XAttribute(NcxPageTarget.Attributes.Value, pageTarget.Value));
                     }
