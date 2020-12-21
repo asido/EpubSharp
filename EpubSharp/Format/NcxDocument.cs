@@ -115,7 +115,7 @@ namespace EpubSharp.Format
         }
 
         public string Id { get; internal set; }
-        public int? Value { get; internal set; }
+        public string Value { get; internal set; }
         public string Class { get; internal set; }
         public NcxPageTargetType? Type { get; internal set; }
         public string NavLabelText { get; internal set; }
