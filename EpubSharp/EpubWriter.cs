@@ -338,6 +338,10 @@ namespace EpubSharp
             };
             coverItem.Properties.Add(OpfManifest.ManifestItemCoverImageProperty);
             format.Opf.Manifest.Items.Add(coverItem);
+            format.Opf.Metadata.Metas.Add(new OpfMetadataMeta() { 
+                Name= "cover",                
+                Content = "cover-image"
+            });
         }
 
         public byte[] Write()
